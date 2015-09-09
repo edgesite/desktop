@@ -1,7 +1,6 @@
 # Desktop
 
-Java desktop functions. Have you tried to find user default Download folder using java? If so, you would find this
-library very helpful.
+Java && Go desktop functions. Have you tried to find user default Download folder using java? If so, you would find this library very helpful.
 
 ## Example Desktop Folders
     
