@@ -35,8 +35,11 @@ import (
 )
 
 func main() {
-  fmt.Println(desktop.GetHomeFolder())
-  fmt.Println(desktop.GetDownloadsFolder())
+  fmt.Println("Home:", desktop.GetHomeFolder())
+  fmt.Println("Documents:" desktop.GetDocumentsFolder())
+  fmt.Println("AppFolder:" desktop.GetAppDataFolder())
+  fmt.Println("Desktop:" desktop.GetDesktopFolder())
+  fmt.Println("Downloads:" desktop.GetDownloadsFolder())
 }
 
 ```
