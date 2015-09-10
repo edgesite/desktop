@@ -6,7 +6,9 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 public class SimpleTrayTest extends JFrame {
     private static final long serialVersionUID = -8634052159132145737L;
@@ -36,7 +38,7 @@ public class SimpleTrayTest extends JFrame {
         menuItem1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                System.out.println("test1");
+                System.out.println("test disabled");
             }
         });
         menuItem1.setEnabled(false);
@@ -46,7 +48,13 @@ public class SimpleTrayTest extends JFrame {
         menuItem2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                System.out.println("test2");
+                System.out.println("test icon");
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        JOptionPane.showMessageDialog(null, "test icon");
+                    }
+                });
             }
         });
         menu.add(menuItem2);
@@ -55,7 +63,7 @@ public class SimpleTrayTest extends JFrame {
         menuItem3.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                System.out.println("test3");
+                System.out.println("test checkbox");
                 sys.update();
             }
         });
@@ -64,7 +72,13 @@ public class SimpleTrayTest extends JFrame {
         menuItem4.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                System.out.println("test4");
+                System.out.println("test normal");
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        JOptionPane.showMessageDialog(null, "test normal");
+                    }
+                });
             }
         });
         menu.add(menuItem4);
