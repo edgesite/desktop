@@ -97,6 +97,7 @@ public class WindowsSysTray extends DesktopSysTray {
     public static final int TPM_RIGHTBUTTON = 0x0002;
 
     public static final int SM_CYMENUCHECK = 72;
+    public static final int SM_CYMENU = 15;
 
     static final int SPACE_ICONS = 2;
 
