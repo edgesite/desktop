@@ -29,6 +29,7 @@ public class DesktopTest {
 Go:
 
 ```go
+package main
 
 import (
   "github.com/axet/desktop/go"
