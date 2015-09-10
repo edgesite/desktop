@@ -44,7 +44,7 @@ public abstract class DesktopSysTray {
     /**
      * OSX does not show title on icons.
      * 
-     * @param title
+     * @param title - set main icon text
      */
     public abstract void setTitle(String title);
 

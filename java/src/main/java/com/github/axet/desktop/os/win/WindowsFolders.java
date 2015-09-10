@@ -40,11 +40,6 @@ public class WindowsFolders implements DesktopFolders {
     // http://stackoverflow.com/questions/7672774/how-do-i-determine-the-windows-download-folder-path
     //
 
-    /**
-     * 
-     * 
-     * @return
-     */
     public File getDownloadsVista() {
         GUID guid = new GUID("374DE290-123F-4565-9164-39C4925E467B");
 

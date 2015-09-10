@@ -13,19 +13,7 @@ public interface CoreFoundation extends Library {
     // https://developer.apple.com/library/mac/#documentation/CoreFOundation/Reference/CFBundleRef/Reference/reference.html#//apple_ref/c/func/CFBundleGetMainBundle
     //
 
-    /**
-     * CFBundleRef CFBundleGetMainBundle ( void );
-     * 
-     * @return
-     */
     public Pointer CFBundleGetMainBundle();
 
-    /**
-     * CFStringRef CFBundleGetIdentifier ( CFBundleRef bundle );
-     * 
-     * @param bundle
-     * @return
-     */
     public NSString CFBundleGetIdentifier(Pointer bundle);
-
 }
