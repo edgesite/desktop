@@ -18,7 +18,7 @@ public class NSStatusItem extends NSObject {
     }
 
     public NSStatusItem(Pointer p) {
-        super(Pointer.nativeValue(p));
+        this(Pointer.nativeValue(p));
     }
 
     public void setHighlightMode(boolean b) {

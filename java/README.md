@@ -1,3 +1,37 @@
+# Desktop
+
+Java desktop functions. Have you tried to find user default Download folder using java? If so, you would find this
+library very helpful.
+
+## Example Desktop Folders
+
+```java    
+package com.github.axet.desktop;
+
+public class DesktopTest {
+    public static void main(String[] args) {
+        DesktopFolders d = Desktop.getDesktopFolders();
+
+        // Home folder: /Users/user
+        System.out.println("Home: " + d.getHome());
+        // Documents folder /Users/user/Documents
+        System.out.println("Documents: " + d.getDocuments());
+        // Config folder /Users/axet/Library/Application Support
+        System.out.println("AppFolder: " + d.getAppData());
+        // Desktop folder /Users/axet/Desktop
+        System.out.println("Desktop: " + d.getDesktop());
+        // Downloads folder /Users/axet/Downloads
+        System.out.println("Downloads: " + d.getDownloads());
+    }
+}
+```
+
+## Example Sys Tray Icon
+(aka Notification Area Icons or Status Bar icons)
+
+Supports: JMenu (submenu), JCheckBoxMenuItem, JMenuItem, JPopupMenu.Separator, setImage() and setEnabled() on JMenuItem.
+
+```java
 package com.github.axet.desktop;
 
 import java.awt.event.ActionEvent;
@@ -98,3 +132,16 @@ public class SimpleTrayTest extends JFrame {
         new SimpleTrayTest();
     }
 }
+```
+
+## Central Maven Repo
+
+```xml
+<dependencies>
+	<dependency>
+	  <groupId>com.github.axet</groupId>
+	  <artifactId>desktop</artifactId>
+	  <version>2.2.3</version>
+	</dependency>
+</dependencies>
+```

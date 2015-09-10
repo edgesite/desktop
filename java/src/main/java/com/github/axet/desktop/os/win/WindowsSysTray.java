@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -96,6 +97,7 @@ public class WindowsSysTray extends DesktopSysTray {
     public static final int TPM_RIGHTBUTTON = 0x0002;
 
     public static final int SM_CYMENUCHECK = 72;
+    public static final int SM_CYMENU = 15;
 
     static final int SPACE_ICONS = 2;
 
@@ -189,8 +191,8 @@ public class WindowsSysTray extends DesktopSysTray {
 
             wc = new WndClassExWrap(hInstance, WndProc, WindowsSysTray.class.getSimpleName());
 
-            HWND hwnd = User32Ex.INSTANCE.CreateWindowEx(0, wc.getName(), wc.getName(), User32Ex.WS_OVERLAPPEDWINDOW,
-                    0, 0, 0, 0, null, null, hInstance, null);
+            HWND hwnd = User32Ex.INSTANCE.CreateWindowEx(0, wc.getName(), wc.getName(), User32Ex.WS_OVERLAPPEDWINDOW, 0,
+                    0, 0, 0, null, null, hInstance, null);
 
             if (hwnd == null)
                 throw new GetLastErrorException();
@@ -313,9 +315,9 @@ public class WindowsSysTray extends DesktopSysTray {
 
         try {
             BufferedImage checked = ImageIO.read(WindowsSysTray.class.getResourceAsStream("checked.png"));
-            hbitmapChecked = new HBitmapWrap(checked);
+            hbitmapChecked = getMenuImage(new ImageIcon(checked));
             BufferedImage unchecked = ImageIO.read(WindowsSysTray.class.getResourceAsStream("unchecked.png"));
-            hbitmapUnchecked = new HBitmapWrap(unchecked);
+            hbitmapUnchecked = getMenuImage(new ImageIcon(unchecked));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -404,19 +406,19 @@ public class WindowsSysTray extends DesktopSysTray {
         x += (getSystemMenuImageSize() + SPACE_ICONS) * 2;
 
         GDI32.INSTANCE.SelectObject(hDC, getSystemMenuFont());
-        GDI32Ex.INSTANCE.ExtTextOut(hDC, x, y, GDI32Ex.ETO_OPAQUE, rcItem, mm.item.getText(), mm.item.getText()
-                .length(), null);
+        GDI32Ex.INSTANCE.ExtTextOut(hDC, x, y, GDI32Ex.ETO_OPAQUE, rcItem, mm.item.getText(),
+                mm.item.getText().length(), null);
 
         x = rcItem.left;
 
         if (mm.item instanceof JCheckBoxMenuItem) {
             JCheckBoxMenuItem cc = (JCheckBoxMenuItem) mm.item;
             if (cc.getState()) {
-                drawHBITMAP(hbitmapChecked, x, y, hbitmapChecked.getImage().getWidth(), hbitmapChecked.getImage()
-                        .getHeight(), hDC);
+                drawHBITMAP(hbitmapChecked, x, y, hbitmapChecked.getImage().getWidth(),
+                        hbitmapChecked.getImage().getHeight(), hDC);
             } else {
-                drawHBITMAP(hbitmapUnchecked, x, y, hbitmapUnchecked.getImage().getWidth(), hbitmapUnchecked.getImage()
-                        .getHeight(), hDC);
+                drawHBITMAP(hbitmapUnchecked, x, y, hbitmapUnchecked.getImage().getWidth(),
+                        hbitmapUnchecked.getImage().getHeight(), hDC);
             }
         }
 

@@ -3,7 +3,7 @@ package com.github.axet.desktop.os.mac.cocoa;
 import com.github.axet.desktop.os.mac.foundation.Runtime;
 import com.sun.jna.Pointer;
 
-// http://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSData_Class/Reference/Reference.html#//apple_ref/doc/c_ref/NSData
+// https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSObject_Class
 
 public class NSObject extends Pointer {
 
@@ -18,22 +18,20 @@ public class NSObject extends Pointer {
         retain();
     }
 
-    public NSObject(Pointer p) {
-        super(Pointer.nativeValue(p));
-
-        retain();
-    }
-
     public NSObject(long l) {
         super(l);
 
         retain();
     }
 
-    protected void finalize() throws Throwable {
-        super.finalize();
+    public NSObject(Pointer p) {
+        this(Pointer.nativeValue(p));
+    }
 
+    protected void finalize() throws Throwable {
         release();
+
+        super.finalize();
     }
 
     public void retain() {

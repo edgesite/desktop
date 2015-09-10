@@ -23,7 +23,7 @@ public class NSAppleEventManager extends NSObject {
     }
 
     public NSAppleEventManager(Pointer p) {
-        super(Pointer.nativeValue(p));
+        this(Pointer.nativeValue(p));
     }
 
     public void setEventHandlerAndSelectorForEventClassAndEventID(Pointer target, Pointer selector, long eventClass,

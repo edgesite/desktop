@@ -14,7 +14,7 @@ public class NSApplicationDelegate extends NSObject {
     }
 
     public NSApplicationDelegate(Pointer p) {
-        super(Pointer.nativeValue(p));
+        this(Pointer.nativeValue(p));
     }
 
 }

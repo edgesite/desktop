@@ -14,10 +14,13 @@ import javax.swing.JPopupMenu;
 
 import com.github.axet.desktop.DesktopSysTray;
 import com.github.axet.desktop.Utils;
+import com.github.axet.desktop.os.mac.cocoa.NSCell;
 import com.github.axet.desktop.os.mac.cocoa.NSFont;
+import com.github.axet.desktop.os.mac.cocoa.NSFontDescriptor;
 import com.github.axet.desktop.os.mac.cocoa.NSImage;
 import com.github.axet.desktop.os.mac.cocoa.NSMenu;
 import com.github.axet.desktop.os.mac.cocoa.NSMenuItem;
+import com.github.axet.desktop.os.mac.cocoa.NSNumber;
 import com.github.axet.desktop.os.mac.cocoa.NSStatusBar;
 import com.github.axet.desktop.os.mac.cocoa.NSStatusItem;
 import com.github.axet.desktop.os.mac.cocoa.NSString;
@@ -31,12 +34,19 @@ public class OSXSysTray extends DesktopSysTray {
 
     NSStatusItem statusItem;
 
+    public OSXSysTray() {
+        // init menubar font, to get proper sizes
+        NSStatusBar.systemStatusBar();
+        // init menu font, to get proper sizes
+        new NSMenu();
+    }
+
     @Override
     public void setIcon(Icon icon) {
         this.icon = Utils.createBitmap(icon);
 
         NSFont f = NSFont.menuBarFontOfSize(0);
-        int menubarHeigh = (int) f.pointSize();
+        int menubarHeigh = new NSNumber(f.fontDescriptor().objectForKey(NSFontDescriptor.NSFontSizeAttribute)).intValue();
 
         BufferedImage scaledImage = new BufferedImage(menubarHeigh, menubarHeigh, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = scaledImage.createGraphics();
@@ -51,7 +61,7 @@ public class OSXSysTray extends DesktopSysTray {
         BufferedImage img = Utils.createBitmap(icon);
 
         NSFont f = NSFont.menuFontOfSize(0);
-        int menubarHeigh = (int) f.pointSize();
+        int menubarHeigh = new NSNumber(f.fontDescriptor().objectForKey(NSFontDescriptor.NSFontSizeAttribute)).intValue();
 
         BufferedImage scaledImage = new BufferedImage(menubarHeigh, menubarHeigh, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = scaledImage.createGraphics();
@@ -112,7 +122,7 @@ public class OSXSysTray extends DesktopSysTray {
                 item.setTitle(new NSString(ch.getText()));
                 item.setImage(bm);
                 item.setEnabled(ch.isEnabled());
-                item.setState(ch.getState() ? 1 : 0);
+                item.setState(ch.getState() ? NSCell.NSCellStateValue.NSOnState : NSCell.NSCellStateValue.NSOffState);
                 item.setTarget(action);
                 item.setAction(OSXSysTrayAction.action);
                 m.addItem(item);

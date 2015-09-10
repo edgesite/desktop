@@ -19,12 +19,12 @@ public class NSWindow extends NSObject {
         super(Runtime.INSTANCE.objc_msgSend(klass, alloc));
     }
 
-    public NSWindow(Pointer p) {
-        super(Pointer.nativeValue(p));
-    }
-
     public NSWindow(long l) {
         super(l);
+    }
+
+    public NSWindow(Pointer p) {
+        this(Pointer.nativeValue(p));
     }
 
     public static NSWindow initWithContentRectStyleMaskBackingDefer(NSRect.ByValue contentRect, int windowStyle,
