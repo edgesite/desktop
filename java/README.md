@@ -29,6 +29,8 @@ public class DesktopTest {
 ## Example Sys Tray Icon
 (aka Notification Area Icons or Status Bar icons)
 
+Supports: JMenu (submenu), JCheckBoxMenuItem, JMenuItem, JPopupMenu.Separator
+
 ```java
 package com.github.axet.desktop;
 
