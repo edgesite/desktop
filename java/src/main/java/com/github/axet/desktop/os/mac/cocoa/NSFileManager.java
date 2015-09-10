@@ -64,9 +64,11 @@ public class NSFileManager extends NSObject {
      * directory, NSSearchPathDomainMask domainMask, BOOL expandTilde );
      * 
      * @param directory
+     *            NSSearchPathDirectory
      * @param domainMask
-     * @param expandTilde
-     * @return
+     *            NSSearchPathDomainMask
+     * 
+     * @return NSArray of directories
      */
     public NSArray URLsForDirectoryInDomains(int directory, int domainMask) {
         return new NSArray(Runtime.INSTANCE.objc_msgSend(this, URLsForDirectoryInDomains, directory, domainMask));

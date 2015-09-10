@@ -7,15 +7,6 @@ import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ff729175(v=vs.85).aspx
-/**
- * typedef struct tagNONCLIENTMETRICS { UINT cbSize; int iBorderWidth; int
- * iScrollWidth; int iScrollHeight; int iCaptionWidth; int iCaptionHeight;
- * LOGFONT lfCaptionFont; int iSmCaptionWidth; int iSmCaptionHeight; LOGFONT
- * lfSmCaptionFont; int iMenuWidth; int iMenuHeight; LOGFONT lfMenuFont; LOGFONT
- * lfStatusFont; LOGFONT lfMessageFont; #if (WINVER >= 0x0600) int
- * iPaddedBorderWidth; #endif } NONCLIENTMETRICS, *PNONCLIENTMETRICS,
- * *LPNONCLIENTMETRICS;
- */
 public class NONCLIENTMETRICS extends Structure {
 
     public static final int ODT_MENU = 1;
@@ -39,14 +30,13 @@ public class NONCLIENTMETRICS extends Structure {
 
         read();
     }
-    
+
     @Override
     protected List<?> getFieldOrder() {
-        return Arrays.asList(new String[] { "cbSize","iBorderWidth","iScrollWidth","iScrollHeight","iCaptionWidth","iCaptionHeight",
-                "lfCaptionFont","iSmCaptionWidth","iSmCaptionHeight","lfSmCaptionFont","iMenuWidth","iMenuHeight","lfMenuFont","lfStatusFont","lfMessageFont",
-                "iPaddedBorderWidth"});
+        return Arrays.asList(new String[] { "cbSize", "iBorderWidth", "iScrollWidth", "iScrollHeight", "iCaptionWidth",
+                "iCaptionHeight", "lfCaptionFont", "iSmCaptionWidth", "iSmCaptionHeight", "lfSmCaptionFont",
+                "iMenuWidth", "iMenuHeight", "lfMenuFont", "lfStatusFont", "lfMessageFont", "iPaddedBorderWidth" });
     }
-
 
     public int cbSize;
     public int iBorderWidth;
