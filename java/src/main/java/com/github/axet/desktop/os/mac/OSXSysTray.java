@@ -14,6 +14,7 @@ import javax.swing.JPopupMenu;
 
 import com.github.axet.desktop.DesktopSysTray;
 import com.github.axet.desktop.Utils;
+import com.github.axet.desktop.os.mac.cocoa.NSCell;
 import com.github.axet.desktop.os.mac.cocoa.NSFont;
 import com.github.axet.desktop.os.mac.cocoa.NSFontDescriptor;
 import com.github.axet.desktop.os.mac.cocoa.NSImage;
@@ -34,8 +35,10 @@ public class OSXSysTray extends DesktopSysTray {
     NSStatusItem statusItem;
 
     public OSXSysTray() {
-        // init menu sizes
+        // init menubar font, to get proper sizes
         NSStatusBar.systemStatusBar();
+        // init menu font, to get proper sizes
+        new NSMenu();
     }
 
     @Override
@@ -119,7 +122,7 @@ public class OSXSysTray extends DesktopSysTray {
                 item.setTitle(new NSString(ch.getText()));
                 item.setImage(bm);
                 item.setEnabled(ch.isEnabled());
-                item.setState(ch.getState() ? 1 : 0);
+                item.setState(ch.getState() ? NSCell.NSCellStateValue.NSOnState : NSCell.NSCellStateValue.NSOffState);
                 item.setTarget(action);
                 item.setAction(OSXSysTrayAction.action);
                 m.addItem(item);

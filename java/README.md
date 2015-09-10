@@ -29,7 +29,7 @@ public class DesktopTest {
 ## Example Sys Tray Icon
 (aka Notification Area Icons or Status Bar icons)
 
-Supports: JMenu (submenu), JCheckBoxMenuItem, JMenuItem, JPopupMenu.Separator
+Supports: JMenu (submenu), JCheckBoxMenuItem, JMenuItem, JPopupMenu.Separator, setImage() and setEnabled() on JMenuItem.
 
 ```java
 package com.github.axet.desktop;
@@ -37,6 +37,7 @@ package com.github.axet.desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -65,15 +66,17 @@ public class SimpleTrayTest extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         menu = new JPopupMenu();
-        JMenuItem menuItem1 = new JMenuItem("test1");
+        JMenuItem menuItem1 = new JMenuItem("test disabled");
         menuItem1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 System.out.println("test1");
             }
         });
+        menuItem1.setEnabled(false);
         menu.add(menuItem1);
-        JMenuItem menuItem2 = new JMenuItem("test2");
+        JMenuItem menuItem2 = new JMenuItem("test icon");
+        menuItem2.setIcon(Utils.loadIcon("icon.png"));
         menuItem2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -82,15 +85,16 @@ public class SimpleTrayTest extends JFrame {
         });
         menu.add(menuItem2);
         menu.addSeparator();
-        JMenuItem menuItem3 = new JMenuItem("test3");
+        final JCheckBoxMenuItem menuItem3 = new JCheckBoxMenuItem("test checkbox");
         menuItem3.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 System.out.println("test3");
+                sys.update();
             }
         });
         menu.add(menuItem3);
-        JMenuItem menuItem4 = new JMenuItem("test4");
+        JMenuItem menuItem4 = new JMenuItem("test normal");
         menuItem4.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
