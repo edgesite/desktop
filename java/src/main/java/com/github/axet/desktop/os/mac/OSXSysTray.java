@@ -15,9 +15,11 @@ import javax.swing.JPopupMenu;
 import com.github.axet.desktop.DesktopSysTray;
 import com.github.axet.desktop.Utils;
 import com.github.axet.desktop.os.mac.cocoa.NSFont;
+import com.github.axet.desktop.os.mac.cocoa.NSFontDescriptor;
 import com.github.axet.desktop.os.mac.cocoa.NSImage;
 import com.github.axet.desktop.os.mac.cocoa.NSMenu;
 import com.github.axet.desktop.os.mac.cocoa.NSMenuItem;
+import com.github.axet.desktop.os.mac.cocoa.NSNumber;
 import com.github.axet.desktop.os.mac.cocoa.NSStatusBar;
 import com.github.axet.desktop.os.mac.cocoa.NSStatusItem;
 import com.github.axet.desktop.os.mac.cocoa.NSString;
@@ -31,12 +33,17 @@ public class OSXSysTray extends DesktopSysTray {
 
     NSStatusItem statusItem;
 
+    public OSXSysTray() {
+        // init menu sizes
+        NSStatusBar.systemStatusBar();
+    }
+
     @Override
     public void setIcon(Icon icon) {
         this.icon = Utils.createBitmap(icon);
 
         NSFont f = NSFont.menuBarFontOfSize(0);
-        int menubarHeigh = (int) f.pointSize();
+        int menubarHeigh = new NSNumber(f.fontDescriptor().objectForKey(NSFontDescriptor.NSFontSizeAttribute)).intValue();
 
         BufferedImage scaledImage = new BufferedImage(menubarHeigh, menubarHeigh, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = scaledImage.createGraphics();
@@ -51,7 +58,7 @@ public class OSXSysTray extends DesktopSysTray {
         BufferedImage img = Utils.createBitmap(icon);
 
         NSFont f = NSFont.menuFontOfSize(0);
-        int menubarHeigh = (int) f.pointSize();
+        int menubarHeigh = new NSNumber(f.fontDescriptor().objectForKey(NSFontDescriptor.NSFontSizeAttribute)).intValue();
 
         BufferedImage scaledImage = new BufferedImage(menubarHeigh, menubarHeigh, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = scaledImage.createGraphics();

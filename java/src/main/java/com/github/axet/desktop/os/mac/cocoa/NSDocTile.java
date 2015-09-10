@@ -10,12 +10,12 @@ public class NSDocTile extends NSObject {
     static Pointer klass = Runtime.INSTANCE.objc_lookUpClass("NSDocTile");
     static Pointer setBadgeLabel = Runtime.INSTANCE.sel_getUid("setBadgeLabel:");
 
-    public NSDocTile(Pointer p) {
-        super(Pointer.nativeValue(p));
-    }
-
     public NSDocTile(long l) {
         super(l);
+    }
+
+    public NSDocTile(Pointer p) {
+        this(Pointer.nativeValue(p));
     }
 
     public void setBadgeLabel(NSString label) {

@@ -1,5 +1,7 @@
 package desktop
 
-type DesktopFolders struct {
-  
+type DesktopSysTray struct {
+}
+
+type DesktopSysTrayListener interface {
 }

@@ -22,7 +22,7 @@ public class NSMenu extends NSObject {
     }
 
     public NSMenu(Pointer p) {
-        super(Pointer.nativeValue(p));
+        this(Pointer.nativeValue(p));
     }
 
     public void addItem(NSMenuItem i) {

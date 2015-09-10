@@ -26,12 +26,12 @@ public class NSMenuItem extends NSObject {
         super(Runtime.INSTANCE.class_createInstance(klass, 0));
     }
 
-    public NSMenuItem(Pointer p) {
-        super(Pointer.nativeValue(p));
-    }
-
     public NSMenuItem(long l) {
         super(l);
+    }
+
+    public NSMenuItem(Pointer p) {
+        this(Pointer.nativeValue(p));
     }
 
     public static NSMenuItem separatorItem() {

@@ -34,7 +34,7 @@ public class NSApplication extends NSObject {
     }
 
     public NSApplication(Pointer p) {
-        super(Pointer.nativeValue(p));
+        this(Pointer.nativeValue(p));
     }
 
     public boolean isRunning() {

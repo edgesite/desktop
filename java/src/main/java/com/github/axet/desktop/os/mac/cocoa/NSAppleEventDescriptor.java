@@ -17,7 +17,7 @@ public class NSAppleEventDescriptor extends NSObject {
     }
 
     public NSAppleEventDescriptor(Pointer p) {
-        super(Pointer.nativeValue(p));
+        this(Pointer.nativeValue(p));
     }
 
     public long numberOfItems() {

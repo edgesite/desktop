@@ -14,16 +14,16 @@ public class NSString extends NSObject {
     static Pointer stringWithUTF8String = Runtime.INSTANCE.sel_getUid("stringWithUTF8String:");
     static Pointer UTF8String = Runtime.INSTANCE.sel_getUid("UTF8String");
 
-    public NSString(String str) {
-        super(Runtime.INSTANCE.objc_msgSend(klass, stringWithUTF8String, StringUtils.getBytesUtf8(str + "\0")));
-    }
-
     public NSString(long l) {
         super(l);
     }
 
+    public NSString(String str) {
+        this(Runtime.INSTANCE.objc_msgSend(klass, stringWithUTF8String, StringUtils.getBytesUtf8(str + "\0")));
+    }
+
     public NSString(Pointer p) {
-        super(Pointer.nativeValue(p));
+        this(Pointer.nativeValue(p));
     }
 
     public String toString() {

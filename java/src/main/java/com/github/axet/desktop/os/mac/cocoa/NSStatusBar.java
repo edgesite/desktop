@@ -3,7 +3,7 @@ package com.github.axet.desktop.os.mac.cocoa;
 import com.github.axet.desktop.os.mac.foundation.Runtime;
 import com.sun.jna.Pointer;
 
-// http://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSData_Class/Reference/Reference.html#//apple_ref/doc/c_ref/NSData
+// https://developer.apple.com/library/mac/documentation/Cocoa/Reference/ApplicationKit/Classes/NSStatusBar_Class
 
 public class NSStatusBar extends NSObject {
 
@@ -14,6 +14,7 @@ public class NSStatusBar extends NSObject {
     static Pointer systemStatusBar = Runtime.INSTANCE.sel_getUid("systemStatusBar");
     static Pointer statusItemWithLength = Runtime.INSTANCE.sel_getUid("statusItemWithLength:");
     static Pointer removeStatusItem = Runtime.INSTANCE.sel_getUid("removeStatusItem:");
+    static Pointer thickness = Runtime.INSTANCE.sel_getUid("thickness");
 
     public static NSStatusBar systemStatusBar() {
         return new NSStatusBar(Runtime.INSTANCE.objc_msgSend(klass, systemStatusBar));
@@ -24,7 +25,7 @@ public class NSStatusBar extends NSObject {
     }
 
     public NSStatusBar(Pointer p) {
-        super(Pointer.nativeValue(p));
+        this(Pointer.nativeValue(p));
     }
 
     public NSStatusItem statusItemWithLength(double i) {
@@ -35,4 +36,7 @@ public class NSStatusBar extends NSObject {
         Runtime.INSTANCE.objc_msgSend(this, removeStatusItem, i);
     }
 
+    public CGFloat thickness() {
+        return new CGFloat(Runtime.INSTANCE.objc_msgSend(this, thickness));
+    }
 }

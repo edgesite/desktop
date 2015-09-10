@@ -16,7 +16,7 @@ public class NSArray extends NSObject {
     }
 
     public NSArray(Pointer p) {
-        super(Pointer.nativeValue(p));
+        this(Pointer.nativeValue(p));
     }
 
     public long count() {
