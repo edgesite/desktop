@@ -3,7 +3,7 @@ package com.github.axet.desktop.os.mac.cocoa;
 import com.github.axet.desktop.os.mac.foundation.Runtime;
 import com.sun.jna.Pointer;
 
-// http://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSData_Class/Reference/Reference.html#//apple_ref/doc/c_ref/NSData
+// https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSObject_Class/index.html#//apple_ref/occ/cl/NSObject
 
 public class NSObject extends Pointer {
 
