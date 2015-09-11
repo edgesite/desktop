@@ -1,16 +1,9 @@
-package com.github.axet.desktop.windows;
+package com.github.axet.desktop;
 
-import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
-import java.awt.SystemTray;
-import java.awt.Toolkit;
-import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -27,11 +20,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import net.sf.image4j.codec.ico.ICODecoder;
-
 import com.github.axet.desktop.Desktop;
 import com.github.axet.desktop.DesktopSysTray;
-import com.github.axet.desktop.os.win.WindowsSysTray;
+
+import net.sf.image4j.codec.ico.ICODecoder;
 
 public class SysTrayTest extends JFrame {
     private static final long serialVersionUID = -7388906080696230194L;
@@ -142,11 +134,13 @@ public class SysTrayTest extends JFrame {
             }
         });
         menu.add(menuItem2);
-        JMenuItem menuItem3 = new JMenuItem("test3", warn);
+        JCheckBoxMenuItem menuItem3 = new JCheckBoxMenuItem("test3", warn);
+        menuItem3.setState(true);
         menuItem3.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 System.out.println("test3");
+                sys.update();
             }
         });
         menu.add(menuItem3);
@@ -178,6 +172,8 @@ public class SysTrayTest extends JFrame {
         sys.show();
 
         this.setSize(new Dimension(400, 400));
+        this.setLocationRelativeTo(null);
+        
         GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0, 0 };
         gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };

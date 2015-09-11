@@ -2,7 +2,13 @@ package com.github.axet.desktop;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -28,10 +34,32 @@ public class SimpleTrayTest extends JFrame {
         }
     };
 
+    public static Icon loadIcon(String path) {
+        try {
+            InputStream is = Utils.class.getResourceAsStream(path);
+            if (is == null) {
+                throw new RuntimeException("resource file not found " + path);
+            }
+            BufferedImage bi = ImageIO.read(is);
+            if (bi == null) {
+                throw new RuntimeException("wrong format " + path);
+            }
+            return new ImageIcon(bi);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public SimpleTrayTest() {
         super("MainFrame");
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        Icon icon = loadIcon("icon.png");
+        Icon icon2 = loadIcon("icon.png");
+        Icon icon3 = loadIcon("icon.png");
+        Icon icon4 = loadIcon("icon.png");
+        Icon icon5 = loadIcon("icon.png");
 
         menu = new JPopupMenu();
         JMenuItem menuItem1 = new JMenuItem("test disabled");
@@ -44,7 +72,7 @@ public class SimpleTrayTest extends JFrame {
         menuItem1.setEnabled(false);
         menu.add(menuItem1);
         JMenuItem menuItem2 = new JMenuItem("test icon");
-        menuItem2.setIcon(Utils.loadIcon("icon.png"));
+        menuItem2.setIcon(icon);
         menuItem2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -84,7 +112,7 @@ public class SimpleTrayTest extends JFrame {
         menu.add(menuItem4);
 
         sys.addListener(ml);
-        sys.setIcon(Utils.loadIcon("icon.png"));
+        sys.setIcon(icon);
         sys.setTitle("Java tool2");
         sys.setMenu(menu);
         sys.show();

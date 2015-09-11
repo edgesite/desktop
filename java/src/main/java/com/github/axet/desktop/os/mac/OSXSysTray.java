@@ -35,9 +35,9 @@ public class OSXSysTray extends DesktopSysTray {
     NSStatusItem statusItem;
 
     public OSXSysTray() {
-        // init menubar font, to get proper sizes
+        // init menubar font, to get proper font sizes
         NSStatusBar.systemStatusBar();
-        // init menu font, to get proper sizes
+        // init menu font, to get proper font sizes
         new NSMenu();
     }
 
@@ -46,7 +46,8 @@ public class OSXSysTray extends DesktopSysTray {
         this.icon = Utils.createBitmap(icon);
 
         NSFont f = NSFont.menuBarFontOfSize(0);
-        int menubarHeigh = new NSNumber(f.fontDescriptor().objectForKey(NSFontDescriptor.NSFontSizeAttribute)).intValue();
+        int menubarHeigh = new NSNumber(f.fontDescriptor().objectForKey(NSFontDescriptor.NSFontSizeAttribute))
+                .intValue();
 
         BufferedImage scaledImage = new BufferedImage(menubarHeigh, menubarHeigh, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = scaledImage.createGraphics();
@@ -61,7 +62,8 @@ public class OSXSysTray extends DesktopSysTray {
         BufferedImage img = Utils.createBitmap(icon);
 
         NSFont f = NSFont.menuFontOfSize(0);
-        int menubarHeigh = new NSNumber(f.fontDescriptor().objectForKey(NSFontDescriptor.NSFontSizeAttribute)).intValue();
+        int menubarHeigh = new NSNumber(f.fontDescriptor().objectForKey(NSFontDescriptor.NSFontSizeAttribute))
+                .intValue();
 
         BufferedImage scaledImage = new BufferedImage(menubarHeigh, menubarHeigh, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = scaledImage.createGraphics();

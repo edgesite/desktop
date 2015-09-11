@@ -9,9 +9,8 @@ import javax.swing.JPopupMenu;
 public abstract class DesktopSysTray {
 
     /**
-     * OSX does not have clicks on icon. Just ignore this functionality
-     * 
-     * @author axet
+     * OSX does not have clicks on icon. Just ignore this functionality at
+     * whole.
      * 
      */
     public interface Listener {
@@ -26,7 +25,7 @@ public abstract class DesktopSysTray {
         // 2) if you call showContextMenu from another java thread, HMENU bugged
         // and you can't use it.
         //
-        // 3) Mac OSX does not support show context menu programmatically
+        // 3) Mac OSX does not support showing context menu programmatically
     }
 
     protected Set<Listener> listeners = new HashSet<Listener>();
@@ -44,7 +43,8 @@ public abstract class DesktopSysTray {
     /**
      * OSX does not show title on icons.
      * 
-     * @param title - set main icon text
+     * @param title
+     *            set main icon text
      */
     public abstract void setTitle(String title);
 
