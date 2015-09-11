@@ -12,6 +12,7 @@ public class NSStatusItem extends NSObject {
     static Pointer setImage = Runtime.INSTANCE.sel_getUid("setImage:");
     static Pointer setTitle = Runtime.INSTANCE.sel_getUid("setTitle:");
     static Pointer setMenu = Runtime.INSTANCE.sel_getUid("setMenu:");
+    static Pointer setToolTip = Runtime.INSTANCE.sel_getUid("setToolTip:");
 
     public NSStatusItem(long l) {
         super(l);
@@ -35,5 +36,9 @@ public class NSStatusItem extends NSObject {
 
     public void setMenu(NSMenu t) {
         Runtime.INSTANCE.objc_msgSend(this, setMenu, t);
+    }
+
+    public void setToolTip(String t) {
+        Runtime.INSTANCE.objc_msgSend(this, setToolTip, new NSString(t));
     }
 }
