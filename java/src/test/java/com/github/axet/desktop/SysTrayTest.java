@@ -51,11 +51,11 @@ public class SysTrayTest extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         try {
-            InputStream is = SysTrayTest.class.getResourceAsStream("bug.ico");
+            InputStream is = getClass().getResourceAsStream("bug.ico");
             List<BufferedImage> bmp = ICODecoder.read(is);
             warn = new ImageIcon(bmp.get(0));
 
-            is = SysTrayTest.class.getResourceAsStream("dov.ico");
+            is = getClass().getResourceAsStream("dov.ico");
             bmp = ICODecoder.read(is);
             stop = new ImageIcon(bmp.get(0));
         } catch (RuntimeException e) {
@@ -173,7 +173,7 @@ public class SysTrayTest extends JFrame {
 
         this.setSize(new Dimension(400, 400));
         this.setLocationRelativeTo(null);
-        
+
         GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[] { 0, 0, 0, 0, 0 };
         gridBagLayout.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
