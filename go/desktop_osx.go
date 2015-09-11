@@ -1,16 +1,14 @@
-// +build !windows
+// +build darwin
 
 package desktop
 
 import (
   "os"
-  
-  "./osx/cocoa"
 )
 
 // user application data folder
 func GetAppDataFolder() string {
-  return path(cocoa.NSApplicationSupportDirectory, cocoa.NSUserDomainMask);
+  return path(NSApplicationSupportDirectory, NSUserDomainMask);
 }
 
 // user home "/home/user"
@@ -20,21 +18,21 @@ func GetHomeFolder() string {
 
 // user my documents "~/Documents"
 func GetDocumentsFolder() string {
-  return path(cocoa.NSDocumentDirectory, cocoa.NSUserDomainMask);
+  return path(NSDocumentDirectory, NSUserDomainMask);
 }
 
 // user downloads "~/Downloads"
 func GetDownloadsFolder() string {
-  return path(cocoa.NSDownloadsDirectory, cocoa.NSUserDomainMask)
+  return path(NSDownloadsDirectory, NSUserDomainMask)
 }
 
 // user desktop "~/Desktop"
 func GetDesktopFolder() string {
-  return path(cocoa.NSDesktopDirectory, cocoa.NSUserDomainMask);
+  return path(NSDesktopDirectory, NSUserDomainMask);
 }
 
 func path(d int , dd int) string {
-  f := cocoa.NSFileManagerNew()
+  f := NSFileManagerNew()
   defer f.Release()
 
   a := f.URLsForDirectoryInDomains(d, dd)
@@ -44,7 +42,7 @@ func path(d int , dd int) string {
     return ""
   }
 
-  var u cocoa.NSURL = cocoa.NSURLPointer(a.ObjectAtIndex(0))
+  var u NSURL = NSURLPointer(a.ObjectAtIndex(0))
   defer u.Release()
 
   return u.Path()

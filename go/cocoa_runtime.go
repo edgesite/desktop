@@ -1,4 +1,6 @@
-package objc
+// +build darwin
+
+package desktop
 
 /*
 #cgo LDFLAGS: -lobjc -framework AppKit

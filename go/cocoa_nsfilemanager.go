@@ -1,16 +1,16 @@
-package cocoa
+// +build darwin
+
+package desktop
 
 import (
   "unsafe"
-
-  "../objc"
 )
 
 // https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSFileManager_Class/
 
-var NSFileManagerClass unsafe.Pointer = objc.Runtime_objc_lookUpClass("NSFileManager")
-var NSFileManagerDefaultManager unsafe.Pointer = objc.Runtime_sel_getUid("defaultManager")
-var NSFileManagerURLsForDirectoryInDomains unsafe.Pointer = objc.Runtime_sel_getUid("URLsForDirectory:inDomains:")
+var NSFileManagerClass unsafe.Pointer = Runtime_objc_lookUpClass("NSFileManager")
+var NSFileManagerDefaultManager unsafe.Pointer = Runtime_sel_getUid("defaultManager")
+var NSFileManagerURLsForDirectoryInDomains unsafe.Pointer = Runtime_sel_getUid("URLsForDirectory:inDomains:")
 
 // http://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Miscellaneous/Foundation_Constants/Reference/reference.html#//apple_ref/doc/c_ref/NSSearchPathDirectory
 
@@ -63,7 +63,7 @@ type NSFileManager struct {
 }
 
 func NSFileManagerNew() NSFileManager {
-  var m NSFileManager = NSFileManager{NSObjectPointer(objc.Runtime_objc_msgSend(NSFileManagerClass, NSFileManagerDefaultManager))}
+  var m NSFileManager = NSFileManager{NSObjectPointer(Runtime_objc_msgSend(NSFileManagerClass, NSFileManagerDefaultManager))}
   return m
 }
 
@@ -71,5 +71,5 @@ func NSFileManagerNew() NSFileManager {
 func (m NSFileManager) URLsForDirectoryInDomains(directory int, domainMask int) NSArray {
   d := unsafe.Pointer(uintptr(directory))
   dd := unsafe.Pointer(uintptr(domainMask))
-  return NSArrayPointer(objc.Runtime_objc_msgSend(m.Pointer, NSFileManagerURLsForDirectoryInDomains, d, dd))
+  return NSArrayPointer(Runtime_objc_msgSend(m.Pointer, NSFileManagerURLsForDirectoryInDomains, d, dd))
 }
