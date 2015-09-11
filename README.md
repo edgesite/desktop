@@ -49,5 +49,4 @@ func main() {
   fmt.Println("Desktop:" desktop.GetDesktopFolder())
   fmt.Println("Downloads:" desktop.GetDownloadsFolder())
 }
-
 ```
