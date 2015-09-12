@@ -1,5 +1,9 @@
 package desktop
 
+import (
+  "image"
+)
+
 //
 // Desktop Folders
 //
@@ -64,7 +68,6 @@ type Menu struct {
 	Type    int
 	Enabled bool
 	Name    string
-	Icon    []byte
 }
 
 type DesktopSysTray struct {
@@ -104,14 +107,12 @@ func (m *DesktopSysTray) RemoveListener(l DesktopSysTrayListener) {
 	delete(m.Listeners, l)
 }
 
-func (m *DesktopSysTray) SetIcon(icon []byte) {
-	m.Icon = icon
-	update(m)
+func (m *DesktopSysTray) SetIcon(icon image.Image) {
+  setIcon(m, icon)
 }
 
 func (m *DesktopSysTray) SetTitle(title string) {
 	m.Title = title
-	update(m)
 }
 
 func (m *DesktopSysTray) Show() {

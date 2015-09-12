@@ -63,11 +63,9 @@ type NSFileManager struct {
 }
 
 func NSFileManagerNew() NSFileManager {
-	var m NSFileManager = NSFileManager{NSObjectPointer(Runtime_objc_msgSend(NSFileManagerClass, NSFileManagerDefaultManager))}
-	return m
+	return NSFileManager{NSObjectPointer(Runtime_objc_msgSend(NSFileManagerClass, NSFileManagerDefaultManager))}
 }
 
-// NSArray * NSSearchPathForDirectoriesInDomains ( NSSearchPathDirectory directory, NSSearchPathDomainMask domainMask, BOOL expandTilde );
 func (m NSFileManager) URLsForDirectoryInDomains(directory int, domainMask int) NSArray {
 	return NSArrayPointer(Runtime_objc_msgSend(m.Pointer, NSFileManagerURLsForDirectoryInDomains, Int2Pointer(directory), Int2Pointer(domainMask)))
 }

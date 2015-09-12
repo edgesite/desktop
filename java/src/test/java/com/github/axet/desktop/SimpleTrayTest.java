@@ -69,10 +69,10 @@ public class SimpleTrayTest extends JFrame {
             throw new RuntimeException(e1);
         }
 
-        sys.addListener(ml);
+        //sys.addListener(ml);
         sys.setTitle("Java tool2");
         sys.setIcon(icon);
-        sys.setMenu(menu);
+        //sys.setMenu(menu);
         sys.show();
     }
 

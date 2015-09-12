@@ -4,6 +4,7 @@ package desktop
 
 import (
 	"os"
+  "image"
 )
 
 // user application data folder
@@ -53,24 +54,41 @@ func path(d int, dd int) string {
 //
 
 type DesktopSysTrayOSX struct {
+  statusitem NSStatusItem
+  image NSImage
 }
 
 func desktopSysTrayNew() *DesktopSysTray {
-	return &DesktopSysTray{os: DesktopSysTrayOSX{}}
+	return &DesktopSysTray{os: &DesktopSysTrayOSX{}}
 }
 
 func update(m *DesktopSysTray) {
-	//  var d DesktopSysTrayOSX = m.os.(DesktopSysTrayOSX)
+	var d *DesktopSysTrayOSX = m.os.(*DesktopSysTrayOSX)
+  
+  statusbar := NSStatusBarSystemStatusBar()
+  defer statusbar.Release()
+  
+  if d.statusitem.Pointer == nil {
+    d.statusitem = statusbar.StatusItemWithLength(NSVariableStatusItemLength)
+  }
+  
+  d.statusitem.SetToolTip(m.Title)
+  d.statusitem.SetHighlightMode(true)
+  d.statusitem.SetImage(d.image)
+}
+
+func setIcon(m *DesktopSysTray, icon image.Image) {
+	var d *DesktopSysTrayOSX = m.os.(*DesktopSysTrayOSX)
+  
+  d.image = NSImageImage(icon)
 }
 
 func show(m *DesktopSysTray) {
-
+  update(m)
 }
 
 func hide(m *DesktopSysTray) {
-
 }
 
 func close(m *DesktopSysTray) {
-
 }

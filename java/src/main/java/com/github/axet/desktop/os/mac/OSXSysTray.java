@@ -102,70 +102,72 @@ public class OSXSysTray extends DesktopSysTray {
 
         actionKeeper.clear();
 
-        NSMenu m = new NSMenu();
-
-        for (int i = 0; i < menu.getComponentCount(); i++) {
-            Component e = menu.getComponent(i);
-
-            if (e instanceof JMenu) {
-                JMenu sub = (JMenu) e;
-                NSMenu hsub = createSubmenu(sub);
-
-                NSImage bm = null;
-                if (sub.getIcon() != null)
-                    bm = convertMenuIcon(sub.getIcon());
-
-                NSMenuItem item = new NSMenuItem();
-                item.setTitle(new NSString(sub.getText()));
-                item.setImage(bm);
-                item.setSubmenu(hsub);
-                m.addItem(item);
-            } else if (e instanceof JCheckBoxMenuItem) {
-                JCheckBoxMenuItem ch = (JCheckBoxMenuItem) e;
-
-                NSImage bm = null;
-                if (ch.getIcon() != null)
-                    bm = convertMenuIcon(ch.getIcon());
-
-                OSXSysTrayAction action = new OSXSysTrayAction(ch);
-                actionKeeper.add(action);
-
-                NSMenuItem item = new NSMenuItem();
-                item.setTitle(new NSString(ch.getText()));
-                item.setImage(bm);
-                item.setEnabled(ch.isEnabled());
-                item.setState(ch.getState() ? NSCell.NSCellStateValue.NSOnState : NSCell.NSCellStateValue.NSOffState);
-                item.setTarget(action);
-                item.setAction(OSXSysTrayAction.action);
-                m.addItem(item);
-            } else if (e instanceof JMenuItem) {
-                JMenuItem mi = (JMenuItem) e;
-
-                NSImage bm = null;
-                if (mi.getIcon() != null)
-                    bm = convertMenuIcon(mi.getIcon());
-
-                OSXSysTrayAction action = new OSXSysTrayAction(mi);
-                actionKeeper.add(action);
-
-                NSMenuItem item = new NSMenuItem();
-                item.setTitle(new NSString(mi.getText()));
-                item.setImage(bm);
-                item.setEnabled(mi.isEnabled());
-                item.setTarget(action);
-                item.setAction(OSXSysTrayAction.action);
-                m.addItem(item);
-            }
-
-            if (e instanceof JPopupMenu.Separator) {
-                m.addItem(NSMenuItem.separatorItem());
-            }
-        }
-
-        m.setAutoenablesItems(false);
         statusItem.setImage(icon);
         statusItem.setHighlightMode(true);
-        statusItem.setMenu(m);
+
+        if (menu != null) {
+            NSMenu m = new NSMenu();
+            for (int i = 0; i < menu.getComponentCount(); i++) {
+                Component e = menu.getComponent(i);
+
+                if (e instanceof JMenu) {
+                    JMenu sub = (JMenu) e;
+                    NSMenu hsub = createSubmenu(sub);
+
+                    NSImage bm = null;
+                    if (sub.getIcon() != null)
+                        bm = convertMenuIcon(sub.getIcon());
+
+                    NSMenuItem item = new NSMenuItem();
+                    item.setTitle(new NSString(sub.getText()));
+                    item.setImage(bm);
+                    item.setSubmenu(hsub);
+                    m.addItem(item);
+                } else if (e instanceof JCheckBoxMenuItem) {
+                    JCheckBoxMenuItem ch = (JCheckBoxMenuItem) e;
+
+                    NSImage bm = null;
+                    if (ch.getIcon() != null)
+                        bm = convertMenuIcon(ch.getIcon());
+
+                    OSXSysTrayAction action = new OSXSysTrayAction(ch);
+                    actionKeeper.add(action);
+
+                    NSMenuItem item = new NSMenuItem();
+                    item.setTitle(new NSString(ch.getText()));
+                    item.setImage(bm);
+                    item.setEnabled(ch.isEnabled());
+                    item.setState(
+                            ch.getState() ? NSCell.NSCellStateValue.NSOnState : NSCell.NSCellStateValue.NSOffState);
+                    item.setTarget(action);
+                    item.setAction(OSXSysTrayAction.action);
+                    m.addItem(item);
+                } else if (e instanceof JMenuItem) {
+                    JMenuItem mi = (JMenuItem) e;
+
+                    NSImage bm = null;
+                    if (mi.getIcon() != null)
+                        bm = convertMenuIcon(mi.getIcon());
+
+                    OSXSysTrayAction action = new OSXSysTrayAction(mi);
+                    actionKeeper.add(action);
+
+                    NSMenuItem item = new NSMenuItem();
+                    item.setTitle(new NSString(mi.getText()));
+                    item.setImage(bm);
+                    item.setEnabled(mi.isEnabled());
+                    item.setTarget(action);
+                    item.setAction(OSXSysTrayAction.action);
+                    m.addItem(item);
+                }
+
+                if (e instanceof JPopupMenu.Separator) {
+                    m.addItem(NSMenuItem.separatorItem());
+                }
+            }
+            m.setAutoenablesItems(false);
+            statusItem.setMenu(m);
+        }
     }
 
     NSMenu createSubmenu(JMenu menu) {

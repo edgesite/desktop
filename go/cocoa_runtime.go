@@ -8,6 +8,8 @@ package desktop
 #include <stdlib.h>
 #include <objc/objc-runtime.h>
 
+BOOL NSApplicationLoad (void);
+
 id objc_msgSend0(id to, SEL sel) {
   return objc_msgSend(to, sel);
 }
@@ -29,12 +31,35 @@ import "C"
 import (
 	"fmt"
 	"unsafe"
+  "math"
 )
 
-var Bool2Pointer = map[bool]unsafe.Pointer{true: unsafe.Pointer(uintptr(1)), false: unsafe.Pointer(uintptr(0))}
+func init() {
+  b := C.NSApplicationLoad()
+  if b == 0 {
+    panic("!NSApplicationLoad")
+  }
+}
+
+var Bool2Int = map[bool]int {
+  true: 1,
+  false: 0,
+}
+
+func Bool2Pointer(b bool) unsafe.Pointer {
+  return unsafe.Pointer(uintptr(Bool2Int[b]))
+}
 
 func Int2Pointer(i int) unsafe.Pointer {
   return unsafe.Pointer(uintptr(i))
+}
+
+func Float2Pointer(i float64) unsafe.Pointer {
+  return unsafe.Pointer(uintptr(math.Float64bits(i)))
+}
+
+func Pointer2Int(p unsafe.Pointer) int {
+  return int(uintptr(p))
 }
 
 // when pointer is (const char*)
