@@ -33,7 +33,7 @@ Supports: JMenu (submenu), JCheckBoxMenuItem, JMenuItem, JPopupMenu.Separator, s
 
 Full example with submenus, icons, checkboxes can be found in test folder:
 
-  * [SysTrayTest.java](java/src/test/java/com/github/axet/desktop/SysTrayTest.java)
+  * [SysTrayTest.java](src/test/java/com/github/axet/desktop/SysTrayTest.java)
 
 ```java
 package com.github.axet.desktop;
