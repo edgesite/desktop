@@ -13,10 +13,39 @@ import (
 )
 
 func main() {
+  // Home folder
+  //
+  // osx: /Users/user
+  // windows: C:\Users\user
+  // linux: /home/user
   fmt.Println("Home:", desktop.GetHomeFolder())
+  
+  // Documents folder
+  //
+  // osx: /Users/user/Documents
+  // windows: C:\Users\user\Documents
+  // linux: /home/user/Documents
   fmt.Println("Documents:" desktop.GetDocumentsFolder())
+  
+  // Config folder
+  //
+  // osx: /Users/user/Library/Application Support
+  // windows: C:\Users\user\AppData\Local
+  // linux: /home/user/.config
   fmt.Println("AppFolder:" desktop.GetAppDataFolder())
+  
+  // Desktop folder
+  //
+  // osx: /Users/user/Desktop
+  // windows: C:\Users\user\Desktop
+  // linux: /home/user/Desktop
   fmt.Println("Desktop:" desktop.GetDesktopFolder())
+  
+  // Downloads folder
+  //
+  // osx: /Users/user/Downloads
+  // windows: C:\Users\user\Downloads
+  // linux: /home/user/Desktop
   fmt.Println("Downloads:" desktop.GetDownloadsFolder())
 }
 ```

@@ -7,27 +7,27 @@ import (
 )
 
 // user application data folder
-func GetAppDataFolder() string {
+func getAppDataFolder() string {
   return path(NSApplicationSupportDirectory, NSUserDomainMask);
 }
 
 // user home "/home/user"
-func GetHomeFolder() string {
+func getHomeFolder() string {
   return os.Getenv("HOME")
 }
 
 // user my documents "~/Documents"
-func GetDocumentsFolder() string {
+func getDocumentsFolder() string {
   return path(NSDocumentDirectory, NSUserDomainMask);
 }
 
 // user downloads "~/Downloads"
-func GetDownloadsFolder() string {
+func getDownloadsFolder() string {
   return path(NSDownloadsDirectory, NSUserDomainMask)
 }
 
 // user desktop "~/Desktop"
-func GetDesktopFolder() string {
+func getDesktopFolder() string {
   return path(NSDesktopDirectory, NSUserDomainMask);
 }
 
@@ -46,4 +46,32 @@ func path(d int , dd int) string {
   defer u.Release()
 
   return u.Path()
+}
+
+//
+// SysTray
+//
+
+type DesktopSysTrayOSX struct {
+  
+}
+
+func desktopSysTrayNew() *DesktopSysTray {
+  return &DesktopSysTray{os:DesktopSysTrayOSX{}}
+}
+
+func update(m *DesktopSysTray) {
+//  var d DesktopSysTrayOSX = m.os.(DesktopSysTrayOSX)
+}
+
+func show(m *DesktopSysTray) {
+  
+}
+
+func hide(m *DesktopSysTray) {
+  
+}
+
+func close(m *DesktopSysTray) {
+  
 }
