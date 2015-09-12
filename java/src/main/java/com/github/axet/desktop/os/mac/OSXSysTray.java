@@ -196,6 +196,7 @@ public class OSXSysTray extends DesktopSysTray {
 
                 OSXSysTrayAction action = new OSXSysTrayAction(ch);
                 actionKeeper.add(action);
+
                 NSMenuItem item = new NSMenuItem();
                 item.setTitle(new NSString(ch.getText()));
                 item.setImage(bm);
@@ -213,6 +214,7 @@ public class OSXSysTray extends DesktopSysTray {
 
                 OSXSysTrayAction action = new OSXSysTrayAction(mi);
                 actionKeeper.add(action);
+
                 NSMenuItem item = new NSMenuItem();
                 item.setTitle(new NSString(mi.getText()));
                 item.setImage(bm);

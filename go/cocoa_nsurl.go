@@ -5,7 +5,7 @@ package desktop
 import "C"
 
 import (
-  "unsafe"
+	"unsafe"
 )
 
 // https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSURL_Class/
@@ -15,22 +15,18 @@ var NSURLAbsoluteString unsafe.Pointer = Runtime_sel_getUid("absoluteString")
 var NSURLPath unsafe.Pointer = Runtime_sel_getUid("path")
 
 type NSURL struct {
-  NSObject
+	NSObject
 }
 
 func NSURLPointer(p unsafe.Pointer) NSURL {
-  var m NSURL = NSURL{NSObjectPointer(p)}
-  return m
+	var m NSURL = NSURL{NSObjectPointer(p)}
+	return m
 }
 
 func (m NSObject) AbsoluteString() string {
-  s := NSStringPointer(Runtime_objc_msgSend(m.Pointer, NSURLAbsoluteString))
-  defer s.Release()
-  return s.String()
+	return NSStringPointer2String(Runtime_objc_msgSend(m.Pointer, NSURLAbsoluteString))
 }
 
 func (m NSObject) Path() string {
-  s := NSStringPointer(Runtime_objc_msgSend(m.Pointer, NSURLPath))
-  defer s.Release()
-  return s.String()
+	return NSStringPointer2String(Runtime_objc_msgSend(m.Pointer, NSURLPath))
 }

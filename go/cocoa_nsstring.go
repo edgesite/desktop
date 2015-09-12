@@ -6,7 +6,7 @@ package desktop
 import "C"
 
 import (
-  "unsafe"
+	"unsafe"
 )
 
 // https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Classes/NSString_Class/Reference/NSString.html
@@ -16,21 +16,25 @@ var NSStringStringWithUTF8String unsafe.Pointer = Runtime_sel_getUid("stringWith
 var NSStringUTF8String unsafe.Pointer = Runtime_sel_getUid("UTF8String")
 
 type NSString struct {
-  NSObject
+	NSObject
 }
 
 func NSStringNew(s string) NSString {
-  p := unsafe.Pointer(&[]byte(s)[0])
-  var m NSString = NSString{NSObjectPointer(Runtime_objc_msgSend(NSStringClass, NSStringStringWithUTF8String, p))}
-  return m
+	p := unsafe.Pointer(&[]byte(s + "\x00")[0])
+	var m NSString = NSString{NSObjectPointer(Runtime_objc_msgSend(NSStringClass, NSStringStringWithUTF8String, p))}
+	return m
 }
 
 func NSStringPointer(p unsafe.Pointer) NSString {
-  var m NSString = NSString{NSObjectPointer(p)}
-  return m
+	return NSString{NSObjectPointer(p)}
+}
+
+func NSStringPointer2String(p unsafe.Pointer) string {
+	s := NSStringPointer(p)
+	defer s.Release()
+	return s.String()
 }
 
 func (m NSString) String() string {
-  var p unsafe.Pointer = Runtime_objc_msgSend(m.NSObject.Pointer, NSStringUTF8String)
-  return C.GoString((*C.char)(p))
+	return Pointer2String(Runtime_objc_msgSend(m.NSObject.Pointer, NSStringUTF8String))
 }

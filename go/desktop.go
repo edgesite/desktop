@@ -4,29 +4,49 @@ package desktop
 // Desktop Folders
 //
 
-// user application data folder
+// Config folder
+//
+//  - osx: /Users/user/Library/Application Support
+//  - windows: C:\Users\user\AppData\Local
+//  - linux: /home/user/.config
 func GetAppDataFolder() string {
-  return getAppDataFolder();
+	return getAppDataFolder()
 }
 
-// user home "/home/user"
+// Home folder
+//
+//  - osx: /Users/user
+//  - windows: C:\Users\user
+//  - linux: /home/user
 func GetHomeFolder() string {
-  return getHomeFolder()
+	return getHomeFolder()
 }
 
-// user my documents "~/Documents"
+// Documents folder
+//
+//  - osx: /Users/user/Documents
+//  - windows: C:\Users\user\Documents
+//  - linux: /home/user/Documents
 func GetDocumentsFolder() string {
-  return getDocumentsFolder()
+	return getDocumentsFolder()
 }
 
-// user downloads "~/Downloads"
+// Downloads folder
+//
+//  - osx: /Users/user/Downloads
+//  - windows: C:\Users\user\Downloads
+//  - linux: /home/user/Desktop
 func GetDownloadsFolder() string {
-  return getDownloadsFolder()
+	return getDownloadsFolder()
 }
 
-// user desktop "~/Desktop"
+// Desktop folder
+//
+//  - osx: /Users/user/Desktop
+//  - windows: C:\Users\user\Desktop
+//  - linux: /home/user/Desktop
 func GetDesktopFolder() string {
-  return getDesktopFolder()
+	return getDesktopFolder()
 }
 
 //
@@ -34,83 +54,83 @@ func GetDesktopFolder() string {
 //
 
 const (
-  MenuItem = 1
-  MenuSeparator = 2
-  MenuCheckBox = 3
+	MenuItem      = 1
+	MenuSeparator = 2
+	MenuCheckBox  = 3
 )
 
 type Menu struct {
-  Menu []Menu
-  Type int
-  Enabled bool
-  Name string
-  Icon []byte
+	Menu    []Menu
+	Type    int
+	Enabled bool
+	Name    string
+	Icon    []byte
 }
 
 type DesktopSysTray struct {
-  Listeners map[DesktopSysTrayListener]bool
-  Icon []byte
-  Title string
-  Menu []Menu
-  
-  // os specific structs
-  os interface{}
+	Listeners map[DesktopSysTrayListener]bool
+	Icon      []byte
+	Title     string
+	Menu      []Menu
+
+	// os specific structs
+	os interface{}
 }
 
 type DesktopSysTrayListener interface {
-  MouseLeftClick()
+	MouseLeftClick()
 
-  MouseLeftDoubleClick()
+	MouseLeftDoubleClick()
 
-  // We do not handle right clicks, because:
-  //
-  // 1) Icon is binded to context menu anyway.
-  //
-  // 2) On Windows if you call showContextMenu from java thread, HMENU bugged
-  // and you can't use it.
-  //
-  // 3) Mac OSX does not support showing context menu programmatically.
+	// We do not handle right clicks, because:
+	//
+	// 1) Icon is binded to context menu anyway.
+	//
+	// 2) On Windows if you call showContextMenu from java thread, HMENU bugged
+	// and you can't use it.
+	//
+	// 3) Mac OSX does not support showing context menu programmatically.
 }
 
 func DesktopSysTrayNew() *DesktopSysTray {
-  return desktopSysTrayNew()
+	return desktopSysTrayNew()
 }
 
 func (m *DesktopSysTray) AddListener(l DesktopSysTrayListener) {
-  m.Listeners[l] = true;
+	m.Listeners[l] = true
 }
 
 func (m *DesktopSysTray) RemoveListener(l DesktopSysTrayListener) {
-  delete(m.Listeners, l);
+	delete(m.Listeners, l)
 }
 
 func (m *DesktopSysTray) SetIcon(icon []byte) {
-  m.Icon = icon
-  update(m)
+	m.Icon = icon
+	update(m)
 }
 
 func (m *DesktopSysTray) SetTitle(title string) {
-  m.Title = title
-  update(m)
+	m.Title = title
+	update(m)
 }
 
 func (m *DesktopSysTray) Show() {
-  show(m)
+	show(m)
 }
 
 func (m *DesktopSysTray) Update() {
-  update(m)
+	update(m)
 }
 
 func (m *DesktopSysTray) Hide() {
-  hide(m)
+	hide(m)
 }
 
 func (m *DesktopSysTray) SetMenu(menu []Menu) {
-  m.Menu = menu
-  update(m)
+	m.Menu = menu
+	update(m)
 }
 
 func (m *DesktopSysTray) Close() {
-  close(m)
+	close(m)
 }

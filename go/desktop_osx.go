@@ -3,49 +3,49 @@
 package desktop
 
 import (
-  "os"
+	"os"
 )
 
 // user application data folder
 func getAppDataFolder() string {
-  return path(NSApplicationSupportDirectory, NSUserDomainMask);
+	return path(NSApplicationSupportDirectory, NSUserDomainMask)
 }
 
 // user home "/home/user"
 func getHomeFolder() string {
-  return os.Getenv("HOME")
+	return os.Getenv("HOME")
 }
 
 // user my documents "~/Documents"
 func getDocumentsFolder() string {
-  return path(NSDocumentDirectory, NSUserDomainMask);
+	return path(NSDocumentDirectory, NSUserDomainMask)
 }
 
 // user downloads "~/Downloads"
 func getDownloadsFolder() string {
-  return path(NSDownloadsDirectory, NSUserDomainMask)
+	return path(NSDownloadsDirectory, NSUserDomainMask)
 }
 
 // user desktop "~/Desktop"
 func getDesktopFolder() string {
-  return path(NSDesktopDirectory, NSUserDomainMask);
+	return path(NSDesktopDirectory, NSUserDomainMask)
 }
 
-func path(d int , dd int) string {
-  f := NSFileManagerNew()
-  defer f.Release()
+func path(d int, dd int) string {
+	f := NSFileManagerNew()
+	defer f.Release()
 
-  a := f.URLsForDirectoryInDomains(d, dd)
-  defer a.Release()
+	a := f.URLsForDirectoryInDomains(d, dd)
+	defer a.Release()
 
-  if a.Count() != 1 {
-    return ""
-  }
+	if a.Count() != 1 {
+		return ""
+	}
 
-  var u NSURL = NSURLPointer(a.ObjectAtIndex(0))
-  defer u.Release()
+	var u NSURL = NSURLPointer(a.ObjectAtIndex(0))
+	defer u.Release()
 
-  return u.Path()
+	return u.Path()
 }
 
 //
@@ -53,25 +53,24 @@ func path(d int , dd int) string {
 //
 
 type DesktopSysTrayOSX struct {
-  
 }
 
 func desktopSysTrayNew() *DesktopSysTray {
-  return &DesktopSysTray{os:DesktopSysTrayOSX{}}
+	return &DesktopSysTray{os: DesktopSysTrayOSX{}}
 }
 
 func update(m *DesktopSysTray) {
-//  var d DesktopSysTrayOSX = m.os.(DesktopSysTrayOSX)
+	//  var d DesktopSysTrayOSX = m.os.(DesktopSysTrayOSX)
 }
 
 func show(m *DesktopSysTray) {
-  
+
 }
 
 func hide(m *DesktopSysTray) {
-  
+
 }
 
 func close(m *DesktopSysTray) {
-  
+
 }

@@ -3,7 +3,7 @@
 package desktop
 
 import (
-  "unsafe"
+	"unsafe"
 )
 
 // https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSFileManager_Class/
@@ -17,33 +17,33 @@ var NSFileManagerURLsForDirectoryInDomains unsafe.Pointer = Runtime_sel_getUid("
 type NSSearchPathDirectory int
 
 const (
-  NSApplicationDirectory = 1;
-  NSDemoApplicationDirectory = 2;
-  NSDeveloperApplicationDirectory = 3;
-  NSAdminApplicationDirectory = 4;
-  NSLibraryDirectory = 5;
-  NSDeveloperDirectory = 6;
-  NSUserDirectory = 7;
-  NSDocumentationDirectory = 8;
-  NSDocumentDirectory = 9;
-  NSCoreServiceDirectory = 10;
-  NSAutosavedInformationDirectory = 11;
-  NSDesktopDirectory = 12;
-  NSCachesDirectory = 13;
-  NSApplicationSupportDirectory = 14;
-  NSDownloadsDirectory = 15;
-  NSInputMethodsDirectory = 16;
-  NSMoviesDirectory = 17;
-  NSMusicDirectory = 18;
-  NSPicturesDirectory = 19;
-  NSPrinterDescriptionDirectory = 20;
-  NSSharedPublicDirectory = 21;
-  NSPreferencePanesDirectory = 22;
-  NSApplicationScriptsDirectory = 23;
-  NSItemReplacementDirectory = 99;
-  NSAllApplicationsDirectory = 100;
-  NSAllLibrariesDirectory = 101;
-  NSTrashDirectory = 102;
+	NSApplicationDirectory          = 1
+	NSDemoApplicationDirectory      = 2
+	NSDeveloperApplicationDirectory = 3
+	NSAdminApplicationDirectory     = 4
+	NSLibraryDirectory              = 5
+	NSDeveloperDirectory            = 6
+	NSUserDirectory                 = 7
+	NSDocumentationDirectory        = 8
+	NSDocumentDirectory             = 9
+	NSCoreServiceDirectory          = 10
+	NSAutosavedInformationDirectory = 11
+	NSDesktopDirectory              = 12
+	NSCachesDirectory               = 13
+	NSApplicationSupportDirectory   = 14
+	NSDownloadsDirectory            = 15
+	NSInputMethodsDirectory         = 16
+	NSMoviesDirectory               = 17
+	NSMusicDirectory                = 18
+	NSPicturesDirectory             = 19
+	NSPrinterDescriptionDirectory   = 20
+	NSSharedPublicDirectory         = 21
+	NSPreferencePanesDirectory      = 22
+	NSApplicationScriptsDirectory   = 23
+	NSItemReplacementDirectory      = 99
+	NSAllApplicationsDirectory      = 100
+	NSAllLibrariesDirectory         = 101
+	NSTrashDirectory                = 102
 )
 
 // http://developer.apple.com/library/mac/#documentation/Cocoa/Reference/Foundation/Miscellaneous/Foundation_Constants/Reference/reference.html#//apple_ref/doc/c_ref/NSSearchPathDomainMask
@@ -51,25 +51,23 @@ const (
 type NSSearchPathDomainMask int
 
 const (
-  NSUserDomainMask = 1;
-  NSLocalDomainMask = 2;
-  NSNetworkDomainMask = 4;
-  NSSystemDomainMask = 8;
-  NSAllDomainsMask = 0x0ffff;
+	NSUserDomainMask    = 1
+	NSLocalDomainMask   = 2
+	NSNetworkDomainMask = 4
+	NSSystemDomainMask  = 8
+	NSAllDomainsMask    = 0x0ffff
 )
 
 type NSFileManager struct {
-  NSObject
+	NSObject
 }
 
 func NSFileManagerNew() NSFileManager {
-  var m NSFileManager = NSFileManager{NSObjectPointer(Runtime_objc_msgSend(NSFileManagerClass, NSFileManagerDefaultManager))}
-  return m
+	var m NSFileManager = NSFileManager{NSObjectPointer(Runtime_objc_msgSend(NSFileManagerClass, NSFileManagerDefaultManager))}
+	return m
 }
 
 // NSArray * NSSearchPathForDirectoriesInDomains ( NSSearchPathDirectory directory, NSSearchPathDomainMask domainMask, BOOL expandTilde );
 func (m NSFileManager) URLsForDirectoryInDomains(directory int, domainMask int) NSArray {
-  d := unsafe.Pointer(uintptr(directory))
-  dd := unsafe.Pointer(uintptr(domainMask))
-  return NSArrayPointer(Runtime_objc_msgSend(m.Pointer, NSFileManagerURLsForDirectoryInDomains, d, dd))
+	return NSArrayPointer(Runtime_objc_msgSend(m.Pointer, NSFileManagerURLsForDirectoryInDomains, Int2Pointer(directory), Int2Pointer(domainMask)))
 }

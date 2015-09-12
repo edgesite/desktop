@@ -16,23 +16,14 @@ public class NSImage extends NSObject {
     static Pointer klass = Runtime.INSTANCE.objc_lookUpClass("NSImage");
     static Pointer initWithData = Runtime.INSTANCE.sel_getUid("initWithData:");
 
-    static NSData create(BufferedImage img) {
+    static byte[] BufferedImage2Bytes(BufferedImage img) {
         try {
             ByteArrayOutputStream bufio = new ByteArrayOutputStream();
             ImageIO.write(img, "PNG", bufio);
-            byte[] buf = bufio.toByteArray();
-            NSData data = new NSData(buf);
-            return data;
+            return bufio.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public NSImage(BufferedImage img) {
-        super(Runtime.INSTANCE.class_createInstance(klass, 0));
-
-        NSData data = create(img);
-        Runtime.INSTANCE.objc_msgSend(this, initWithData, data);
     }
 
     public NSImage(NSData data) {
@@ -43,6 +34,10 @@ public class NSImage extends NSObject {
 
     public NSImage(Pointer p) {
         super(Pointer.nativeValue(p));
+    }
+
+    public NSImage(BufferedImage img) {
+        this(new NSData(BufferedImage2Bytes(img)));
     }
 
 }
