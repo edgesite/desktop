@@ -58,6 +58,11 @@ func Float2Pointer(i float64) unsafe.Pointer {
   return unsafe.Pointer(uintptr(math.Float64bits(i)))
 }
 
+func Pointer2Float(p unsafe.Pointer) float64 {
+  i := uint64(uintptr(p))
+  return math.Float64frombits(i)
+}
+
 func Pointer2Int(p unsafe.Pointer) int {
   return int(uintptr(p))
 }

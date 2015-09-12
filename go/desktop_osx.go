@@ -5,6 +5,7 @@ package desktop
 import (
 	"os"
   "image"
+  "github.com/nfnt/resize"
 )
 
 // user application data folder
@@ -54,24 +55,22 @@ func path(d int, dd int) string {
 //
 
 type DesktopSysTrayOSX struct {
+  statusbar NSStatusBar
   statusitem NSStatusItem
   image NSImage
 }
 
 func desktopSysTrayNew() *DesktopSysTray {
-	return &DesktopSysTray{os: &DesktopSysTrayOSX{}}
+	return &DesktopSysTray{os: &DesktopSysTrayOSX{statusbar:NSStatusBarSystemStatusBar()}}
 }
 
 func update(m *DesktopSysTray) {
 	var d *DesktopSysTrayOSX = m.os.(*DesktopSysTrayOSX)
-  
-  statusbar := NSStatusBarSystemStatusBar()
-  defer statusbar.Release()
-  
+
   if d.statusitem.Pointer == nil {
-    d.statusitem = statusbar.StatusItemWithLength(NSVariableStatusItemLength)
+    d.statusitem = d.statusbar.StatusItemWithLength(NSVariableStatusItemLength)
   }
-  
+
   d.statusitem.SetToolTip(m.Title)
   d.statusitem.SetHighlightMode(true)
   d.statusitem.SetImage(d.image)
@@ -79,8 +78,30 @@ func update(m *DesktopSysTray) {
 
 func setIcon(m *DesktopSysTray, icon image.Image) {
 	var d *DesktopSysTrayOSX = m.os.(*DesktopSysTrayOSX)
+
+  if d.image.Pointer != nil {
+    d.image.Release()
+    d.image.Pointer = nil
+  }
+
+  d.image = convertTrayIcon(icon)  
+}
+
+func convertTrayIcon(i image.Image) NSImage {
+  var f NSFont = NSFontMenuBarFontOfSize(0)
+  defer f.Release()
   
-  d.image = NSImageImage(icon)
+  fd := f.FontDescriptor()
+  defer fd.Release()
+
+  n := NSNumberPointer(fd.ObjectForKey(NSFontSizeAttribute));
+  defer n.Release()
+  
+  menubarHeigh := uint(n.IntValue())
+  
+  c := resize.Resize(menubarHeigh, menubarHeigh, i, resize.Lanczos3)
+  
+  return NSImageImage(c)
 }
 
 func show(m *DesktopSysTray) {

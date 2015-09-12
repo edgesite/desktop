@@ -16,11 +16,11 @@ public class NSFont extends NSObject {
     static Pointer fontDescriptor = Runtime.INSTANCE.sel_getUid("fontDescriptor");
 
     public static NSFont menuFontOfSize(double size) {
-        return new NSFont(Runtime.INSTANCE.objc_msgSend(klass, menuFontOfSize));
+        return new NSFont(Runtime.INSTANCE.objc_msgSend(klass, menuFontOfSize, size));
     }
 
     public static NSFont menuBarFontOfSize(double size) {
-        return new NSFont(Runtime.INSTANCE.objc_msgSend(klass, menuBarFontOfSize));
+        return new NSFont(Runtime.INSTANCE.objc_msgSend(klass, menuBarFontOfSize, size));
     }
 
     public NSFont(long l) {
