@@ -21,7 +21,7 @@ type NSMenu struct {
 }
 
 func NSMenuNew() NSMenu {
-	return NSMenu{NSObjectPointer(Runtime_class_createInstance(NSMenuClass, 0))}
+	return NSMenuPointer(Runtime_class_createInstance(NSMenuClass, 0))
 }
 
 func NSMenuPointer(p unsafe.Pointer) NSMenu {
@@ -29,11 +29,11 @@ func NSMenuPointer(p unsafe.Pointer) NSMenu {
 }
 
 func (m NSMenu) AddItem(i NSMenuItem) {
-	Runtime_objc_msgSend(m.Pointer, i.Pointer)
+	Runtime_objc_msgSend(m.Pointer, NSMenuAddItem, i.Pointer)
 }
 
 func (m NSMenu) InsertItemAtIndex(i NSMenuItem, in int) {
-	Runtime_objc_msgSend(m.Pointer, i.Pointer, Int2Pointer(in))
+	Runtime_objc_msgSend(m.Pointer, NSMenuItemAtIndex, i.Pointer, Int2Pointer(in))
 }
 
 func (m NSMenu) SetAutoenablesItems(b bool) {

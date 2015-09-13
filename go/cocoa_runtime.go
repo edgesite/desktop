@@ -55,6 +55,15 @@ func Bool2Pointer(b bool) unsafe.Pointer {
 	return unsafe.Pointer(uintptr(Bool2Int[b]))
 }
 
+var Int2Bool = map[int]bool{
+	1: true,
+	0: false,
+}
+
+func Pointer2Bool(p unsafe.Pointer) bool {
+	return Int2Bool[int(uintptr(p))]
+}
+
 func Int2Pointer(i int) unsafe.Pointer {
 	return unsafe.Pointer(uintptr(i))
 }
@@ -144,13 +153,31 @@ func Runtime_class_createInstance(cls unsafe.Pointer, extraBytes int) unsafe.Poi
 	return unsafe.Pointer(C.class_createInstance((*C.struct_objc_class)(cls), (C.size_t)(extraBytes)))
 }
 
-//boolean class_addMethod(Pointer cls, Pointer selector, StdCallCallback imp, String types);
+func Runtime_class_addMethod(cls unsafe.Pointer, sel unsafe.Pointer, imp unsafe.Pointer, types string) bool {
+  var n *C.char = C.CString(types)
+  defer C.free(unsafe.Pointer(n))
+  if C.class_addMethod((*C.struct_objc_class)(cls), (*C.struct_objc_selector)(sel), (*[0]byte)(imp), n) == 1 {
+    return true
+  } else {
+    return false
+  }
+}
 
-//Pointer sel_registerName(String name);
+func Runtime_sel_registerName(name string) unsafe.Pointer {
+  var n *C.char = C.CString(name)
+  defer C.free(unsafe.Pointer(n))
+  return unsafe.Pointer(C.sel_registerName(n))
+}
 
-//Pointer objc_allocateClassPair(Pointer superClass, String name, long extraBytes);
+func Runtime_objc_allocateClassPair(superClass unsafe.Pointer, name string, extraBytes int) unsafe.Pointer {
+  var n *C.char = C.CString(name)
+  defer C.free(unsafe.Pointer(n))
+  return unsafe.Pointer(C.objc_allocateClassPair((*C.struct_objc_class)(superClass), n, (C.size_t)(extraBytes)))
+}
 
-//void objc_registerClassPair(Pointer cls);
+func Runtime_objc_registerClassPair(cls unsafe.Pointer) {
+  C.objc_registerClassPair((*C.struct_objc_class)(cls))
+}
 
 //Pointer class_getInstanceMethod(Pointer cls, Pointer selecter);
 

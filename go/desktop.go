@@ -57,11 +57,13 @@ func GetDesktopFolder() string {
 // Main function
 //
 // Need to keep messages loop running. Have to be run on main thread. 
+// All GUI applications need that. So if you plan to use SysTray call
+// this function from main function.
 //
+
 func Main() {
   desktopMain()
 }
-
 
 //
 // SysTrayIcon or NSStatusBar or Notification Area
@@ -73,8 +75,12 @@ const (
 	MenuCheckBox  = 3
 )
 
+type MenuAction func(*Menu)
+
 type Menu struct {
 	Menu    []Menu
+  Action  MenuAction
+  State   bool
 	Type    int
 	Enabled bool
 	Name    string
@@ -140,7 +146,6 @@ func (m *DesktopSysTray) Hide() {
 
 func (m *DesktopSysTray) SetMenu(menu []Menu) {
 	m.Menu = menu
-	update(m)
 }
 
 func (m *DesktopSysTray) Close() {
