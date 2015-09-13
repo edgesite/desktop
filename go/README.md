@@ -24,63 +24,65 @@ func main() {
 ## Example Sys Tray Icon
 (aka Notification Area Icons or Status Bar icons)
 
-```java
-package com.github.axet.desktop;
+Full example:
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+  * [SysTrayTest.go](test/systraytest.go)
 
-import javax.swing.JFrame;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
+```go
+package main
 
-public class SysTrayTest extends JFrame {
+import (
+	"image"
+	"os"
+  "fmt"
 
-    DesktopSysTray sys = Desktop.getDesktopSysTray();
-    JPopupMenu menu;
+	"github.com/axet/desktop/go"
+)
 
-    DesktopSysTray.Listener ml = new DesktopSysTray.Listener() {
-        @Override
-        public void mouseLeftClick() {
-            System.out.println("left click");
-        }
+type SysTest struct {
+  s *desktop.DesktopSysTray
+}
 
-        @Override
-        public void mouseLeftDoubleClick() {
-            System.out.println("double click");
-        }
+func (m *SysTest) Click(mn *desktop.Menu) {
+  fmt.Println("m", mn.Name)
+}
 
-        @Override
-        public void mouseRightClick() {
-            System.out.println("right click");
-            sys.showContextMenu();
-        }
+func (m *SysTest) ClickBox(mn *desktop.Menu) {
+  fmt.Println(mn.Name)
+  mn.State = !mn.State
+  m.s.Update()
+}
 
-    };
+func main() {
+  m := SysTest{desktop.DesktopSysTrayNew()}
+  
+	file, err := os.Open("icon.png")
+	if err != nil {
+		panic(err)
+	}
+	icon, _, err := image.Decode(file)
+	if err != nil {
+		panic(err)
+	}
 
-    public SysTrayTest() {
-        super("MainFrame");
+	menu := []desktop.Menu {
+    desktop.Menu{Icon:icon, Type:desktop.MenuItem, Enabled:true, Name:"test1", Action:m.Click},
+    desktop.Menu{Type:desktop.MenuSeparator},
+    desktop.Menu{Icon:icon, Type:desktop.MenuItem, Enabled:true, Name:"test2", Menu: []desktop.Menu {
+      desktop.Menu{Type:desktop.MenuItem, Enabled:true, Name:"test21", Action:m.Click},
+      desktop.Menu{Type:desktop.MenuItem, Enabled:true, Name:"test22", Action:m.Click},
+    }},
+    desktop.Menu{Type:desktop.MenuItem, Enabled:false, Name:"test3", Action:m.Click},
+    desktop.Menu{Type:desktop.MenuCheckBox, Enabled:true, Name:"test4", State:true, Action:m.ClickBox},
+    desktop.Menu{Type:desktop.MenuSeparator},
+    desktop.Menu{Icon:icon, Type:desktop.MenuItem, Enabled:true, Name:"test5", Action:m.Click},
+	}
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        menu = new JPopupMenu();
-        JMenuItem menuItem1 = new JMenuItem("test1");
-        menuItem1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                System.out.println("test1");
-            }
-        });
-        menu.addSeparator();
-
-        sys.addListener(ml);
-        sys.setTitle("Java tool2");
-        sys.setMenu(menu);
-        sys.show();
-    }
-
-    public static void main(String[] args) {
-        new SysTrayTest();
-    }
+	m.s.SetIcon(icon)
+	m.s.SetTitle("go menu hoho!")
+	m.s.SetMenu(menu)
+	m.s.Show()
+  
+  desktop.Main()
 }
 ```
