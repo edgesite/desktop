@@ -16,7 +16,7 @@ type NSData struct {
 }
 
 func NSDataNew(b []byte) NSData {
-  return NSData{NSObjectPointer(Runtime_objc_msgSend(NSDataClass, NSDataDataWithBytesLength, unsafe.Pointer(&b[0]), Int2Pointer(len(b))))}
+	return NSData{NSObjectPointer(Runtime_objc_msgSend(NSDataClass, NSDataDataWithBytesLength, unsafe.Pointer(&b[0]), Int2Pointer(len(b))))}
 }
 
 func NSDataPointer(p unsafe.Pointer) NSData {

@@ -18,7 +18,6 @@ const NSFontFaceAttribute = "NSFontFaceAttribute"
 const NSFontFixedAdvanceAttribute = "NSFontFixedAdvanceAttribute"
 const NSFontVisibleNameAttribute = "NSFontVisibleNameAttribute"
 
-
 var NSFontDescriptorObjectForKey unsafe.Pointer = Runtime_sel_getUid("objectForKey:")
 
 type NSFontDescriptor struct {
@@ -30,7 +29,7 @@ func NSFontDescriptorPointer(p unsafe.Pointer) NSFontDescriptor {
 }
 
 func (m NSFontDescriptor) ObjectForKey(key string) unsafe.Pointer {
-  n := NSStringNew(key)
-  defer n.Release()
+	n := NSStringNew(key)
+	defer n.Release()
 	return Runtime_objc_msgSend(m.Pointer, NSFontDescriptorObjectForKey, n.Pointer)
 }

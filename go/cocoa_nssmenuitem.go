@@ -27,65 +27,65 @@ type NSMenuItem struct {
 }
 
 func NSMenuItemNew() NSMenuItem {
-  return NSMenuItemPointer(Runtime_class_createInstance(NSMenuItemClass, 0))
+	return NSMenuItemPointer(Runtime_class_createInstance(NSMenuItemClass, 0))
 }
 
 func NSMenuItemSeparatorItem() NSMenuItem {
-  return NSMenuItem{NSObjectPointer(Runtime_objc_msgSend(NSMenuItemClass, NSMenuItemSeparatorItemSel))}
+	return NSMenuItem{NSObjectPointer(Runtime_objc_msgSend(NSMenuItemClass, NSMenuItemSeparatorItemSel))}
 }
 
 func NSMenuItemInitWithTitleActionKeyEquivalent(name string, action unsafe.Pointer, code string) NSMenuItem {
-  var m NSMenuItem = NSMenuItemNew()
-  n := NSStringNew(name)
-  defer n.Release()
-  k := NSStringNew(code)
-  defer k.Release()
+	var m NSMenuItem = NSMenuItemNew()
+	n := NSStringNew(name)
+	defer n.Release()
+	k := NSStringNew(code)
+	defer k.Release()
 	Runtime_objc_msgSend(m.Pointer, NSMenuItemInitWithTitleActionKeyEquivalentSel, n.Pointer, action, k.Pointer)
-  return m
+	return m
 }
 
 func NSMenuItemPointer(p unsafe.Pointer) NSMenuItem {
 	return NSMenuItem{NSObjectPointer(p)}
 }
 
-func (m NSMenuItem) NSMenuItemSetTitle(s string) {
-  n := NSStringNew(s)
-  defer n.Release()
+func (m NSMenuItem) SetTitle(s string) {
+	n := NSStringNew(s)
+	defer n.Release()
 	Runtime_objc_msgSend(m.Pointer, NSMenuItemSetTitle, n.Pointer)
 }
 
-func (m NSMenuItem) NSMenuItemSetImage(i NSImage) {
+func (m NSMenuItem) SetImage(i NSImage) {
 	Runtime_objc_msgSend(m.Pointer, NSMenuItemSetImage, i.Pointer)
 }
 
-func (m NSMenuItem) NSMenuItemSetEnabled(b bool) {
+func (m NSMenuItem) SetEnabled(b bool) {
 	Runtime_objc_msgSend(m.Pointer, NSMenuItemSetEnabled, Bool2Pointer(b))
 }
 
-func (m NSMenuItem) NSMenuItemSetSubmenu(i NSMenu) {
+func (m NSMenuItem) SetSubmenu(i NSMenu) {
 	Runtime_objc_msgSend(m.Pointer, NSMenuItemSetSubmenu, i.Pointer)
 }
 
-func (m NSMenuItem) NSMenuItemSetState(i int) {
+func (m NSMenuItem) SetState(i int) {
 	Runtime_objc_msgSend(m.Pointer, NSMenuItemSetState, Int2Pointer(i))
 }
 
-func (m NSMenuItem) NSMenuItemSetTarget(o NSObject) {
+func (m NSMenuItem) SetTarget(o NSObject) {
 	Runtime_objc_msgSend(m.Pointer, NSMenuItemSetTarget, o.Pointer)
 }
 
-func (m NSMenuItem) NSMenuItemSetAction(o unsafe.Pointer) {
+func (m NSMenuItem) SetAction(o unsafe.Pointer) {
 	Runtime_objc_msgSend(m.Pointer, NSMenuItemSetAction, o)
 }
 
-func (m NSMenuItem) NSMenuItemSubmenu() NSMenu {
+func (m NSMenuItem) Submenu() NSMenu {
 	return NSMenuPointer(Runtime_objc_msgSend(m.Pointer, NSMenuItemSubmenu))
 }
 
-func (m NSMenuItem) NSMenuItemTag() int {
+func (m NSMenuItem) Tag() int {
 	return Pointer2Int(Runtime_objc_msgSend(m.Pointer, NSMenuItemTag))
 }
 
-func (m NSMenuItem) NSMenuItemTitle() string {
+func (m NSMenuItem) Title() string {
 	return NSStringPointer2String(Runtime_objc_msgSend(m.Pointer, NSMenuItemTitle))
 }

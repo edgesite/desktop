@@ -9,6 +9,7 @@ package desktop
 #include <objc/objc-runtime.h>
 
 BOOL NSApplicationLoad (void);
+int NSApplicationMain ( int argc, const char *argv[] );
 
 id objc_msgSend0(id to, SEL sel) {
   return objc_msgSend(to, sel);
@@ -25,51 +26,79 @@ id objc_msgSend2(id to, SEL sel, void* arg1, void* arg2) {
 id objc_msgSend3(id to, SEL sel, void* arg1, void* arg2, void* arg3) {
   return objc_msgSend(to, sel, arg1, arg2, arg3);
 }
+
+id objc_msgSend4(id to, SEL sel, void* arg1, void* arg2, void* arg3, void* arg4) {
+  return objc_msgSend(to, sel, arg1, arg2, arg3, arg4);
+}
 */
 import "C"
 
 import (
 	"fmt"
+	"math"
 	"unsafe"
-  "math"
 )
 
 func init() {
-  b := C.NSApplicationLoad()
-  if b == 0 {
-    panic("!NSApplicationLoad")
-  }
+	b := C.NSApplicationLoad()
+	if b == 0 {
+		panic("!NSApplicationLoad")
+	}
 }
 
-var Bool2Int = map[bool]int {
-  true: 1,
-  false: 0,
+var Bool2Int = map[bool]int{
+	true:  1,
+	false: 0,
 }
 
 func Bool2Pointer(b bool) unsafe.Pointer {
-  return unsafe.Pointer(uintptr(Bool2Int[b]))
+	return unsafe.Pointer(uintptr(Bool2Int[b]))
 }
 
 func Int2Pointer(i int) unsafe.Pointer {
-  return unsafe.Pointer(uintptr(i))
+	return unsafe.Pointer(uintptr(i))
 }
 
 func Float2Pointer(i float64) unsafe.Pointer {
-  return unsafe.Pointer(uintptr(math.Float64bits(i)))
+	return unsafe.Pointer(uintptr(math.Float64bits(i)))
 }
 
 func Pointer2Float(p unsafe.Pointer) float64 {
-  i := uint64(uintptr(p))
-  return math.Float64frombits(i)
+	return math.Float64frombits(uint64(uintptr(p)))
 }
 
 func Pointer2Int(p unsafe.Pointer) int {
-  return int(uintptr(p))
+	return int(uintptr(p))
 }
 
-// when pointer is (const char*)
 func Pointer2String(p unsafe.Pointer) string {
-  return C.GoString((*C.char)(p))
+	return C.GoString((*C.char)(p))
+}
+
+func UInt2Pointer(i uint) unsafe.Pointer {
+	return unsafe.Pointer(uintptr(i))
+}
+
+func Runtime_Main() {
+	app := NSApplicationMainSharedApplication()
+	defer app.Release()
+	app.Run()
+}
+
+func Runtime_Loop() {
+	app := NSApplicationMainSharedApplication()
+	defer app.Release()
+
+	date := NSDateDistantFuture()
+	defer date.Release()
+
+	for {
+		p := app.NextEventMatchingMaskUntilDateInModeDequeue(NSAnyEventMask, date, NSDefaultRunLoopMode, true)
+		fmt.Println(p, p.Type())
+		app.SendEvent(p)
+		app.UpdateWindows()
+    p.Release()
+	}
 }
 
 // https://developer.apple.com/library/mac/#documentation/Cocoa/Reference/ObjCRuntimeRef/Reference/reference.html
@@ -104,13 +133,15 @@ func Runtime_objc_msgSend(self unsafe.Pointer, sel unsafe.Pointer, args ...unsaf
 		return unsafe.Pointer(C.objc_msgSend2((*C.struct_objc_object)(self), (*C.struct_objc_selector)(sel), args[0], args[1]))
 	case 3:
 		return unsafe.Pointer(C.objc_msgSend3((*C.struct_objc_object)(self), (*C.struct_objc_selector)(sel), args[0], args[1], args[2]))
+	case 4:
+		return unsafe.Pointer(C.objc_msgSend4((*C.struct_objc_object)(self), (*C.struct_objc_selector)(sel), args[0], args[1], args[2], args[3]))
 	default:
 		panic(fmt.Sprint("Unsupported number of arguments ", len(args)))
 	}
 }
 
 func Runtime_class_createInstance(cls unsafe.Pointer, extraBytes int) unsafe.Pointer {
-  return unsafe.Pointer(C.class_createInstance((*C.struct_objc_class)(cls), (C.size_t)(extraBytes)))
+	return unsafe.Pointer(C.class_createInstance((*C.struct_objc_class)(cls), (C.size_t)(extraBytes)))
 }
 
 //boolean class_addMethod(Pointer cls, Pointer selector, StdCallCallback imp, String types);

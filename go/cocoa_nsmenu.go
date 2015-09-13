@@ -21,25 +21,25 @@ type NSMenu struct {
 }
 
 func NSMenuNew() NSMenu {
-  return NSMenu{NSObjectPointer(Runtime_class_createInstance(NSMenuClass, 0))}
+	return NSMenu{NSObjectPointer(Runtime_class_createInstance(NSMenuClass, 0))}
 }
 
 func NSMenuPointer(p unsafe.Pointer) NSMenu {
 	return NSMenu{NSObjectPointer(p)}
 }
 
-func (m *NSMenu) NSMenuAddItem(i NSMenuItem) {
-  Runtime_objc_msgSend(m.Pointer, i.Pointer)
+func (m NSMenu) AddItem(i NSMenuItem) {
+	Runtime_objc_msgSend(m.Pointer, i.Pointer)
 }
 
-func (m *NSMenu) NSMenuInsertItemAtIndex(i NSMenuItem, in int) {
-  Runtime_objc_msgSend(m.Pointer, i.Pointer, Int2Pointer(in))
+func (m NSMenu) InsertItemAtIndex(i NSMenuItem, in int) {
+	Runtime_objc_msgSend(m.Pointer, i.Pointer, Int2Pointer(in))
 }
 
-func (m *NSMenu) NSMenuNSMenuSetAutoenablesItems(b bool) {
-  Runtime_objc_msgSend(m.Pointer, Bool2Pointer(b))
+func (m NSMenu) SetAutoenablesItems(b bool) {
+	Runtime_objc_msgSend(m.Pointer, NSMenuSetAutoenablesItems, Bool2Pointer(b))
 }
 
-func (m *NSMenu) NSMenuItemAtIndex(i int) NSMenuItem {
-  return NSMenuItemPointer(Runtime_objc_msgSend(m.Pointer, Int2Pointer(i)))
+func (m NSMenu) ItemAtIndex(i int) NSMenuItem {
+	return NSMenuItemPointer(Runtime_objc_msgSend(m.Pointer, NSMenuItemAtIndex, Int2Pointer(i)))
 }

@@ -22,8 +22,7 @@ func NSArrayPointer(p unsafe.Pointer) NSArray {
 }
 
 func (m NSArray) Count() int {
-	u := (uintptr)(Runtime_objc_msgSend(m.Pointer, NSArrayCount))
-	return (int)(u)
+	return Pointer2Int(Runtime_objc_msgSend(m.Pointer, NSArrayCount))
 }
 
 func (m NSArray) ObjectAtIndex(i int) unsafe.Pointer {

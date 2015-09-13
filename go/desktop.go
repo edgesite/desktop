@@ -1,7 +1,7 @@
 package desktop
 
 import (
-  "image"
+	"image"
 )
 
 //
@@ -54,6 +54,16 @@ func GetDesktopFolder() string {
 }
 
 //
+// Main function
+//
+// Need to keep messages loop running. Have to be run on main thread. 
+//
+func Main() {
+  desktopMain()
+}
+
+
+//
 // SysTrayIcon or NSStatusBar or Notification Area
 //
 
@@ -68,6 +78,7 @@ type Menu struct {
 	Type    int
 	Enabled bool
 	Name    string
+	Icon    image.Image
 }
 
 type DesktopSysTray struct {
@@ -108,7 +119,7 @@ func (m *DesktopSysTray) RemoveListener(l DesktopSysTrayListener) {
 }
 
 func (m *DesktopSysTray) SetIcon(icon image.Image) {
-  setIcon(m, icon)
+	setIcon(m, icon)
 }
 
 func (m *DesktopSysTray) SetTitle(title string) {

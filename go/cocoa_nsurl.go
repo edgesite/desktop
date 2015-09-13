@@ -19,8 +19,7 @@ type NSURL struct {
 }
 
 func NSURLPointer(p unsafe.Pointer) NSURL {
-	var m NSURL = NSURL{NSObjectPointer(p)}
-	return m
+	return NSURL{NSObjectPointer(p)}
 }
 
 func (m NSObject) AbsoluteString() string {

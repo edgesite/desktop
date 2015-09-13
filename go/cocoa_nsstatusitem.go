@@ -36,7 +36,7 @@ func (m NSStatusItem) SetMenu(i NSMenu) {
 }
 
 func (m NSStatusItem) SetToolTip(s string) {
-  n := NSStringNew(s)
-  defer n.Release()
+	n := NSStringNew(s)
+	defer n.Release()
 	Runtime_objc_msgSend(m.Pointer, NSStatusItemSetToolTip, n.Pointer)
 }
