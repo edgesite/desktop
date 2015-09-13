@@ -26,7 +26,7 @@ func main() {
 
 Full example:
 
-  * [SysTrayTest.go](test/systraytest.go)
+  * [systraytest.go](test/systraytest.go)
 
 ```go
 package main
