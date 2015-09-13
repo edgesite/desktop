@@ -22,9 +22,9 @@ func NSObjectNew() NSObject {
 }
 
 func NSObjectPointer(p unsafe.Pointer) NSObject {
-  if p == nil {
-    panic("NSObject nil")
-  }
+	if p == nil {
+		panic("NSObject nil")
+	}
 
 	var m NSObject = NSObject{p}
 	m.Retain()

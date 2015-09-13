@@ -8,7 +8,7 @@ extern void DesktopSysTrayActionOSXActionMap(void*, void*);
 import "C"
 
 import (
-  "unsafe"
+	"unsafe"
 )
 
 //
@@ -22,18 +22,18 @@ var DesktopSysTrayActionOSXMap = make(map[unsafe.Pointer]*DesktopSysTrayActionOS
 
 //export DesktopSysTrayActionOSXActionMap
 func DesktopSysTrayActionOSXActionMap(id unsafe.Pointer, sel unsafe.Pointer) {
-  if sel == DesktopSysTrayActionOSXActionReg {
-    DesktopSysTrayActionOSXMap[id].Action()
-  }
+	if sel == DesktopSysTrayActionOSXActionReg {
+		DesktopSysTrayActionOSXMap[id].Action()
+	}
 }
 
 func DesktopSysTrayActionOSXRegister() bool {
-  if !Runtime_class_addMethod(DesktopSysTrayActionOSXClassReg, DesktopSysTrayActionOSXActionReg, C.DesktopSysTrayActionOSXActionMap, "v@:") {
-    panic("problem initalizing class")
-  }
-  Runtime_objc_registerClassPair(DesktopSysTrayActionOSXClassReg)
-  
-  return true
+	if !Runtime_class_addMethod(DesktopSysTrayActionOSXClassReg, DesktopSysTrayActionOSXActionReg, C.DesktopSysTrayActionOSXActionMap, "v@:") {
+		panic("problem initalizing class")
+	}
+	Runtime_objc_registerClassPair(DesktopSysTrayActionOSXClassReg)
+
+	return true
 }
 
 var DesktopSysTrayActionOSXRegistred bool = DesktopSysTrayActionOSXRegister()
@@ -46,32 +46,32 @@ var DesktopSysTrayActionOSXClass unsafe.Pointer = Runtime_objc_lookUpClass("Desk
 var DesktopSysTrayActionOSXAction unsafe.Pointer = Runtime_sel_getUid("action")
 
 type DesktopSysTrayActionOSX struct {
-  NSObject
+	NSObject
 
-  Menu *Menu
+	Menu *Menu
 }
 
 func DesktopSysTrayActionOSXNew(mn *Menu) *DesktopSysTrayActionOSX {
-  m := DesktopSysTrayActionOSXPointer(Runtime_class_createInstance(DesktopSysTrayActionOSXClass, 0))
-  
-  m.Menu = mn
-  
-  return m
+	m := DesktopSysTrayActionOSXPointer(Runtime_class_createInstance(DesktopSysTrayActionOSXClass, 0))
+
+	m.Menu = mn
+
+	return m
 }
 
 func DesktopSysTrayActionOSXPointer(p unsafe.Pointer) *DesktopSysTrayActionOSX {
-  m := &DesktopSysTrayActionOSX{NSObjectPointer(p), nil}
+	m := &DesktopSysTrayActionOSX{NSObjectPointer(p), nil}
 
-  DesktopSysTrayActionOSXMap[m.Pointer] = m
+	DesktopSysTrayActionOSXMap[m.Pointer] = m
 
-  return m
+	return m
 }
 
 func (m *DesktopSysTrayActionOSX) Action() {
-  m.Menu.Action(m.Menu)
+	m.Menu.Action(m.Menu)
 }
 
 func (m *DesktopSysTrayActionOSX) Release() {
-  delete(DesktopSysTrayActionOSXMap, m.Pointer)
-  m.NSObject.Release()
+	delete(DesktopSysTrayActionOSXMap, m.Pointer)
+	m.NSObject.Release()
 }

@@ -26,7 +26,7 @@ func update(m *DesktopSysTray) {
 
 	if m.Menu != nil {
 		mn := createSubMenu(m.Menu)
-    defer mn.Release()
+		defer mn.Release()
 		d.statusitem.SetMenu(mn)
 	}
 
@@ -36,14 +36,14 @@ func update(m *DesktopSysTray) {
 }
 
 func desktopMain() {
-  Runtime_Main()
+	Runtime_Main()
 }
 
 func createSubMenu(mm []Menu) NSMenu {
 	var mn NSMenu = NSMenuNew()
 
 	for i := range mm {
-    m := &mm[i]
+		m := &mm[i]
 
 		switch m.Type {
 		case MenuItem:
@@ -56,18 +56,18 @@ func createSubMenu(mm []Menu) NSMenu {
 			menu.SetTitle(m.Name)
 			menu.SetImage(icon)
 			menu.SetEnabled(m.Enabled)
-      
-      if m.Action != nil {
-        a := DesktopSysTrayActionOSXNew(m)
-        menu.SetTarget(a.Pointer)
-        menu.SetAction(DesktopSysTrayActionOSXAction)
-      }
-      
-      if m.Menu != nil {
-        sub := createSubMenu(m.Menu)
-        defer sub.Release()
-        menu.SetSubmenu(sub)
-      }
+
+			if m.Action != nil {
+				a := DesktopSysTrayActionOSXNew(m)
+				menu.SetTarget(a.Pointer)
+				menu.SetAction(DesktopSysTrayActionOSXAction)
+			}
+
+			if m.Menu != nil {
+				sub := createSubMenu(m.Menu)
+				defer sub.Release()
+				menu.SetSubmenu(sub)
+			}
 			mn.AddItem(menu)
 		case MenuSeparator:
 			menu := NSMenuItemSeparatorItem()
@@ -83,13 +83,13 @@ func createSubMenu(mm []Menu) NSMenu {
 			menu.SetTitle(m.Name)
 			menu.SetImage(icon)
 			menu.SetEnabled(m.Enabled)
-      menu.SetState((map[bool]int{true:NSOnState, false:NSOffState})[m.State])
-      
-      if m.Action != nil {
-        a := DesktopSysTrayActionOSXNew(m)
-        menu.SetTarget(a.Pointer)
-        menu.SetAction(DesktopSysTrayActionOSXAction)
-      }
+			menu.SetState((map[bool]int{true: NSOnState, false: NSOffState})[m.State])
+
+			if m.Action != nil {
+				a := DesktopSysTrayActionOSXNew(m)
+				menu.SetTarget(a.Pointer)
+				menu.SetAction(DesktopSysTrayActionOSXAction)
+			}
 
 			mn.AddItem(menu)
 		}

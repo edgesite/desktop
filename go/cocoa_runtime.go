@@ -106,7 +106,7 @@ func Runtime_Loop() {
 		fmt.Println(p, p.Type())
 		app.SendEvent(p)
 		app.UpdateWindows()
-    p.Release()
+		p.Release()
 	}
 }
 
@@ -154,29 +154,29 @@ func Runtime_class_createInstance(cls unsafe.Pointer, extraBytes int) unsafe.Poi
 }
 
 func Runtime_class_addMethod(cls unsafe.Pointer, sel unsafe.Pointer, imp unsafe.Pointer, types string) bool {
-  var n *C.char = C.CString(types)
-  defer C.free(unsafe.Pointer(n))
-  if C.class_addMethod((*C.struct_objc_class)(cls), (*C.struct_objc_selector)(sel), (*[0]byte)(imp), n) == 1 {
-    return true
-  } else {
-    return false
-  }
+	var n *C.char = C.CString(types)
+	defer C.free(unsafe.Pointer(n))
+	if C.class_addMethod((*C.struct_objc_class)(cls), (*C.struct_objc_selector)(sel), (*[0]byte)(imp), n) == 1 {
+		return true
+	} else {
+		return false
+	}
 }
 
 func Runtime_sel_registerName(name string) unsafe.Pointer {
-  var n *C.char = C.CString(name)
-  defer C.free(unsafe.Pointer(n))
-  return unsafe.Pointer(C.sel_registerName(n))
+	var n *C.char = C.CString(name)
+	defer C.free(unsafe.Pointer(n))
+	return unsafe.Pointer(C.sel_registerName(n))
 }
 
 func Runtime_objc_allocateClassPair(superClass unsafe.Pointer, name string, extraBytes int) unsafe.Pointer {
-  var n *C.char = C.CString(name)
-  defer C.free(unsafe.Pointer(n))
-  return unsafe.Pointer(C.objc_allocateClassPair((*C.struct_objc_class)(superClass), n, (C.size_t)(extraBytes)))
+	var n *C.char = C.CString(name)
+	defer C.free(unsafe.Pointer(n))
+	return unsafe.Pointer(C.objc_allocateClassPair((*C.struct_objc_class)(superClass), n, (C.size_t)(extraBytes)))
 }
 
 func Runtime_objc_registerClassPair(cls unsafe.Pointer) {
-  C.objc_registerClassPair((*C.struct_objc_class)(cls))
+	C.objc_registerClassPair((*C.struct_objc_class)(cls))
 }
 
 //Pointer class_getInstanceMethod(Pointer cls, Pointer selecter);

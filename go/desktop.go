@@ -56,13 +56,13 @@ func GetDesktopFolder() string {
 //
 // Main function
 //
-// Need to keep messages loop running. Have to be run on main thread. 
+// Need to keep messages loop running. Have to be run on main thread.
 // All GUI applications need that. So if you plan to use SysTray call
 // this function from main function.
 //
 
 func Main() {
-  desktopMain()
+	desktopMain()
 }
 
 //
@@ -79,8 +79,8 @@ type MenuAction func(*Menu)
 
 type Menu struct {
 	Menu    []Menu
-  Action  MenuAction
-  State   bool
+	Action  MenuAction
+	State   bool
 	Type    int
 	Enabled bool
 	Name    string
