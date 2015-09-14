@@ -44,7 +44,16 @@ Script nature of Java or Go now not limited by system programming working with s
       - [ ] Windows
       - [ ] Linux
       - [ ] Mac OS X
-
+  * Register URL handlers (open a file from a browser)
+    * Java
+      - [ ] Windows
+      - [ ] Linux
+      - [X] Mac OS X
+    * Go
+      - [ ] Windows
+      - [ ] Linux
+      - [ ] Mac OS X
+   
 ## Example Desktop Folders
 
 
