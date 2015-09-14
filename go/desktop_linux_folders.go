@@ -4,25 +4,25 @@ package desktop
 
 // user application data folder
 func getAppDataFolder() string {
-  return ""
+	return ""
 }
 
 // user home "/home/user"
 func getHomeFolder() string {
-  return ""
+	return ""
 }
 
 // user my documents "~/Documents"
 func getDocumentsFolder() string {
-  return ""
+	return ""
 }
 
 // user downloads "~/Downloads"
 func getDownloadsFolder() string {
-  return ""
+	return ""
 }
 
 // user desktop "~/Desktop"
 func getDesktopFolder() string {
-  return ""
+	return ""
 }

@@ -10,25 +10,25 @@ func desktopSysTrayNew() *DesktopSysTray {
 	return &DesktopSysTray{}
 }
 
-func desktopMain(){
+func desktopMain() {
 }
 
 func setIcon(m *DesktopSysTray, i image.Image) string {
-  return ""
+	return ""
 }
 
 func show(m *DesktopSysTray) string {
-  return ""
+	return ""
 }
 
 func hide(m *DesktopSysTray) string {
-  return ""
+	return ""
 }
 
 func update(m *DesktopSysTray) string {
-  return ""
+	return ""
 }
 
 func close(m *DesktopSysTray) string {
-  return ""
+	return ""
 }
