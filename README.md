@@ -2,11 +2,14 @@
 
 Java && Go Desktop functions. Have you tried to find user default Download folder using java? It is very complicated. If so, you would find this library very helpful.
 
+Using this library you can use Java or Go language to write a desktop applications and services, without a restriction to be console only or limited Swing/AWT application.
+
 ## Features
 
-  * Cross platform user specific folders: Download folder, Home folder, Documents folder
+  * Cross platform user specific folders: Download folder, Home folder, Documents folder, etc ...
   * Cross platform SysTray Icon
   * Cross platform Browser Pop Window
+  * Cross platform Power Events (reboot, logout)
 
 ## Example Desktop Folders
 
