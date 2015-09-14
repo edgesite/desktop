@@ -7,13 +7,13 @@ import com.github.axet.desktop.os.win.libs.User32Ex;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WinDef.HINSTANCE;
 
-public class WndClassExWrap {
+public class WNDCLASSEXWrap {
 
     String klass;
     ATOM wcatom;
     HINSTANCE hInstance;
 
-    public WndClassExWrap(HINSTANCE hInstance, WNDPROC WndProc, String klass) {
+    public WNDCLASSEXWrap(HINSTANCE hInstance, WNDPROC WndProc, String klass) {
         this.klass = klass;
         this.hInstance = hInstance;
 

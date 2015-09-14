@@ -14,7 +14,7 @@ import com.sun.jna.platform.win32.WinGDI;
 import com.sun.jna.platform.win32.WinGDI.BITMAPINFO;
 import com.sun.jna.ptr.PointerByReference;
 
-public class HBitmapWrap extends HBITMAP {
+public class HBITMAPWrap extends HBITMAP {
 
     // https://github.com/twall/jna/blob/master/contrib/alphamaskdemo/com/sun/jna/contrib/demo/AlphaMaskDemo.java
 
@@ -69,16 +69,16 @@ public class HBitmapWrap extends HBITMAP {
 
     BufferedImage img;
 
-    public HBitmapWrap(BufferedImage img) {
+    public HBITMAPWrap(BufferedImage img) {
         setPointer(createBitmap(img).getPointer());
 
         this.img = img;
     }
 
-    public HBitmapWrap() {
+    public HBITMAPWrap() {
     }
 
-    public HBitmapWrap(Pointer p) {
+    public HBITMAPWrap(Pointer p) {
         super(p);
     }
 

@@ -7,7 +7,7 @@ import com.sun.jna.platform.win32.GDI32;
 import com.sun.jna.platform.win32.WinDef.HBITMAP;
 import com.sun.jna.platform.win32.WinDef.HICON;
 
-public class HIconWrap extends HICON {
+public class HICONWrap extends HICON {
 
     // http://www.pinvoke.net/default.aspx/user32.createiconindirect
 
@@ -24,14 +24,14 @@ public class HIconWrap extends HICON {
         return hicon;
     }
 
-    public HIconWrap() {
+    public HICONWrap() {
     }
 
-    public HIconWrap(Pointer p) {
+    public HICONWrap(Pointer p) {
         super(p);
     }
 
-    public HIconWrap(HBitmapWrap bm) {
+    public HICONWrap(HBITMAPWrap bm) {
         setPointer(createIconIndirect(bm).getPointer());
     }
 

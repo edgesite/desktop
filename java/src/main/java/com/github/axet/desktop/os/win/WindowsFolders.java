@@ -8,7 +8,7 @@ import com.github.axet.desktop.DesktopFolders;
 import com.github.axet.desktop.os.win.libs.Ole32Ex;
 import com.github.axet.desktop.os.win.libs.Shell32Ex;
 import com.github.axet.desktop.os.win.wrap.GUID;
-import com.github.axet.desktop.os.win.wrap.HResultException;
+import com.github.axet.desktop.os.win.wrap.HRESULTException;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.PointerByReference;
@@ -81,7 +81,7 @@ public class WindowsFolders implements DesktopFolders {
             path = path.substring(0, len);
             return new File(path);
         } else {
-            throw new HResultException(hResult);
+            throw new HRESULTException(hResult);
         }
     }
 

@@ -10,7 +10,7 @@ import com.github.axet.desktop.os.win.handle.WNDPROC;
 import com.github.axet.desktop.os.win.libs.Kernel32Ex;
 import com.github.axet.desktop.os.win.libs.User32Ex;
 import com.github.axet.desktop.os.win.wrap.GetLastErrorException;
-import com.github.axet.desktop.os.win.wrap.WndClassExWrap;
+import com.github.axet.desktop.os.win.wrap.WNDCLASSEXWrap;
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.User32;
@@ -34,7 +34,7 @@ public class WindowsPowerXP extends DesktopPower {
     public class MessagePump implements Runnable {
         Thread t;
 
-        WndClassExWrap wc;
+        WNDCLASSEXWrap wc;
         WNDPROC WndProc;
         HWND hWnd;
         HINSTANCE hInstance;
@@ -84,7 +84,7 @@ public class WindowsPowerXP extends DesktopPower {
         HWND createWindow() {
             hInstance = Kernel32.INSTANCE.GetModuleHandle(null);
 
-            wc = new WndClassExWrap(hInstance, WndProc, WindowsPowerXP.class.getSimpleName());
+            wc = new WNDCLASSEXWrap(hInstance, WndProc, WindowsPowerXP.class.getSimpleName());
 
             HWND hwnd = User32Ex.INSTANCE.CreateWindowEx(0, wc.getName(), wc.getName(), User32Ex.WS_OVERLAPPED, 0, 0,
                     0, 0, null, null, hInstance, null);

@@ -34,9 +34,9 @@ import com.github.axet.desktop.os.win.libs.Msimg32;
 import com.github.axet.desktop.os.win.libs.Shell32Ex;
 import com.github.axet.desktop.os.win.libs.User32Ex;
 import com.github.axet.desktop.os.win.wrap.GetLastErrorException;
-import com.github.axet.desktop.os.win.wrap.HBitmapWrap;
-import com.github.axet.desktop.os.win.wrap.HIconWrap;
-import com.github.axet.desktop.os.win.wrap.WndClassExWrap;
+import com.github.axet.desktop.os.win.wrap.HBITMAPWrap;
+import com.github.axet.desktop.os.win.wrap.HICONWrap;
+import com.github.axet.desktop.os.win.wrap.WNDCLASSEXWrap;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.BaseTSD.ULONG_PTR;
 import com.sun.jna.platform.win32.GDI32;
@@ -105,7 +105,7 @@ public class WindowsSysTray extends DesktopSysTray {
     public class MessagePump implements Runnable {
         Thread t;
 
-        WndClassExWrap wc;
+        WNDCLASSEXWrap wc;
         WNDPROC WndProc;
         HWND hWnd;
         HINSTANCE hInstance;
@@ -190,7 +190,7 @@ public class WindowsSysTray extends DesktopSysTray {
         HWND createWindow() {
             hInstance = Kernel32.INSTANCE.GetModuleHandle(null);
 
-            wc = new WndClassExWrap(hInstance, WndProc, WindowsSysTray.class.getSimpleName());
+            wc = new WNDCLASSEXWrap(hInstance, WndProc, WindowsSysTray.class.getSimpleName());
 
             HWND hwnd = User32Ex.INSTANCE.CreateWindowEx(0, wc.getName(), wc.getName(), User32Ex.WS_OVERLAPPEDWINDOW, 0,
                     0, 0, 0, null, null, hInstance, null);
@@ -265,7 +265,7 @@ public class WindowsSysTray extends DesktopSysTray {
     }
 
     static class MenuMap {
-        public HBitmapWrap hbm;
+        public HBITMAPWrap hbm;
         public JMenuItem item;
 
         public MenuMap(JMenuItem item) {
@@ -303,10 +303,10 @@ public class WindowsSysTray extends DesktopSysTray {
     String title;
     JPopupMenu menu;
 
-    HBitmapWrap hbitmapChecked;
-    HBitmapWrap hbitmapUnchecked;
-    HBitmapWrap hbitmapTrayIcon;
-    HIconWrap hicoTrayIcon;
+    HBITMAPWrap hbitmapChecked;
+    HBITMAPWrap hbitmapUnchecked;
+    HBITMAPWrap hbitmapTrayIcon;
+    HICONWrap hicoTrayIcon;
     HMENU hMenus;
     // position in this list == id of HMENU item
     List<MenuMap> hMenusIDs = new ArrayList<MenuMap>();
@@ -441,7 +441,7 @@ public class WindowsSysTray extends DesktopSysTray {
         return User32.INSTANCE.GetSystemMetrics(SM_CYMENUCHECK);
     }
 
-    static HBitmapWrap getMenuImage(Icon icon) {
+    static HBITMAPWrap getMenuImage(Icon icon) {
         BufferedImage img = Utils.createBitmap(icon);
 
         int menubarHeigh = getSystemMenuImageSize();
@@ -452,12 +452,12 @@ public class WindowsSysTray extends DesktopSysTray {
         g.drawImage(img, 0, 0, menubarHeigh, menubarHeigh, null);
         g.dispose();
 
-        return new HBitmapWrap(scaledImage);
+        return new HBITMAPWrap(scaledImage);
     }
 
     public void setIcon(Icon icon) {
-        this.hbitmapTrayIcon = new HBitmapWrap(Utils.createBitmap(icon));
-        this.hicoTrayIcon = new HIconWrap(hbitmapTrayIcon);
+        this.hbitmapTrayIcon = new HBITMAPWrap(Utils.createBitmap(icon));
+        this.hicoTrayIcon = new HICONWrap(hbitmapTrayIcon);
 
     }
 
