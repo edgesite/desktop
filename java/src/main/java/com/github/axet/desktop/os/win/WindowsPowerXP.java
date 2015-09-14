@@ -9,6 +9,7 @@ import com.github.axet.desktop.os.win.handle.HANDLER_ROUTINE;
 import com.github.axet.desktop.os.win.handle.WNDPROC;
 import com.github.axet.desktop.os.win.libs.Kernel32Ex;
 import com.github.axet.desktop.os.win.libs.User32Ex;
+import com.github.axet.desktop.os.win.wrap.GetLastErrorException;
 import com.github.axet.desktop.os.win.wrap.WndClassExWrap;
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.Kernel32;

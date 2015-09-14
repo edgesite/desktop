@@ -33,6 +33,7 @@ import com.github.axet.desktop.os.win.libs.GDI32Ex;
 import com.github.axet.desktop.os.win.libs.Msimg32;
 import com.github.axet.desktop.os.win.libs.Shell32Ex;
 import com.github.axet.desktop.os.win.libs.User32Ex;
+import com.github.axet.desktop.os.win.wrap.GetLastErrorException;
 import com.github.axet.desktop.os.win.wrap.HBitmapWrap;
 import com.github.axet.desktop.os.win.wrap.HIconWrap;
 import com.github.axet.desktop.os.win.wrap.WndClassExWrap;

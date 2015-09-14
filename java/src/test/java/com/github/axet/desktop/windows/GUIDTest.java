@@ -1,6 +1,6 @@
 package com.github.axet.desktop.windows;
 
-import com.github.axet.desktop.os.win.GUID;
+import com.github.axet.desktop.os.win.wrap.GUID;
 
 public class GUIDTest {
     public static void main(String[] args) {

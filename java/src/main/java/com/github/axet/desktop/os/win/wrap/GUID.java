@@ -1,4 +1,4 @@
-package com.github.axet.desktop.os.win;
+package com.github.axet.desktop.os.win.wrap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;

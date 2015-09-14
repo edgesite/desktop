@@ -7,6 +7,8 @@ import org.apache.commons.lang.SystemUtils;
 import com.github.axet.desktop.DesktopFolders;
 import com.github.axet.desktop.os.win.libs.Ole32Ex;
 import com.github.axet.desktop.os.win.libs.Shell32Ex;
+import com.github.axet.desktop.os.win.wrap.GUID;
+import com.github.axet.desktop.os.win.wrap.HResultException;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.PointerByReference;
@@ -70,11 +72,9 @@ public class WindowsFolders implements DesktopFolders {
     }
 
     public File path(int nFolder) {
-        HWND hwndOwner = null;
-        HANDLE hToken = null;
         int dwFlags = Shell32Ex.SHGFP_TYPE_CURRENT;
         char[] pszPath = new char[Shell32Ex.MAX_PATH];
-        int hResult = Shell32Ex.INSTANCE.SHGetFolderPath(hwndOwner, nFolder, hToken, dwFlags, pszPath);
+        int hResult = Shell32Ex.INSTANCE.SHGetFolderPath(null, nFolder, null, dwFlags, pszPath);
         if (Shell32Ex.S_OK == hResult) {
             String path = new String(pszPath);
             int len = path.indexOf('\0');

@@ -1,6 +1,5 @@
 package com.github.axet.desktop.os.win.wrap;
 
-import com.github.axet.desktop.os.win.GetLastErrorException;
 import com.github.axet.desktop.os.win.handle.ICONINFO;
 import com.github.axet.desktop.os.win.libs.User32Ex;
 import com.sun.jna.Pointer;

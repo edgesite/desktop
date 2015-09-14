@@ -1,6 +1,5 @@
 package com.github.axet.desktop.os.win.wrap;
 
-import com.github.axet.desktop.os.win.GetLastErrorException;
 import com.github.axet.desktop.os.win.handle.ATOM;
 import com.github.axet.desktop.os.win.handle.WNDCLASSEX;
 import com.github.axet.desktop.os.win.handle.WNDPROC;

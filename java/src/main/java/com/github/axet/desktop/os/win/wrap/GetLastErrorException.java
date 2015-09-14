@@ -1,4 +1,4 @@
-package com.github.axet.desktop.os.win;
+package com.github.axet.desktop.os.win.wrap;
 
 import com.sun.jna.platform.win32.Kernel32;
 
