@@ -3,7 +3,9 @@
 package desktop
 
 import (
+	"fmt"
 	"reflect"
+	"strings"
 	"syscall"
 	"unicode/utf16"
 	"unsafe"
@@ -53,7 +55,7 @@ func WArray2String(rr []uint16) string {
 	return string(utf16.Decode(rr))
 }
 
-func Ptr(d interface{}) uintptr {
+func Arg(d interface{}) uintptr {
 	v := reflect.ValueOf(d)
 	UIntPtr := reflect.TypeOf((uintptr)(0))
 
@@ -63,4 +65,101 @@ func Ptr(d interface{}) uintptr {
 	} else {
 		return v.Pointer()
 	}
+}
+
+var NULL = Arg(0)
+
+// copy last error from last syscall
+var LastError uintptr
+
+type HMENU uintptr
+
+func HMENUPtr(r1, r2 uintptr, err error) HMENU {
+	LastError = uintptr(err.(syscall.Errno))
+	return HMENU(r1)
+}
+
+type HRESULT uintptr
+
+func HRESULTPtr(r1, r2 uintptr, err error) HRESULT {
+	LastError = uintptr(err.(syscall.Errno))
+	return HRESULT(r1)
+}
+
+func (m HRESULT) String() string {
+	msg := [1024]uint16{}
+	FormatMessage.Call(Arg(FORMAT_MESSAGE_FROM_SYSTEM), NULL, Arg(m), NULL, Arg(&msg[0]), Arg(len(msg)), NULL)
+	return fmt.Sprintf("HRESULT: 0x%08x [%s]", uintptr(m), strings.TrimSpace(WString2String(Arg(&msg[0]))))
+}
+
+var Bool2Int = map[bool]int{
+	true:  1,
+	false: 0,
+}
+
+var Int2Bool = map[int]bool{
+	1: true,
+	0: false,
+}
+
+type BOOL uint32
+
+func BOOLPtr(r1, r2 uintptr, err error) BOOL {
+	LastError = uintptr(err.(syscall.Errno))
+	return BOOL(r1)
+}
+
+func (m BOOL) Bool() bool {
+	return Int2Bool[int(m)]
+}
+
+type DWORD uint32
+type UINT uint32
+type HWND uint32
+
+func HWNDPtr(r1, r2 uintptr, err error) HWND {
+	LastError = uintptr(err.(syscall.Errno))
+	return HWND(r1)
+}
+
+type HICON uint32
+type TCHAR uint16
+
+func GetLastErrorString() string {
+	return HRESULT(LastError).String()
+}
+
+type WNDPROC uintptr
+
+func WNDPROCNew(fn interface{}) WNDPROC {
+	return WNDPROC(syscall.NewCallback(fn))
+}
+
+type HINSTANCE uintptr
+
+func HINSTANCEPtr(r1, r2 uintptr, err error) HINSTANCE {
+	LastError = uintptr(err.(syscall.Errno))
+	return HINSTANCE(r1)
+}
+
+type LPCTSTR uintptr
+type HCURSOR uintptr
+type HBRUSH uintptr
+type LONG int
+
+type LRESULT uintptr
+
+func LRESULTPtr(r1, r2 uintptr, err error) LRESULT {
+	LastError = uintptr(err.(syscall.Errno))
+	return LRESULT(r1)
+}
+
+type WPARAM uint32
+type LPARAM uint32
+
+type ATOM uintptr
+
+func ATOMPtr(r1, r2 uintptr, err error) ATOM {
+	LastError = uintptr(err.(syscall.Errno))
+	return ATOM(r1)
 }

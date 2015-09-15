@@ -3,7 +3,6 @@
 package desktop
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -39,25 +38,23 @@ func getDesktopFolder() string {
 
 func knowpath(guid GUID) string {
 	var pszPath uintptr
-	hResult, _, _ := SHGetKnownFolderPath.Call(Ptr(&guid), Ptr(SHGFP_TYPE_CURRENT), Ptr(0), Ptr(&pszPath))
+	hResult := HRESULTPtr(SHGetKnownFolderPath.Call(Arg(&guid), Arg(SHGFP_TYPE_CURRENT), NULL, Arg(&pszPath)))
 	switch hResult {
-	case S_FILE_NOT_FOUND:
-		panic("File not Found")
 	case S_OK:
 		path := WString2String(pszPath)
 		CoTaskMemFree.Call(pszPath)
 		return path
 	default:
-		panic(fmt.Sprint("Error: %x", hResult))
+		panic(hResult.String())
 	}
 }
 
 func path(nFolder int) string {
 	pszPath := [MAX_PATH]uint16{}
-	hResult, _, _ := SHGetFolderPath.Call(Ptr(0), Ptr(nFolder), Ptr(0), Ptr(SHGFP_TYPE_CURRENT), Ptr(&pszPath[0]))
+	hResult := HRESULTPtr(SHGetFolderPath.Call(NULL, Arg(nFolder), NULL, Arg(SHGFP_TYPE_CURRENT), Arg(&pszPath[0])))
 	if S_OK == hResult {
-		return WString2String(Ptr(&pszPath[0]))
+		return WString2String(Arg(&pszPath[0]))
 	} else {
-		panic(fmt.Sprint("Error: %x", hResult))
+		panic(hResult.String())
 	}
 }

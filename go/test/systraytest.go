@@ -4,7 +4,7 @@ package main
 
 import (
 	"fmt"
-	"image"
+	"image/png"
 	"os"
 
 	".."
@@ -31,7 +31,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	icon, _, err := image.Decode(file)
+	icon, err := png.Decode(file)
 	if err != nil {
 		panic(err)
 	}

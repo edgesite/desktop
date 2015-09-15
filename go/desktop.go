@@ -89,7 +89,6 @@ type Menu struct {
 
 type DesktopSysTray struct {
 	Listeners map[DesktopSysTrayListener]bool
-	Icon      []byte
 	Title     string
 	Menu      []Menu
 
