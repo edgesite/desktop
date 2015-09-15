@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	MAX_PATH = 260
+	MAX_PATH DWORD = 260
 
 	// Local Settings\Application Data
 	CSIDL_LOCAL_APPDATA = 0x001c
@@ -23,9 +23,9 @@ const (
 	S_OK               = 0
 	S_FILE_NOT_FOUND   = 0x80070002
 
-	NIM_ADD    = 0
-	NIM_MODIFY = 1
-	NIM_DELETE = 2
+	NIM_ADD    DWORD = 0
+	NIM_MODIFY DWORD = 1
+	NIM_DELETE DWORD = 2
 )
 
 var Shell32Dll = syscall.MustLoadDLL("Shell32.dll")

@@ -9,7 +9,7 @@ import (
 func TestNOTIFYICONDATA(t *testing.T) {
 	n := NOTIFYICONDATANew()
 
-	if n.cbSize != 956 {
+	if n.cbSize != 976 {
 		t.Error("wrong NOTIFYICONDATA size", n.cbSize)
 	}
 }

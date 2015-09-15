@@ -7,27 +7,27 @@ import (
 )
 
 const (
-	WM_LBUTTONDOWN   = 513
-	WM_NCCREATE      = 129
-	WM_NCCALCSIZE    = 131
-	WM_CREATE        = 1
-	WM_SIZE          = 5
-	WM_MOVE          = 3
-	WM_USER          = 1024
-	WM_LBUTTONUP     = 0x0202
-	WM_LBUTTONDBLCLK = 515
-	WM_RBUTTONUP     = 517
-	WM_CLOSE         = 0x0010
-	WM_NULL          = 0x0000
-	SW_SHOW          = 5
-	WM_COMMAND       = 0x0111
-	WM_SHELLNOTIFY   = WM_USER + 1
-	WM_MEASUREITEM   = 44
-	WM_DRAWITEM      = 43
-	WM_CANCELMODE    = 0x001F
-	VK_ESCAPE        = 0x1B
-	WM_KEYDOWN       = 0x0100
-	WM_KEYUP         = 0x0101
+	WM_LBUTTONDOWN   DWORD = 513
+	WM_NCCREATE            = 129
+	WM_NCCALCSIZE          = 131
+	WM_CREATE              = 1
+	WM_SIZE                = 5
+	WM_MOVE                = 3
+	WM_USER                = 1024
+	WM_LBUTTONUP           = 0x0202
+	WM_LBUTTONDBLCLK       = 515
+	WM_RBUTTONUP           = 517
+	WM_CLOSE               = 0x0010
+	WM_NULL                = 0x0000
+	SW_SHOW                = 5
+	WM_COMMAND             = 0x0111
+	WM_SHELLNOTIFY         = WM_USER + 1
+	WM_MEASUREITEM         = 44
+	WM_DRAWITEM            = 43
+	WM_CANCELMODE          = 0x001F
+	VK_ESCAPE              = 0x1B
+	WM_KEYDOWN             = 0x0100
+	WM_KEYUP               = 0x0101
 
 	MF_ENABLED    = 0
 	MF_DISABLED   = 0x00000002
@@ -64,8 +64,15 @@ func desktopSysTrayNew() *DesktopSysTray {
 }
 
 func setIcon(m *DesktopSysTray, i image.Image) {
-	//var d *DesktopSysTrayWin = m.os.(*DesktopSysTrayWin)
+	var d *DesktopSysTrayWin = m.os.(*DesktopSysTrayWin)
 
+	bm := HBITMAPNew(i)
+	defer bm.Close()
+
+	if d.Icon != 0 {
+		d.Icon.Close()
+	}
+	d.Icon = HICONNew(bm)
 }
 
 func show(m *DesktopSysTray) {
@@ -87,8 +94,22 @@ func hide(m *DesktopSysTray) {
 func update(m *DesktopSysTray) {
 	var d *DesktopSysTrayWin = m.os.(*DesktopSysTrayWin)
 
+	if d.Menu != 0 {
+		d.Menu.Close()
+	}
 	d.Menu = HMENUPtr(CreatePopupMenu.Call())
 }
 
 func close(m *DesktopSysTray) {
+	var d *DesktopSysTrayWin = m.os.(*DesktopSysTrayWin)
+
+	if d.Icon != 0 {
+		d.Icon.Close()
+		d.Icon = 0
+	}
+
+	if d.Menu != 0 {
+		d.Menu.Close()
+		d.Menu = 0
+	}
 }

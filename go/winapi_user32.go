@@ -8,7 +8,7 @@ import (
 
 const (
 	WS_OVERLAPPED           = 0
-	WS_OVERLAPPEDWINDOW     = 0xcf0000
+	WS_OVERLAPPEDWINDOW     = 0x00cf0000
 	SPI_GETNONCLIENTMETRICS = 0x0029
 	COLOR_MENU              = 4
 	COLOR_MENUTEXT          = 7
@@ -26,3 +26,11 @@ var GetMessage = User32Dll.MustFindProc("GetMessageW")
 var DispatchMessage = User32Dll.MustFindProc("DispatchMessageW")
 var DefWindowProc = User32Dll.MustFindProc("DefWindowProcW")
 var DestroyWindow = User32Dll.MustFindProc("DestroyWindow")
+var CreateIconIndirect = User32Dll.MustFindProc("CreateIconIndirect")
+var GetDC = User32Dll.MustFindProc("GetDC")
+var ReleaseDC = User32Dll.MustFindProc("ReleaseDC")
+var DestroyMenu = User32Dll.MustFindProc("DestroyMenu")
+var GetWindowText = User32Dll.MustFindProc("GetWindowTextW")
+var GetClassName = User32Dll.MustFindProc("GetClassNameW")
+var SetWindowText = User32Dll.MustFindProc("SetWindowTextW")
+var TranslateMessage = User32Dll.MustFindProc("TranslateMessage")

@@ -2,7 +2,9 @@
 
 package desktop
 
-import ()
+import (
+	"fmt"
+)
 
 type MessageLoop struct {
 	WndClassEx *WNDCLASSEX
@@ -16,7 +18,9 @@ func MessageLoopNew() *MessageLoop {
 
 	m.WndClassEx = WNDCLASSEXNew(hinstance, WNDPROCNew(m.WndProc), "MessageLoop")
 
-	m.Wnd = HWNDPtr(CreateWindowEx.Call(NULL, Arg(m.WndClassEx.lpszClassName), Arg(m.WndClassEx.lpszClassName), Arg(WS_OVERLAPPEDWINDOW), NULL, NULL, NULL, NULL, NULL, NULL, Arg(hinstance), NULL))
+	m.Wnd = HWNDPtr(CreateWindowEx.Call(NULL, Arg(m.WndClassEx.lpszClassName),
+		Arg(m.WndClassEx.lpszClassName), Arg(WS_OVERLAPPEDWINDOW),
+		NULL, NULL, NULL, NULL, NULL, NULL, Arg(hinstance), NULL))
 	if m.Wnd == 0 {
 		panic(GetLastErrorString())
 	}
@@ -24,7 +28,8 @@ func MessageLoopNew() *MessageLoop {
 	return m
 }
 
-func (m *MessageLoop) WndProc(hWnd HWND, msg int, wParam WPARAM, lParam LPARAM) LRESULT {
+func (m *MessageLoop) WndProc(hWnd HWND, msg UINT, wParam WPARAM, lParam LPARAM) LRESULT {
+	fmt.Printf("WNDPROC %x %d %d %d\n", hWnd, msg, wParam, lParam)
 	return LRESULTPtr(DefWindowProc.Call(Arg(hWnd), Arg(msg), Arg(wParam), Arg(lParam)))
 }
 
@@ -41,6 +46,7 @@ func desktopMain() {
 	msg := &MSG{}
 
 	for BOOLPtr(GetMessage.Call(Arg(msg), Arg(MainWnd.Wnd), NULL, NULL)).Bool() {
+		TranslateMessage.Call(Arg(msg))
 		DispatchMessage.Call(Arg(msg))
 	}
 }

@@ -79,6 +79,12 @@ func HMENUPtr(r1, r2 uintptr, err error) HMENU {
 	return HMENU(r1)
 }
 
+func (m HMENU) Close() {
+	if !BOOLPtr(DestroyMenu.Call(Arg(m))).Bool() {
+		panic(GetLastErrorString())
+	}
+}
+
 type HRESULT uintptr
 
 func HRESULTPtr(r1, r2 uintptr, err error) HRESULT {
@@ -115,14 +121,13 @@ func (m BOOL) Bool() bool {
 
 type DWORD uint32
 type UINT uint32
-type HWND uint32
+type HWND uintptr
 
 func HWNDPtr(r1, r2 uintptr, err error) HWND {
 	LastError = uintptr(err.(syscall.Errno))
 	return HWND(r1)
 }
 
-type HICON uint32
 type TCHAR uint16
 
 func GetLastErrorString() string {
@@ -142,10 +147,12 @@ func HINSTANCEPtr(r1, r2 uintptr, err error) HINSTANCE {
 	return HINSTANCE(r1)
 }
 
+type BYTE byte
+type WORD uint16
 type LPCTSTR uintptr
 type HCURSOR uintptr
 type HBRUSH uintptr
-type LONG int
+type LONG uint32
 
 type LRESULT uintptr
 
@@ -162,4 +169,11 @@ type ATOM uintptr
 func ATOMPtr(r1, r2 uintptr, err error) ATOM {
 	LastError = uintptr(err.(syscall.Errno))
 	return ATOM(r1)
+}
+
+type HDC uintptr
+
+func HDCPtr(r1, r2 uintptr, err error) HDC {
+	LastError = uintptr(err.(syscall.Errno))
+	return HDC(r1)
 }
