@@ -211,7 +211,7 @@ public class WindowsSysTray extends DesktopSysTray {
 
             MSG msg = new MSG();
 
-            while (User32.INSTANCE.GetMessage(msg, hWnd, 0, 0) > 0) {
+            while (User32.INSTANCE.GetMessage(msg, null, 0, 0) > 0) {
                 User32.INSTANCE.DispatchMessage(msg);
             }
 
