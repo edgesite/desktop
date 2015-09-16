@@ -73,6 +73,7 @@ public class NOTIFYICONDATA extends Structure {
 
     public void setTooltip(String s) {
         uFlags |= NIF_INFO | NIF_TIP;
+        // windows xp icon tool tip
         System.arraycopy(s.toCharArray(), 0, szTip, 0, Math.min(s.length(), szTip.length));
         System.arraycopy(s.toCharArray(), 0, szInfoTitle, 0, Math.min(s.length(), szInfoTitle.length));
         System.arraycopy(s.toCharArray(), 0, szInfo, 0, Math.min(s.length(), szInfo.length));
