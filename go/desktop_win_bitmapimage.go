@@ -81,10 +81,10 @@ func (m *BitmapImage) Height() int {
 	return m.image.Bounds().Max.Y - m.image.Bounds().Min.Y
 }
 
-func (m *BitmapImage) Draw(x LONG, y LONG, hdcDst HDC) {
+func (m *BitmapImage) Draw(x LONG, y LONG,hdcDst HDC) {
 	cx := m.Width()
 	cy := m.Height()
-
+	
     hdcSrc := HDCPtr(CreateCompatibleDC.Call(Arg(hdcDst)))
 	if hdcSrc == 0 {
 		panic(GetLastErrorString())

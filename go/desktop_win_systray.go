@@ -155,8 +155,8 @@ func desktopSysTrayNew() *DesktopSysTray {
 
 	d.MainWnd = WindowNew(WNDPROCNew(m.WndProc))
 
-	d.Checked_png = convertMenuIcon(decodeImageString(checked_png))
-	d.Unchecked_png = convertMenuIcon(decodeImageString(unchecked_png))
+	d.Checked_png = BitmapImageNew(decodeImageString(checked_png))
+	d.Unchecked_png = BitmapImageNew(decodeImageString(unchecked_png))
 
 	return m
 }
@@ -219,6 +219,8 @@ func (m *DesktopSysTray) WndProc(hWnd HWND, msg UINT, wParam WPARAM, lParam LPAR
 		
 		x := di.rcItem.left
 		y := di.rcItem.top
+		//w := di.rcItem.right - di.rcItem.left
+		//h := di.rcItem.top - di.rcItem.bottom
 		
 		x += LONG(getSystemMenuImageSize() + SPACE_ICONS) * 2;
 		
@@ -233,7 +235,7 @@ func (m *DesktopSysTray) WndProc(hWnd HWND, msg UINT, wParam WPARAM, lParam LPAR
 			if mn.Menu.State  {
                 d.Checked_png.Draw(x, y, di.hDC)
 			} else {
-                d.Unchecked_png.Draw(x, y,di.hDC)
+                d.Unchecked_png.Draw(x, y, di.hDC)
 			}
 		}
 
