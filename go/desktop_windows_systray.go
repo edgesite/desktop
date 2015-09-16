@@ -4,6 +4,10 @@ package desktop
 
 import (
 	"image"
+	"github.com/nfnt/resize"
+	"unsafe"
+	"encoding/base64"
+	"strings"
 )
 
 var WM_TASKBARCREATED = UINTPtr(RegisterWindowMessage.Call(String2WString("TaskbarCreated")))
@@ -50,10 +54,91 @@ const (
 	SPACE_ICONS = 2
 )
 
+func convertMenuIcon(i image.Image) *Bitmap {
+	menubarHeigh := getSystemMenuImageSize()
+
+	c := resize.Resize(menubarHeigh, menubarHeigh, i, resize.Lanczos3)
+
+	return BitmapNew(c)
+}
+
+func getSystemMenuImageSize() uint {
+	return uint(UINTPtr(GetSystemMetrics.Call(Arg(SM_CYMENUCHECK))))
+}
+
+func getSystemMenuFont() *LOGFONT {
+	nm := NONCLIENTMETRICS{}
+	nm.cbSize = UINT(unsafe.Sizeof(nm))
+
+	SystemParametersInfo.Call(Arg(SPI_GETNONCLIENTMETRICS), NULL, Arg(&nm), NULL)
+
+	return &nm.lfMenuFont
+}
+
+//
+// Window
+//
+
+type Window struct {
+	WndClassEx *WNDCLASSEX
+	Wnd        HWND
+}
+
+func WindowNew(w WNDPROC) *Window {
+	m := &Window{}
+
+	if w == 0 {
+		w = WNDPROCNew(m.DefWindowProc)
+	}
+
+	hinstance := HINSTANCEPtr(GetModuleHandle.Call())
+
+	m.WndClassEx = WNDCLASSEXNew(hinstance, w, "MessageLoop")
+
+	m.Wnd = HWNDPtr(CreateWindowEx.Call(NULL, Arg(m.WndClassEx.lpszClassName),
+		Arg(m.WndClassEx.lpszClassName), Arg(WS_OVERLAPPEDWINDOW),
+		NULL, NULL, NULL, NULL, NULL, NULL, Arg(hinstance), NULL))
+	if m.Wnd == 0 {
+		panic(GetLastErrorString())
+	}
+
+	return m
+}
+
+func (m *Window) DefWindowProc(hWnd HWND, msg UINT, wParam WPARAM, lParam LPARAM) LRESULT {
+	return LRESULTPtr(DefWindowProc.Call(Arg(hWnd), Arg(msg), Arg(wParam), Arg(lParam)))
+}
+
+func (m *Window) Close() {
+	m.Wnd.Close()
+	m.WndClassEx.Close()
+}
+
+//
+// MenuWin
+//
+
+type MenuItemWin struct {
+	Menu *Menu
+	bm *Bitmap
+}
+
+func (m *MenuItemWin) Close() {
+	m.bm.Close()
+}
+
+//
+// DesktopSysTrayWin
+// 
+
 type DesktopSysTrayWin struct {
-	Menu    HMENU
+	MainMenu    HMENU
+	MenuItems []*MenuItemWin
 	Icon    HICON
 	MainWnd *Window
+	
+	Checked_png *Bitmap
+	Unchecked_png *Bitmap
 }
 
 func desktopSysTrayNew() *DesktopSysTray {
@@ -61,6 +146,21 @@ func desktopSysTrayNew() *DesktopSysTray {
 	m := &DesktopSysTray{os: d}
 
 	d.MainWnd = WindowNew(WNDPROCNew(m.WndProc))
+	
+	var err error
+	var i image.Image
+	
+	i, _, err = image.Decode(base64.NewDecoder(base64.StdEncoding, strings.NewReader(checked_png)))
+	if err != nil {
+		panic(err)
+	}
+	d.Checked_png = BitmapNew(i)
+
+	i, _, err = image.Decode(base64.NewDecoder(base64.StdEncoding, strings.NewReader(unchecked_png)))
+	if err != nil {
+		panic(err)
+	}
+	d.Unchecked_png = BitmapNew(i)
 
 	return m
 }
@@ -72,34 +172,97 @@ func (m *DesktopSysTray) WndProc(hWnd HWND, msg UINT, wParam WPARAM, lParam LPAR
 	case WM_SHELLNOTIFY:
 		switch lParam {
 		case WM_LBUTTONUP:
+			return LRESULT(0)
 		case WM_LBUTTONDBLCLK:
+			return LRESULT(0)
 		case WM_RBUTTONUP:
 			m.showContextMenu()
+			return LRESULT(0)
 		}
 	case WM_COMMAND:
+		i := int(wParam)
+		mn := d.MenuItems[i]
+		if mn.Menu.Action != nil {
+			mn.Menu.Action(mn.Menu)
+		}
+		return LRESULT(0)
 	case WM_MEASUREITEM:
+		ms := MEASUREITEMSTRUCTPtr(uintptr(lParam))
+
+		i := int(ms.itemData)
+		mn := d.MenuItems[i]
+		
+		hdc := HDCPtr(GetDC.Call(Arg(d.MainWnd.Wnd)))
+		defer ReleaseDC.Call(Arg(d.MainWnd.Wnd), Arg(hdc))
+		fontold := HFONTPtr(SelectObject.Call(Arg(hdc), Arg(getSystemMenuFont())))
+		size := SIZE{}
+		GetTextExtentPoint32.Call(Arg(hdc), Arg(mn.Menu.Name), Arg(len(mn.Menu.Name)), Arg(&size))
+		SelectObject.Call(Arg(hdc), Arg(fontold))
+		size.cx += LONG(getSystemMenuImageSize() + SPACE_ICONS) * 2
+		ms.itemWidth = UINT(size.cx)
+		ms.itemHeight = UINT(size.cy)
+		return LRESULT(0)
 	case WM_DRAWITEM:
+		di := (*DRAWITEMSTRUCT)(unsafe.Pointer(lParam))
+		
+		i := int(di.itemData)
+		mn := d.MenuItems[i]
+		
+		if !mn.Menu.Enabled {
+			SetTextColor.Call(Arg(di.hDC), Arg(COLORREFPtr(GetSysColor.Call(Arg(COLOR_GRAYTEXT)))))
+			SetBkColor.Call(Arg(di.hDC), Arg(COLORREFPtr(GetSysColor.Call(Arg(COLOR_MENU)))))
+		} else if ((di.itemState & ODS_SELECTED) == ODS_SELECTED) {
+			SetTextColor.Call(Arg(di.hDC), Arg(COLORREFPtr(GetSysColor.Call(Arg(COLOR_HIGHLIGHTTEXT)))))
+			SetBkColor.Call(Arg(di.hDC), Arg(COLORREFPtr(GetSysColor.Call(Arg(COLOR_HIGHLIGHT)))))
+		} else {
+			SetTextColor.Call(Arg(di.hDC), Arg(COLORREFPtr(GetSysColor.Call(Arg(COLOR_MENUTEXT)))))
+			SetBkColor.Call(Arg(di.hDC), Arg(COLORREFPtr(GetSysColor.Call(Arg(COLOR_MENU)))))
+		}
+		
+		x := di.rcItem.left
+		y := di.rcItem.top
+		
+		x += LONG(getSystemMenuImageSize() + SPACE_ICONS) * 2;
+		
+		SelectObject.Call(Arg(di.hDC), Arg(getSystemMenuFont()))
+		ExtTextOut.Call(Arg(di.hDC), Arg(x), Arg(y), Arg(ETO_OPAQUE), Arg(&di.rcItem), Arg(mn.Menu.Name), Arg(len(mn.Menu.Name)), NULL)
+
+		x = di.rcItem.left
+		
+		if mn.Menu.Type == MenuCheckBox {
+			if mn.Menu.State  {
+                d.Checked_png.Draw(x, y, di.hDC);
+			} else {
+                d.Unchecked_png.Draw(x, y,di.hDC);
+			}
+		}
+
+        x += LONG(getSystemMenuImageSize() + SPACE_ICONS);
+        if (mn.bm != nil) {
+            mn.bm.Draw(x, y, di.hDC);
+        }
 	case WM_QUIT:
 		PostMessage.Call(Arg(d.MainWnd.Wnd), Arg(WM_QUIT), NULL, NULL)
 	}
 
 	if msg == WM_TASKBARCREATED {
 		m.show()
+		return LRESULT(0)
 	}
 
-	return d.MainWnd.WndProc(hWnd, msg, wParam, lParam)
+	return d.MainWnd.DefWindowProc(hWnd, msg, wParam, lParam)
 }
 
 func (m *DesktopSysTray) setIcon(i image.Image) {
 	d := m.os.(*DesktopSysTrayWin)
 
-	bm := HBITMAPNew(i)
+	bm := BitmapNew(i)
 	defer bm.Close()
 
 	if d.Icon != 0 {
 		d.Icon.Close()
 	}
-	d.Icon = HICONNew(bm)
+	d.Icon = HICONNew(bm.h)
 }
 
 func (m *DesktopSysTray) show() {
@@ -146,9 +309,9 @@ func (m *DesktopSysTray) close() {
 		d.Icon = 0
 	}
 
-	if d.Menu != 0 {
-		d.Menu.Close()
-		d.Menu = 0
+	if d.MainMenu != 0 {
+		d.MainMenu.Close()
+		d.MainMenu = 0
 	}
 }
 
@@ -159,48 +322,101 @@ func (m *DesktopSysTray) showContextMenu() {
 }
 
 func (m *DesktopSysTray) updateMenus() {
-	menu := HMENUPtr(CreatePopupMenu.Call())
-	if menu == 0 {
+	d := m.os.(*DesktopSysTrayWin)
+
+    if d.MainMenu != 0 {
+		d.MainMenu.Close()
+	}
+
+    d.MainMenu = m.createSubMenu(m.Menu)
+	
+	var pos POINT
+	if !BOOLPtr(GetCursorPos.Call(Arg(&pos))).Bool() {
+		panic(GetLastErrorString())
+	}
+	
+	for !BOOLPtr(TrackPopupMenu.Call(Arg(d.MainMenu), TPM_RIGHTBUTTON, Arg(pos.x), Arg(pos.y), NULL, Arg(d.MainWnd.Wnd), NULL)).Bool() {
+		var hWnd HWND
+		// 0x000005a6 - "Popup menu already active."
+		if LastError == 0x000005a6 {
+			for {
+                // "#32768" - pop up menu window class
+				hWnd = HWNDPtr(FindWindowEx.Call(NULL, Arg(hWnd), Arg("#32768"), NULL))
+				if hWnd == 0 {
+					break
+				}
+				SendMessage.Call(Arg(hWnd), Arg(WM_KEYDOWN), Arg(VK_ESCAPE), NULL)
+			}
+            // noting is working...
+            // just return.
+			return
+		} else {
+			panic(GetLastErrorString())
+		}
+	}
+}
+
+func (m *DesktopSysTray) createSubMenu(mm []Menu) HMENU {
+	d := m.os.(*DesktopSysTrayWin)
+
+	hmenu := HMENUPtr(CreatePopupMenu.Call())
+	if hmenu == 0 {
 		panic(GetLastErrorString())
 	}
 
-}
+	for i := range mm {
+		mn := &mm[i]
 
-//
-// Window
-//
+		switch mn.Type {
+		case MenuItem, MenuCheckBox:
+			menuwin := &MenuItemWin{}
+			menuwin.Menu = mn
 
-type Window struct {
-	WndClassEx *WNDCLASSEX
-	Wnd        HWND
-}
+			if mn.Icon != nil {
+				menuwin.bm = convertMenuIcon(mn.Icon)
+			}
 
-func WindowNew(w WNDPROC) *Window {
-	m := &Window{}
+			id := len(d.MenuItems)
+			d.MenuItems = append(d.MenuItems, menuwin)
 
-	if w == 0 {
-		w = WNDPROCNew(m.WndProc)
+			if mn.Menu != nil {
+				sub := m.createSubMenu(mn.Menu)
+		        // seems like you dont have to free this menu, since it already attached
+		        // to main HMENU handler
+				if !BOOLPtr(AppendMenu.Call(Arg(hmenu), Arg(MF_POPUP | MFT_OWNERDRAW), Arg(sub), NULL)).Bool() {
+					panic(GetLastErrorString())
+				}
+				mi := MENUITEMINFO{}
+				mi.cbSize = UINT(unsafe.Sizeof(mi))
+				if !BOOLPtr(GetMenuItemInfo.Call(Arg(hmenu), Arg(sub), Arg(false), Arg(&mi))).Bool() {
+					panic(GetLastErrorString())
+				}
+				mi.dwItemData = ULONG_PTR(id)
+				mi.fMask |= MIIM_DATA
+				if !BOOLPtr(SetMenuItemInfo.Call(Arg(hmenu), Arg(sub), Arg(false), Arg(&mi))).Bool() {
+					panic(GetLastErrorString())
+				}
+			} else {
+				if !BOOLPtr(AppendMenu.Call(Arg(hmenu), Arg(MFT_OWNERDRAW), Arg(id), NULL)).Bool() {
+					panic(GetLastErrorString())
+				}
+				mi := MENUITEMINFO{}
+				mi.cbSize = UINT(unsafe.Sizeof(mi))
+				if !BOOLPtr(GetMenuItemInfo.Call(Arg(hmenu), Arg(id), Arg(false), Arg(&mi))).Bool() {
+					panic(GetLastErrorString())
+				}
+				mi.dwItemData = ULONG_PTR(id)
+				mi.fMask |= MIIM_DATA
+				if !BOOLPtr(SetMenuItemInfo.Call(Arg(hmenu), Arg(id), Arg(false), Arg(&mi))).Bool() {
+					panic(GetLastErrorString())
+				}
+			}
+		case MenuSeparator:
+			if !BOOLPtr(AppendMenu.Call(Arg(hmenu), Arg(MF_SEPARATOR), NULL, NULL)).Bool() {
+				panic(GetLastErrorString())
+			}
+		}
 	}
 
-	hinstance := HINSTANCEPtr(GetModuleHandle.Call())
-
-	m.WndClassEx = WNDCLASSEXNew(hinstance, w, "MessageLoop")
-
-	m.Wnd = HWNDPtr(CreateWindowEx.Call(NULL, Arg(m.WndClassEx.lpszClassName),
-		Arg(m.WndClassEx.lpszClassName), Arg(WS_OVERLAPPEDWINDOW),
-		NULL, NULL, NULL, NULL, NULL, NULL, Arg(hinstance), NULL))
-	if m.Wnd == 0 {
-		panic(GetLastErrorString())
-	}
-
-	return m
-}
-
-func (m *Window) WndProc(hWnd HWND, msg UINT, wParam WPARAM, lParam LPARAM) LRESULT {
-	return LRESULTPtr(DefWindowProc.Call(Arg(hWnd), Arg(msg), Arg(wParam), Arg(lParam)))
-}
-
-func (m *Window) Close() {
-	m.Wnd.Close()
-	m.WndClassEx.Close()
+	return hmenu
 }

@@ -55,7 +55,19 @@ func WArray2String(rr []uint16) string {
 	return string(utf16.Decode(rr))
 }
 
+var Bool2Int = map[bool]int{
+	true:  1,
+	false: 0,
+}
+
 func Arg(d interface{}) uintptr {
+	switch d.(type) {
+		case string:
+		return String2WString(d.(string))
+		case bool:
+		return uintptr(Bool2Int[d.(bool)])
+	}
+
 	v := reflect.ValueOf(d)
 	UIntPtr := reflect.TypeOf((uintptr)(0))
 
@@ -98,11 +110,6 @@ func (m HRESULT) String() string {
 	return fmt.Sprintf("HRESULT: 0x%08x [%s]", uintptr(m), strings.TrimSpace(WString2String(Arg(&msg[0]))))
 }
 
-var Bool2Int = map[bool]int{
-	true:  1,
-	false: 0,
-}
-
 var Int2Bool = map[int]bool{
 	1: true,
 	0: false,
@@ -121,11 +128,21 @@ func (m BOOL) Bool() bool {
 
 type DWORD uint32
 type UINT uint32
+type ULONG uint32
+type ULONG_PTR uintptr
 
 func UINTPtr(r1, r2 uintptr, err error) UINT {
 	LastError = uintptr(err.(syscall.Errno))
 	return UINT(r1)
 }
+
+type HFONT uintptr
+
+func HFONTPtr(r1, r2 uintptr, err error) HFONT {
+	LastError = uintptr(err.(syscall.Errno))
+	return HFONT(r1)
+}
+
 
 type HWND uintptr
 
@@ -162,9 +179,24 @@ func HINSTANCEPtr(r1, r2 uintptr, err error) HINSTANCE {
 type BYTE byte
 type WORD uint16
 type LPCTSTR uintptr
+type LPTSTR uintptr
 type HCURSOR uintptr
 type HBRUSH uintptr
 type LONG uint32
+
+type HANDLE uintptr
+
+func HANDLEPtr(r1, r2 uintptr, err error) HANDLE {
+	LastError = uintptr(err.(syscall.Errno))
+	return HANDLE(r1)
+}
+
+type COLORREF uintptr
+
+func COLORREFPtr(r1, r2 uintptr, err error) COLORREF {
+	LastError = uintptr(err.(syscall.Errno))
+	return COLORREF(r1)
+}
 
 type LRESULT uintptr
 
@@ -173,8 +205,8 @@ func LRESULTPtr(r1, r2 uintptr, err error) LRESULT {
 	return LRESULT(r1)
 }
 
-type WPARAM uint32
-type LPARAM uint32
+type WPARAM uintptr
+type LPARAM uintptr
 
 type ATOM uintptr
 
