@@ -143,6 +143,9 @@ func HFONTPtr(r1, r2 uintptr, err error) HFONT {
 	return HFONT(r1)
 }
 
+func (m HFONT) Close() {
+	DeleteObject.Call(Arg(m))
+}
 
 type HWND uintptr
 

@@ -50,7 +50,8 @@ func (m *NOTIFYICONDATA) SetCallback(i UINT) {
 }
 
 func (m *NOTIFYICONDATA) SetTooltip(s string) {
-	m.uFlags |= NIF_INFO | NIF_TIP
+	m.uFlags |= NIF_TIP
+	//m.uFlags |= NIF_INFO
 	p := String2WString(s)
 	i := 0
 	for p := uintptr(unsafe.Pointer(p)); ; p += 2 {
@@ -59,8 +60,8 @@ func (m *NOTIFYICONDATA) SetTooltip(s string) {
 			return
 		}
 		m.szTip[i] = u
-		m.szInfo[i] = u
-		m.szInfoTitle[i] = u
+		//m.szInfo[i] = u
+		//m.szInfoTitle[i] = u
 		i++
 	}
 }
