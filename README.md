@@ -12,7 +12,7 @@ Script nature of Java or Go now not limited by system programming working with s
   * Cross platform SysTray Icon
   * Cross platform Browser Pop Window
   * Cross platform Power Events (reboot, logout)
-  * Register URL handlers (open a file from a browser)
+  * Register URL handlers (open a application from a browser)
 
 ## Example Desktop Folders
 
