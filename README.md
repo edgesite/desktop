@@ -13,6 +13,7 @@ Script nature of Java or Go now not limited by system programming working with s
   * Cross platform Browser Pop Window
   * Cross platform Power Events (reboot, logout)
   * Register URL handlers (open a application from a browser)
+  * Sound and Volume control
 
 ## Example Desktop Folders
 
