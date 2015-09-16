@@ -124,7 +124,7 @@ func (m *DesktopSysTray) RemoveListener(l DesktopSysTrayListener) {
 }
 
 func (m *DesktopSysTray) SetIcon(icon image.Image) {
-	setIcon(m, icon)
+	m.setIcon(icon)
 }
 
 func (m *DesktopSysTray) SetTitle(title string) {
@@ -132,15 +132,15 @@ func (m *DesktopSysTray) SetTitle(title string) {
 }
 
 func (m *DesktopSysTray) Show() {
-	show(m)
+	m.show()
 }
 
 func (m *DesktopSysTray) Update() {
-	update(m)
+	m.update()
 }
 
 func (m *DesktopSysTray) Hide() {
-	hide(m)
+	m.hide()
 }
 
 func (m *DesktopSysTray) SetMenu(menu []Menu) {
@@ -148,5 +148,5 @@ func (m *DesktopSysTray) SetMenu(menu []Menu) {
 }
 
 func (m *DesktopSysTray) Close() {
-	close(m)
+	m.close()
 }

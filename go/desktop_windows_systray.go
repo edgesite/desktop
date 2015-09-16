@@ -6,6 +6,8 @@ import (
 	"image"
 )
 
+var WM_TASKBARCREATED = UINTPtr(RegisterWindowMessage.Call(String2WString("TaskbarCreated")))
+
 const (
 	WM_LBUTTONDOWN   DWORD = 513
 	WM_NCCREATE            = 129
@@ -49,22 +51,47 @@ const (
 )
 
 type DesktopSysTrayWin struct {
-	Menu HMENU
-	Icon HICON
+	Menu    HMENU
+	Icon    HICON
+	MainWnd *Window
 }
 
 func desktopSysTrayNew() *DesktopSysTray {
-	m := &DesktopSysTray{os: &DesktopSysTrayWin{}}
+	d := &DesktopSysTrayWin{}
+	m := &DesktopSysTray{os: d}
 
-	if MainWnd == nil {
-		MainWnd = MessageLoopNew()
-	}
+	d.MainWnd = WindowNew(WNDPROCNew(m.WndProc))
 
 	return m
 }
 
-func setIcon(m *DesktopSysTray, i image.Image) {
+func (m *DesktopSysTray) WndProc(hWnd HWND, msg UINT, wParam WPARAM, lParam LPARAM) LRESULT {
 	var d *DesktopSysTrayWin = m.os.(*DesktopSysTrayWin)
+
+	switch msg {
+	case WM_SHELLNOTIFY:
+		switch lParam {
+		case WM_LBUTTONUP:
+		case WM_LBUTTONDBLCLK:
+		case WM_RBUTTONUP:
+			m.showContextMenu()
+		}
+	case WM_COMMAND:
+	case WM_MEASUREITEM:
+	case WM_DRAWITEM:
+	case WM_QUIT:
+		PostMessage.Call(Arg(d.MainWnd.Wnd), Arg(WM_QUIT), NULL, NULL)
+	}
+
+	if msg == WM_TASKBARCREATED {
+		m.show()
+	}
+
+	return d.MainWnd.WndProc(hWnd, msg, wParam, lParam)
+}
+
+func (m *DesktopSysTray) setIcon(i image.Image) {
+	d := m.os.(*DesktopSysTrayWin)
 
 	bm := HBITMAPNew(i)
 	defer bm.Close()
@@ -75,11 +102,11 @@ func setIcon(m *DesktopSysTray, i image.Image) {
 	d.Icon = HICONNew(bm)
 }
 
-func show(m *DesktopSysTray) {
-	var d *DesktopSysTrayWin = m.os.(*DesktopSysTrayWin)
+func (m *DesktopSysTray) show() {
+	d := m.os.(*DesktopSysTrayWin)
 
 	n := NOTIFYICONDATANew()
-	n.hWnd = MainWnd.Wnd
+	n.hWnd = d.MainWnd.Wnd
 	n.SetCallback(WM_SHELLNOTIFY)
 	n.SetIcon(d.Icon)
 	n.SetTooltip(m.Title)
@@ -88,20 +115,31 @@ func show(m *DesktopSysTray) {
 	}
 }
 
-func hide(m *DesktopSysTray) {
-}
+func (m *DesktopSysTray) hide() {
+	d := m.os.(*DesktopSysTrayWin)
 
-func update(m *DesktopSysTray) {
-	var d *DesktopSysTrayWin = m.os.(*DesktopSysTrayWin)
-
-	if d.Menu != 0 {
-		d.Menu.Close()
+	n := NOTIFYICONDATANew()
+	n.hWnd = d.MainWnd.Wnd
+	if !BOOLPtr(Shell_NotifyIcon.Call(Arg(NIM_DELETE), Arg(n))).Bool() {
+		panic(GetLastErrorString())
 	}
-	d.Menu = HMENUPtr(CreatePopupMenu.Call())
 }
 
-func close(m *DesktopSysTray) {
-	var d *DesktopSysTrayWin = m.os.(*DesktopSysTrayWin)
+func (m *DesktopSysTray) update() {
+	d := m.os.(*DesktopSysTrayWin)
+
+	n := NOTIFYICONDATANew()
+	n.hWnd = d.MainWnd.Wnd
+	n.SetCallback(WM_SHELLNOTIFY)
+	n.SetIcon(d.Icon)
+	n.SetTooltip(m.Title)
+	if !BOOLPtr(Shell_NotifyIcon.Call(Arg(NIM_MODIFY), Arg(n))).Bool() {
+		panic(GetLastErrorString())
+	}
+}
+
+func (m *DesktopSysTray) close() {
+	d := m.os.(*DesktopSysTrayWin)
 
 	if d.Icon != 0 {
 		d.Icon.Close()
@@ -112,4 +150,57 @@ func close(m *DesktopSysTray) {
 		d.Menu.Close()
 		d.Menu = 0
 	}
+}
+
+func (m *DesktopSysTray) showContextMenu() {
+	//d := m.os.(*DesktopSysTrayWin)
+
+	m.updateMenus()
+}
+
+func (m *DesktopSysTray) updateMenus() {
+	menu := HMENUPtr(CreatePopupMenu.Call())
+	if menu == 0 {
+		panic(GetLastErrorString())
+	}
+
+}
+
+//
+// Window
+//
+
+type Window struct {
+	WndClassEx *WNDCLASSEX
+	Wnd        HWND
+}
+
+func WindowNew(w WNDPROC) *Window {
+	m := &Window{}
+
+	if w == 0 {
+		w = WNDPROCNew(m.WndProc)
+	}
+
+	hinstance := HINSTANCEPtr(GetModuleHandle.Call())
+
+	m.WndClassEx = WNDCLASSEXNew(hinstance, w, "MessageLoop")
+
+	m.Wnd = HWNDPtr(CreateWindowEx.Call(NULL, Arg(m.WndClassEx.lpszClassName),
+		Arg(m.WndClassEx.lpszClassName), Arg(WS_OVERLAPPEDWINDOW),
+		NULL, NULL, NULL, NULL, NULL, NULL, Arg(hinstance), NULL))
+	if m.Wnd == 0 {
+		panic(GetLastErrorString())
+	}
+
+	return m
+}
+
+func (m *Window) WndProc(hWnd HWND, msg UINT, wParam WPARAM, lParam LPARAM) LRESULT {
+	return LRESULTPtr(DefWindowProc.Call(Arg(hWnd), Arg(msg), Arg(wParam), Arg(lParam)))
+}
+
+func (m *Window) Close() {
+	m.Wnd.Close()
+	m.WndClassEx.Close()
 }

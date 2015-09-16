@@ -273,7 +273,7 @@ public class WindowsSysTray extends DesktopSysTray {
 
             if (item.getIcon() != null) {
                 Icon icon = item.getIcon();
-                hbm = getMenuImage(icon);
+                hbm = convertMenuImage(icon);
             }
         }
 
@@ -295,9 +295,10 @@ public class WindowsSysTray extends DesktopSysTray {
         }
     }
 
+    // meessage pump ref count
     static int count = 0;
     static MessagePump mp;
-
+    // close flat for ref count
     boolean close = false;
 
     String title;
@@ -316,9 +317,9 @@ public class WindowsSysTray extends DesktopSysTray {
 
         try {
             BufferedImage checked = ImageIO.read(WindowsSysTray.class.getResourceAsStream("checked.png"));
-            hbitmapChecked = getMenuImage(new ImageIcon(checked));
+            hbitmapChecked = convertMenuImage(new ImageIcon(checked));
             BufferedImage unchecked = ImageIO.read(WindowsSysTray.class.getResourceAsStream("unchecked.png"));
-            hbitmapUnchecked = getMenuImage(new ImageIcon(unchecked));
+            hbitmapUnchecked = convertMenuImage(new ImageIcon(unchecked));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -441,7 +442,7 @@ public class WindowsSysTray extends DesktopSysTray {
         return User32.INSTANCE.GetSystemMetrics(SM_CYMENUCHECK);
     }
 
-    static HBITMAPWrap getMenuImage(Icon icon) {
+    static HBITMAPWrap convertMenuImage(Icon icon) {
         BufferedImage img = Utils.createBitmap(icon);
 
         int menubarHeigh = getSystemMenuImageSize();

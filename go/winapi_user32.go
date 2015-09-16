@@ -15,6 +15,7 @@ const (
 	COLOR_HIGHLIGHTTEXT     = 14
 	COLOR_HIGHLIGHT         = 13
 	COLOR_GRAYTEXT          = 17
+	WM_QUIT                 = 0x0012
 )
 
 var User32Dll = syscall.MustLoadDLL("User32.dll")
@@ -34,3 +35,5 @@ var GetWindowText = User32Dll.MustFindProc("GetWindowTextW")
 var GetClassName = User32Dll.MustFindProc("GetClassNameW")
 var SetWindowText = User32Dll.MustFindProc("SetWindowTextW")
 var TranslateMessage = User32Dll.MustFindProc("TranslateMessage")
+var RegisterWindowMessage = User32Dll.MustFindProc("RegisterWindowMessageW")
+var PostMessage = User32Dll.MustFindProc("PostMessageW")

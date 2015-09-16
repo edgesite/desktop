@@ -38,27 +38,9 @@ public class WindowsFolders implements DesktopFolders {
         return getDownloadsVista();
     }
 
-    //
-    // http://stackoverflow.com/questions/7672774/how-do-i-determine-the-windows-download-folder-path
-    //
-
     public File getDownloadsVista() {
         GUID guid = new GUID("374DE290-123F-4565-9164-39C4925E467B");
-
-        int dwFlags = Shell32Ex.SHGFP_TYPE_CURRENT;
-        PointerByReference pszPath = new PointerByReference();
-
-        int hResult = Shell32Ex.INSTANCE.SHGetKnownFolderPath(guid, dwFlags, null, pszPath);
-        switch (hResult) {
-        case Shell32Ex.S_FILE_NOT_FOUND:
-            throw new RuntimeException("File not Found");
-        case Shell32Ex.S_OK:
-            String path = new String(pszPath.getValue().getString(0, true));
-            Ole32Ex.INSTANCE.CoTaskMemFree(pszPath.getValue());
-            return new File(path);
-        default:
-            throw new RuntimeException("Error: " + Integer.toHexString(hResult));
-        }
+        return knowpath(guid);
     }
 
     @Override
@@ -85,4 +67,23 @@ public class WindowsFolders implements DesktopFolders {
         }
     }
 
+    //
+    // http://stackoverflow.com/questions/7672774/how-do-i-determine-the-windows-download-folder-path
+    //
+    public File knowpath(GUID guid) {
+        int dwFlags = Shell32Ex.SHGFP_TYPE_CURRENT;
+        PointerByReference pszPath = new PointerByReference();
+
+        int hResult = Shell32Ex.INSTANCE.SHGetKnownFolderPath(guid, dwFlags, null, pszPath);
+        switch (hResult) {
+        case Shell32Ex.S_FILE_NOT_FOUND:
+            throw new RuntimeException("File not Found");
+        case Shell32Ex.S_OK:
+            String path = new String(pszPath.getValue().getString(0, true));
+            Ole32Ex.INSTANCE.CoTaskMemFree(pszPath.getValue());
+            return new File(path);
+        default:
+            throw new RuntimeException("Error: " + Integer.toHexString(hResult));
+        }
+    }
 }

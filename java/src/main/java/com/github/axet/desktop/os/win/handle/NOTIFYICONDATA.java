@@ -51,7 +51,7 @@ public class NOTIFYICONDATA extends Structure {
     // notification message, pass to hwnd WM_USER + 1
     public int uCallbackMessage = 0;
     public HICON hIcon = null;
-    public char[] szTip = new char[64];
+    public char[] szTip = new char[128];
     public int dwState = 0;
     public int dwStateMask = 0;
     public char[] szInfo = new char[256];

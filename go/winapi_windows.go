@@ -121,11 +121,23 @@ func (m BOOL) Bool() bool {
 
 type DWORD uint32
 type UINT uint32
+
+func UINTPtr(r1, r2 uintptr, err error) UINT {
+	LastError = uintptr(err.(syscall.Errno))
+	return UINT(r1)
+}
+
 type HWND uintptr
 
 func HWNDPtr(r1, r2 uintptr, err error) HWND {
 	LastError = uintptr(err.(syscall.Errno))
 	return HWND(r1)
+}
+
+func (m HWND) Close() {
+	if !BOOLPtr(DestroyWindow.Call(Arg(m))).Bool() {
+		panic(GetLastErrorString())
+	}
 }
 
 type TCHAR uint16

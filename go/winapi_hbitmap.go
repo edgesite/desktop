@@ -43,7 +43,6 @@ func HBITMAPNew(i image.Image) HBITMAP {
 	var ppvBits unsafe.Pointer
 
 	hBitmap := HBITMAPPtr(CreateDIBSection.Call(Arg(memDC), Arg(bmi), Arg(DIB_RGB_COLORS), Arg(&ppvBits), NULL, NULL))
-
 	if hBitmap == 0 {
 		panic(GetLastErrorString())
 	}
@@ -54,9 +53,9 @@ func HBITMAPNew(i image.Image) HBITMAP {
 		for x := 0; x < w; x++ {
 			c := i.At(i.Bounds().Min.X+x, i.Bounds().Min.Y+y)
 			r, g, b, a := c.RGBA()
-			r = r << 0
+			b = b << 0
 			g = g << 8
-			b = b << 16
+			r = r << 16
 			a = a << 24
 			buf[x+(h-y-1)*w] = r | g | b | a
 		}

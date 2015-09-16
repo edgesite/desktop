@@ -7,36 +7,42 @@ import (
 	"image"
 )
 
-type DesktopSysTrayOSX struct {
-	statusbar  NSStatusBar
-	statusitem NSStatusItem
-	image      NSImage
-}
-
-func desktopSysTrayNew() *DesktopSysTray {
-	return &DesktopSysTray{os: &DesktopSysTrayOSX{statusbar: NSStatusBarSystemStatusBar()}}
-}
-
-func update(m *DesktopSysTray) {
-	var d *DesktopSysTrayOSX = m.os.(*DesktopSysTrayOSX)
-
-	if d.statusitem.Pointer == nil {
-		d.statusitem = d.statusbar.StatusItemWithLength(NSVariableStatusItemLength)
-	}
-
-	if m.Menu != nil {
-		mn := createSubMenu(m.Menu)
-		defer mn.Release()
-		d.statusitem.SetMenu(mn)
-	}
-
-	d.statusitem.SetToolTip(m.Title)
-	d.statusitem.SetHighlightMode(true)
-	d.statusitem.SetImage(d.image)
-}
-
 func desktopMain() {
 	Runtime_Main()
+}
+
+func convertTrayIcon(i image.Image) NSImage {
+	var f NSFont = NSFontMenuBarFontOfSize(0)
+	defer f.Release()
+
+	fd := f.FontDescriptor()
+	defer fd.Release()
+
+	n := NSNumberPointer(fd.ObjectForKey(NSFontSizeAttribute))
+	defer n.Release()
+
+	menubarHeigh := uint(n.IntValue())
+
+	c := resize.Resize(menubarHeigh, menubarHeigh, i, resize.Lanczos3)
+
+	return NSImageImage(c)
+}
+
+func convertMenuIcon(i image.Image) NSImage {
+	var f NSFont = NSFontMenuFontOfSize(0)
+	defer f.Release()
+
+	fd := f.FontDescriptor()
+	defer fd.Release()
+
+	n := NSNumberPointer(fd.ObjectForKey(NSFontSizeAttribute))
+	defer n.Release()
+
+	menubarHeigh := uint(n.IntValue())
+
+	c := resize.Resize(menubarHeigh, menubarHeigh, i, resize.Lanczos3)
+
+	return NSImageImage(c)
 }
 
 func createSubMenu(mm []Menu) NSMenu {
@@ -99,8 +105,36 @@ func createSubMenu(mm []Menu) NSMenu {
 	return mn
 }
 
-func setIcon(m *DesktopSysTray, icon image.Image) {
-	var d *DesktopSysTrayOSX = m.os.(*DesktopSysTrayOSX)
+type DesktopSysTrayOSX struct {
+	statusbar  NSStatusBar
+	statusitem NSStatusItem
+	image      NSImage
+}
+
+func desktopSysTrayNew() *DesktopSysTray {
+	return &DesktopSysTray{os: &DesktopSysTrayOSX{statusbar: NSStatusBarSystemStatusBar()}}
+}
+
+func (m *DesktopSysTray) update() {
+	d := m.os.(*DesktopSysTrayOSX)
+
+	if d.statusitem.Pointer == nil {
+		d.statusitem = d.statusbar.StatusItemWithLength(NSVariableStatusItemLength)
+	}
+
+	if m.Menu != nil {
+		mn := createSubMenu(m.Menu)
+		defer mn.Release()
+		d.statusitem.SetMenu(mn)
+	}
+
+	d.statusitem.SetToolTip(m.Title)
+	d.statusitem.SetHighlightMode(true)
+	d.statusitem.SetImage(d.image)
+}
+
+func (m *DesktopSysTray) setIcon(icon image.Image) {
+	d := m.os.(*DesktopSysTrayOSX)
 
 	if d.image.Pointer != nil {
 		d.image.Release()
@@ -110,50 +144,16 @@ func setIcon(m *DesktopSysTray, icon image.Image) {
 	d.image = convertTrayIcon(icon)
 }
 
-func convertTrayIcon(i image.Image) NSImage {
-	var f NSFont = NSFontMenuBarFontOfSize(0)
-	defer f.Release()
-
-	fd := f.FontDescriptor()
-	defer fd.Release()
-
-	n := NSNumberPointer(fd.ObjectForKey(NSFontSizeAttribute))
-	defer n.Release()
-
-	menubarHeigh := uint(n.IntValue())
-
-	c := resize.Resize(menubarHeigh, menubarHeigh, i, resize.Lanczos3)
-
-	return NSImageImage(c)
+func (m *DesktopSysTray) show() {
+	m.update()
 }
 
-func convertMenuIcon(i image.Image) NSImage {
-	var f NSFont = NSFontMenuFontOfSize(0)
-	defer f.Release()
-
-	fd := f.FontDescriptor()
-	defer fd.Release()
-
-	n := NSNumberPointer(fd.ObjectForKey(NSFontSizeAttribute))
-	defer n.Release()
-
-	menubarHeigh := uint(n.IntValue())
-
-	c := resize.Resize(menubarHeigh, menubarHeigh, i, resize.Lanczos3)
-
-	return NSImageImage(c)
+func (m *DesktopSysTray) hide() {
+	m.close()
 }
 
-func show(m *DesktopSysTray) {
-	update(m)
-}
-
-func hide(m *DesktopSysTray) {
-	close(m)
-}
-
-func close(m *DesktopSysTray) {
-	var d *DesktopSysTrayOSX = m.os.(*DesktopSysTrayOSX)
+func (m *DesktopSysTray) close() {
+	d := m.os.(*DesktopSysTrayOSX)
 
 	if d.statusitem.Pointer != nil {
 		d.statusbar.RemoveStatusItem(d.statusitem)
