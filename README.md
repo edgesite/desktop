@@ -9,51 +9,11 @@ Script nature of Java or Go now not limited by system programming working with s
 ## Features
 
   * Cross platform user specific folders: Download folder, Home folder, Documents folder, etc ...
-    * Java
-      - [X] Windows
-      - [X] Linux
-      - [X] Mac OS X
-    * Go
-      - [ ] Windows
-      - [ ] Linux
-      - [X] Mac OS X
   * Cross platform SysTray Icon
-    * Java
-      - [X] Windows
-      - [ ] Linux
-      - [X] Mac OS X
-    * Go
-      - [ ] Windows
-      - [ ] Linux
-      - [X] Mac OS X
   * Cross platform Browser Pop Window
-    * Java
-      - [ ] Windows
-      - [ ] Linux
-      - [ ] Mac OS X
-    * Go
-      - [ ] Windows
-      - [ ] Linux
-      - [ ] Mac OS X
   * Cross platform Power Events (reboot, logout)
-    * Java
-      - [ ] Windows
-      - [ ] Linux
-      - [ ] Mac OS X
-    * Go
-      - [ ] Windows
-      - [ ] Linux
-      - [ ] Mac OS X
   * Register URL handlers (open a file from a browser)
-    * Java
-      - [ ] Windows
-      - [ ] Linux
-      - [X] Mac OS X
-    * Go
-      - [ ] Windows
-      - [ ] Linux
-      - [ ] Mac OS X
-   
+
 ## Example Desktop Folders
 
 
