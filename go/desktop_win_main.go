@@ -2,6 +2,8 @@
 
 package desktop
 
+import "runtime"
+
 func desktopMain() {
 	msg := &MSG{}
 
@@ -9,4 +11,6 @@ func desktopMain() {
 		TranslateMessage.Call(Arg(msg))
 		DispatchMessage.Call(Arg(msg))
 	}
+	
+	runtime.UnlockOSThread()
 }

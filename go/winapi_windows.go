@@ -35,8 +35,42 @@ func IsWindowsXP() bool {
 	return v1 == 5 && v2 == 1
 }
 
-func String2WString(s string) uintptr {
-	return uintptr(unsafe.Pointer(&utf16.Encode([]rune(s + "\x00"))[0]))
+type WString uintptr
+
+func WStringPtr(r1, r2 uintptr, err error) WString {
+	LastError = uintptr(err.(syscall.Errno))
+	return WString(r1)
+}
+
+func WStringNew(s string) WString {
+	u := utf16.Encode([]rune(s + "\x00"))
+
+    l := len(u) * int(unsafe.Sizeof(u[0]))
+
+	m := WStringPtr(GlobalAlloc.Call(Arg(GMEM_FIXED), Arg(l)))
+	if m == 0 {
+		panic(GetLastErrorString())
+	}
+
+	to := (*(*[1 << 30]byte)(unsafe.Pointer(m)))[:(l)]
+	from := (*(*[1 << 30]byte)(unsafe.Pointer(&u[0])))[:(l)]
+
+	for i := range to {
+		to[i] = from[i]
+	}
+
+	return m
+}
+
+func (m WString) Size() int {
+	return int(UINTPtr(lstrlen.Call(Arg(m))))
+}
+
+func (m WString) Close() {
+	h := HRESULTPtr(GlobalFree.Call(Arg(m)))
+	if h != 0 {
+		panic(h.String())
+	}
 }
 
 func WString2String(p uintptr) string {
@@ -62,8 +96,6 @@ var Bool2Int = map[bool]int{
 
 func Arg(d interface{}) uintptr {
 	switch d.(type) {
-		case string:
-		return String2WString(d.(string))
 		case bool:
 		return uintptr(Bool2Int[d.(bool)])
 	}

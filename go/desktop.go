@@ -2,6 +2,11 @@ package desktop
 
 import (
 	"image"
+    _ "image/gif"
+	_ "image/png"
+	_ "image/jpeg"
+	"encoding/base64"
+	"strings"
 )
 
 //
@@ -149,4 +154,16 @@ func (m *DesktopSysTray) SetMenu(menu []Menu) {
 
 func (m *DesktopSysTray) Close() {
 	m.close()
+}
+
+//
+// funcs
+//
+
+func DecodeImageString(s string) image.Image {
+	i, _, err := image.Decode(base64.NewDecoder(base64.StdEncoding, strings.NewReader(s)))
+	if err != nil {
+		panic(err)
+	}
+	return i
 }

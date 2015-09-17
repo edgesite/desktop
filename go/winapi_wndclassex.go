@@ -32,7 +32,7 @@ func WNDCLASSEXNew(hInstance HINSTANCE, WndProc WNDPROC, klass string) *WNDCLASS
 	m.hIcon = HICON(0)
 	m.hbrBackground = HBRUSH(0)
 	m.lpszMenuName = LPCTSTR(0)
-	m.lpszClassName = LPCTSTR(String2WString(klass))
+	m.lpszClassName = LPCTSTR(WStringNew(klass))
 
 	a := ATOMPtr(RegisterClassEx.Call(Arg(m)))
 	if a == 0 {
@@ -46,4 +46,7 @@ func (m *WNDCLASSEX) Close() {
 	if !BOOLPtr(UnregisterClass.Call(Arg(m.lpszClassName), Arg(m.hInstance))).Bool() {
 		panic(GetLastErrorString())
 	}
+	
+	w := WString(m.lpszClassName)
+	w.Close()
 }
