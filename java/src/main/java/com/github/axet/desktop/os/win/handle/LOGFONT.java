@@ -11,10 +11,10 @@ public class LOGFONT extends Structure {
 
     public static final int LF_FACESIZE = 32;
 
-    public static class ByValue extends NONCLIENTMETRICS implements Structure.ByValue {
+    public static class ByValue extends LOGFONT implements Structure.ByValue {
     }
 
-    public static class ByReference extends NONCLIENTMETRICS implements Structure.ByReference {
+    public static class ByReference extends LOGFONT implements Structure.ByReference {
     }
 
     public LOGFONT() {

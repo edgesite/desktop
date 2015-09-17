@@ -432,7 +432,7 @@ public class WindowsSysTray extends DesktopSysTray {
         }
     }
 
-    static HFONT createSystemMenuFont() {
+    public static HFONT createSystemMenuFont() {
         NONCLIENTMETRICS nm = new NONCLIENTMETRICS();
 
         User32Ex.INSTANCE.SystemParametersInfo(User32Ex.SPI_GETNONCLIENTMETRICS, 0, nm, 0);
