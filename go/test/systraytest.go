@@ -82,8 +82,16 @@ func (m *SysTest) ClickBox(mn *desktop.Menu) {
 	m.s.Update()
 }
 
+func (m *SysTest) MouseLeftClick() {
+	fmt.Println("click")
+}
+
+func (m *SysTest) MouseLeftDoubleClick() {
+	fmt.Println("dclick")
+}
+
 func main() {
-	m := SysTest{desktop.DesktopSysTrayNew()}
+	m := &SysTest{desktop.DesktopSysTrayNew()}
 
 	icon := desktop.DecodeImageString(icon_png)
 
@@ -100,6 +108,7 @@ func main() {
 		desktop.Menu{Icon: icon, Type: desktop.MenuItem, Enabled: true, Name: "test5", Action: m.Click},
 	}
 
+	m.s.AddListener(m)
 	m.s.SetIcon(icon)
 	m.s.SetTitle("go menu hoho!")
 	m.s.SetMenu(menu)

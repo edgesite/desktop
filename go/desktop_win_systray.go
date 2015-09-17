@@ -133,7 +133,13 @@ func (m *DesktopSysTray) WndProc(hWnd HWND, msg UINT, wParam WPARAM, lParam LPAR
 	case WM_SHELLNOTIFY:
 		switch lParam {
 		case WM_LBUTTONUP:
+			for l := range m.Listeners {
+				l.MouseLeftClick()
+			}
 		case WM_LBUTTONDBLCLK:
+			for l := range m.Listeners {
+				l.MouseLeftDoubleClick()
+			}
 		case WM_RBUTTONUP:
 			m.showContextMenu()
 		}

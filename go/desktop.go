@@ -117,7 +117,9 @@ type DesktopSysTrayListener interface {
 }
 
 func DesktopSysTrayNew() *DesktopSysTray {
-	return desktopSysTrayNew()
+	m := desktopSysTrayNew()
+	m.Listeners = make(map[DesktopSysTrayListener]bool)
+	return m
 }
 
 func (m *DesktopSysTray) AddListener(l DesktopSysTrayListener) {
