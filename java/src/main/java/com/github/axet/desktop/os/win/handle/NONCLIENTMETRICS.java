@@ -35,7 +35,9 @@ public class NONCLIENTMETRICS extends Structure {
     protected List<?> getFieldOrder() {
         return Arrays.asList(new String[] { "cbSize", "iBorderWidth", "iScrollWidth", "iScrollHeight", "iCaptionWidth",
                 "iCaptionHeight", "lfCaptionFont", "iSmCaptionWidth", "iSmCaptionHeight", "lfSmCaptionFont",
-                "iMenuWidth", "iMenuHeight", "lfMenuFont", "lfStatusFont", "lfMessageFont", "iPaddedBorderWidth" });
+                "iMenuWidth", "iMenuHeight", "lfMenuFont", "lfStatusFont", "lfMessageFont", 
+                //"iPaddedBorderWidth"
+                });
     }
 
     public int cbSize;
@@ -53,6 +55,5 @@ public class NONCLIENTMETRICS extends Structure {
     public LOGFONT.ByValue lfMenuFont;
     public LOGFONT.ByValue lfStatusFont;
     public LOGFONT.ByValue lfMessageFont;
-    public int iPaddedBorderWidth;
-
+    //public int iPaddedBorderWidth;
 }
