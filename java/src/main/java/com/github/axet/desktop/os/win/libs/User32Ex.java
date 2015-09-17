@@ -4,6 +4,7 @@ import com.github.axet.desktop.os.win.handle.ATOM;
 import com.github.axet.desktop.os.win.handle.COLORREF;
 import com.github.axet.desktop.os.win.handle.ICONINFO;
 import com.github.axet.desktop.os.win.handle.MENUITEMINFO;
+import com.github.axet.desktop.os.win.handle.NONCLIENTMETRICS;
 import com.github.axet.desktop.os.win.handle.WNDCLASSEX;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
@@ -162,7 +163,7 @@ public interface User32Ex extends Library {
      * BOOL WINAPI SystemParametersInfo( _In_ UINT uiAction, _In_ UINT uiParam,
      * _Inout_ PVOID pvParam, _In_ UINT fWinIni );
      */
-    boolean SystemParametersInfo(int uiAction, int uiParam, Structure pvParam, int fWinIni);
+    boolean SystemParametersInfo(int uiAction, int uiParam, NONCLIENTMETRICS pvParam, int fWinIni);
 
     // http://msdn.microsoft.com/en-us/library/windows/desktop/ms724371(v=vs.85).aspx
     /**

@@ -44,15 +44,15 @@ public class NONCLIENTMETRICS extends Structure {
     public int iScrollHeight;
     public int iCaptionWidth;
     public int iCaptionHeight;
-    public LOGFONT lfCaptionFont;
+    public LOGFONT.ByValue lfCaptionFont;
     public int iSmCaptionWidth;
     public int iSmCaptionHeight;
-    public LOGFONT lfSmCaptionFont;
+    public LOGFONT.ByValue lfSmCaptionFont;
     public int iMenuWidth;
     public int iMenuHeight;
-    public LOGFONT lfMenuFont;
-    public LOGFONT lfStatusFont;
-    public LOGFONT lfMessageFont;
+    public LOGFONT.ByValue lfMenuFont;
+    public LOGFONT.ByValue lfStatusFont;
+    public LOGFONT.ByValue lfMessageFont;
     public int iPaddedBorderWidth;
 
 }

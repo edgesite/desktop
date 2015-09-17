@@ -20,9 +20,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import com.github.axet.desktop.Desktop;
-import com.github.axet.desktop.DesktopSysTray;
-
 import net.sf.image4j.codec.ico.ICODecoder;
 
 public class SysTrayTest extends JFrame {
