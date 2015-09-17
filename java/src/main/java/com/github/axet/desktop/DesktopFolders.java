@@ -4,18 +4,48 @@ import java.io.File;
 
 public interface DesktopFolders {
 
-    // user application data folder
+    /**
+         Config folder
+
+         osx: /Users/user/Library/Application Support
+         windows: C:\\Users\\user\\AppData\\Local
+         linux: /home/user/.config
+     */
     abstract public File getAppData();
 
-    // user home
+    /**
+         Home folder
+        
+         osx: /Users/user
+         windows: C:\\Users\\user
+         linux: /home/user
+     */
     abstract public File getHome();
 
-    // user my documents
+    /**
+         Documents folder
+        
+         osx: /Users/user/Documents
+         windows: C:\\Users\\user\\Documents
+         linux: /home/user/Documents
+     */
     abstract public File getDocuments();
 
-    // user downloads
+    /**
+         Downloads folder
+        
+         osx: /Users/user/Downloads
+         windows: C:\\Users\\user\\Downloads
+         linux: /home/user/Desktop
+     */
     abstract public File getDownloads();
 
-    // user desktop
+    /**
+         Desktop folder
+        
+         osx: /Users/user/Desktop
+         windows: C:\\Users\\user\\Desktop
+         linux: /home/user/Desktop
+     */
     abstract public File getDesktop();
 }

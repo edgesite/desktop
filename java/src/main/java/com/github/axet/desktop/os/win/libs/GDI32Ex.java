@@ -1,9 +1,11 @@
 package com.github.axet.desktop.os.win.libs;
 
 import com.github.axet.desktop.os.win.handle.COLORREF;
+import com.github.axet.desktop.os.win.handle.LOGFONT;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.WinDef.HDC;
+import com.sun.jna.platform.win32.WinDef.HFONT;
 import com.sun.jna.platform.win32.WinDef.RECT;
 import com.sun.jna.platform.win32.WinUser.SIZE;
 import com.sun.jna.win32.W32APIOptions;
@@ -30,5 +32,8 @@ public interface GDI32Ex extends Library {
     // http://msdn.microsoft.com/en-us/library/windows/desktop/dd183370(v=vs.85).aspx
     boolean BitBlt(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc,
             int dwRop);
+
+    // https://msdn.microsoft.com/ru-ru/library/windows/desktop/dd183500(v=vs.85).aspx
+    HFONT CreateFontIndirect(LOGFONT l);
 
 }

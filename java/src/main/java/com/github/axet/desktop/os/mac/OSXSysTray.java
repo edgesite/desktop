@@ -21,47 +21,58 @@ import com.github.axet.desktop.os.mac.cocoa.NSImage;
 import com.github.axet.desktop.os.mac.cocoa.NSMenu;
 import com.github.axet.desktop.os.mac.cocoa.NSMenuItem;
 import com.github.axet.desktop.os.mac.cocoa.NSNumber;
+import com.github.axet.desktop.os.mac.cocoa.NSObject;
 import com.github.axet.desktop.os.mac.cocoa.NSStatusBar;
 import com.github.axet.desktop.os.mac.cocoa.NSStatusItem;
 import com.github.axet.desktop.os.mac.cocoa.NSString;
 
 public class OSXSysTray extends DesktopSysTray {
-
-    BufferedImage icon;
-
+    // keep title to update it when icon reshown
+    NSImage icon;
+    // keep title to update it when icon reshown
+    String title;
+    // kepp to abble to rebuild menu
     JPopupMenu menu;
-    ArrayList<OSXSysTrayAction> menuActions = new ArrayList<OSXSysTrayAction>();
-
+    // keep reference to be able to remove statusbar icon
     NSStatusItem statusItem;
+    // prevent action to be gc(), since it has two pointers to NS object and
+    // Java object. nsobject keept by Apple and here is no one who keeps java
+    // reference.
+    ArrayList<NSObject> actionKeeper = new ArrayList<NSObject>();
+    NSStatusBar statusbar;
 
     public OSXSysTray() {
-        // init menubar font, to get proper sizes
-        NSStatusBar.systemStatusBar();
-        // init menu font, to get proper sizes
-        new NSMenu();
+        // init menubar font, to get proper font sizes
+        statusbar = NSStatusBar.systemStatusBar();
     }
 
     @Override
     public void setIcon(Icon icon) {
-        this.icon = Utils.createBitmap(icon);
+        this.icon = convertTrayIcon(icon);
+    }
+
+    static NSImage convertTrayIcon(Icon i) {
+        BufferedImage icon = Utils.createBitmap(i);
 
         NSFont f = NSFont.menuBarFontOfSize(0);
-        int menubarHeigh = new NSNumber(f.fontDescriptor().objectForKey(NSFontDescriptor.NSFontSizeAttribute)).intValue();
+        int menubarHeigh = new NSNumber(f.fontDescriptor().objectForKey(NSFontDescriptor.NSFontSizeAttribute))
+                .intValue();
 
         BufferedImage scaledImage = new BufferedImage(menubarHeigh, menubarHeigh, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = scaledImage.createGraphics();
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
-        g.drawImage(this.icon, 0, 0, menubarHeigh, menubarHeigh, null);
+        g.drawImage(icon, 0, 0, menubarHeigh, menubarHeigh, null);
         g.dispose();
 
-        this.icon = scaledImage;
+        return new NSImage(scaledImage);
     }
 
-    NSImage getMenuImage(Icon icon) {
+    static NSImage convertMenuIcon(Icon icon) {
         BufferedImage img = Utils.createBitmap(icon);
 
         NSFont f = NSFont.menuFontOfSize(0);
-        int menubarHeigh = new NSNumber(f.fontDescriptor().objectForKey(NSFontDescriptor.NSFontSizeAttribute)).intValue();
+        int menubarHeigh = new NSNumber(f.fontDescriptor().objectForKey(NSFontDescriptor.NSFontSizeAttribute))
+                .intValue();
 
         BufferedImage scaledImage = new BufferedImage(menubarHeigh, menubarHeigh, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = scaledImage.createGraphics();
@@ -74,7 +85,7 @@ public class OSXSysTray extends DesktopSysTray {
 
     @Override
     public void setTitle(String title) {
-
+        this.title = title;
     }
 
     @Override
@@ -84,77 +95,79 @@ public class OSXSysTray extends DesktopSysTray {
 
     void updateMenus() {
         if (statusItem == null) {
-            NSStatusBar b = NSStatusBar.systemStatusBar();
-            statusItem = b.statusItemWithLength(NSStatusBar.NSVariableStatusItemLength);
+            statusItem = statusbar.statusItemWithLength(NSStatusBar.NSVariableStatusItemLength);
         }
 
-        menuActions.clear();
+        statusItem.setToolTip(title);
 
-        NSMenu m = new NSMenu();
+        actionKeeper.clear();
 
-        for (int i = 0; i < menu.getComponentCount(); i++) {
-            Component e = menu.getComponent(i);
-
-            if (e instanceof JMenu) {
-                JMenu sub = (JMenu) e;
-                NSMenu hsub = createSubmenu(sub);
-
-                NSImage bm = null;
-                if (sub.getIcon() != null)
-                    bm = getMenuImage(sub.getIcon());
-
-                NSMenuItem item = new NSMenuItem();
-                item.setTitle(new NSString(sub.getText()));
-                item.setImage(bm);
-                item.setSubmenu(hsub);
-                m.addItem(item);
-            } else if (e instanceof JCheckBoxMenuItem) {
-                JCheckBoxMenuItem ch = (JCheckBoxMenuItem) e;
-
-                NSImage bm = null;
-                if (ch.getIcon() != null)
-                    bm = getMenuImage(ch.getIcon());
-
-                OSXSysTrayAction action = new OSXSysTrayAction(ch);
-                menuActions.add(action);
-
-                NSMenuItem item = new NSMenuItem();
-                item.setTitle(new NSString(ch.getText()));
-                item.setImage(bm);
-                item.setEnabled(ch.isEnabled());
-                item.setState(ch.getState() ? NSCell.NSCellStateValue.NSOnState : NSCell.NSCellStateValue.NSOffState);
-                item.setTarget(action);
-                item.setAction(OSXSysTrayAction.action);
-                m.addItem(item);
-            } else if (e instanceof JMenuItem) {
-                JMenuItem mi = (JMenuItem) e;
-
-                NSImage bm = null;
-                if (mi.getIcon() != null)
-                    bm = getMenuImage(mi.getIcon());
-
-                OSXSysTrayAction action = new OSXSysTrayAction(mi);
-                menuActions.add(action);
-
-                NSMenuItem item = new NSMenuItem();
-                item.setTitle(new NSString(mi.getText()));
-                item.setImage(bm);
-                item.setEnabled(mi.isEnabled());
-                item.setTarget(action);
-                item.setAction(OSXSysTrayAction.action);
-                m.addItem(item);
-            }
-
-            if (e instanceof JPopupMenu.Separator) {
-                m.addItem(NSMenuItem.separatorItem());
-            }
-        }
-
-        m.setAutoenablesItems(false);
-        NSImage n = new NSImage(icon);
-        statusItem.setImage(n);
+        statusItem.setImage(icon);
         statusItem.setHighlightMode(true);
-        statusItem.setMenu(m);
+
+        if (menu != null) {
+            NSMenu m = new NSMenu();
+            for (int i = 0; i < menu.getComponentCount(); i++) {
+                Component e = menu.getComponent(i);
+
+                if (e instanceof JMenu) {
+                    JMenu sub = (JMenu) e;
+                    NSMenu hsub = createSubmenu(sub);
+
+                    NSImage bm = null;
+                    if (sub.getIcon() != null)
+                        bm = convertMenuIcon(sub.getIcon());
+
+                    NSMenuItem item = new NSMenuItem();
+                    item.setTitle(new NSString(sub.getText()));
+                    item.setImage(bm);
+                    item.setSubmenu(hsub);
+                    m.addItem(item);
+                } else if (e instanceof JCheckBoxMenuItem) {
+                    JCheckBoxMenuItem ch = (JCheckBoxMenuItem) e;
+
+                    NSImage bm = null;
+                    if (ch.getIcon() != null)
+                        bm = convertMenuIcon(ch.getIcon());
+
+                    OSXSysTrayAction action = new OSXSysTrayAction(ch);
+                    actionKeeper.add(action);
+
+                    NSMenuItem item = new NSMenuItem();
+                    item.setTitle(new NSString(ch.getText()));
+                    item.setImage(bm);
+                    item.setEnabled(ch.isEnabled());
+                    item.setState(
+                            ch.getState() ? NSCell.NSCellStateValue.NSOnState : NSCell.NSCellStateValue.NSOffState);
+                    item.setTarget(action);
+                    item.setAction(OSXSysTrayAction.action);
+                    m.addItem(item);
+                } else if (e instanceof JMenuItem) {
+                    JMenuItem mi = (JMenuItem) e;
+
+                    NSImage bm = null;
+                    if (mi.getIcon() != null)
+                        bm = convertMenuIcon(mi.getIcon());
+
+                    OSXSysTrayAction action = new OSXSysTrayAction(mi);
+                    actionKeeper.add(action);
+
+                    NSMenuItem item = new NSMenuItem();
+                    item.setTitle(new NSString(mi.getText()));
+                    item.setImage(bm);
+                    item.setEnabled(mi.isEnabled());
+                    item.setTarget(action);
+                    item.setAction(OSXSysTrayAction.action);
+                    m.addItem(item);
+                }
+
+                if (e instanceof JPopupMenu.Separator) {
+                    m.addItem(NSMenuItem.separatorItem());
+                }
+            }
+            m.setAutoenablesItems(false);
+            statusItem.setMenu(m);
+        }
     }
 
     NSMenu createSubmenu(JMenu menu) {
@@ -169,7 +182,7 @@ public class OSXSysTray extends DesktopSysTray {
 
                 NSImage bm = null;
                 if (sub.getIcon() != null)
-                    bm = getMenuImage(sub.getIcon());
+                    bm = convertMenuIcon(sub.getIcon());
 
                 NSMenuItem item = new NSMenuItem();
                 item.setTitle(new NSString(sub.getText()));
@@ -181,10 +194,10 @@ public class OSXSysTray extends DesktopSysTray {
 
                 NSImage bm = null;
                 if (ch.getIcon() != null)
-                    bm = getMenuImage(ch.getIcon());
+                    bm = convertMenuIcon(ch.getIcon());
 
                 OSXSysTrayAction action = new OSXSysTrayAction(ch);
-                menuActions.add(action);
+                actionKeeper.add(action);
 
                 NSMenuItem item = new NSMenuItem();
                 item.setTitle(new NSString(ch.getText()));
@@ -199,10 +212,10 @@ public class OSXSysTray extends DesktopSysTray {
 
                 NSImage bm = null;
                 if (mi.getIcon() != null)
-                    bm = getMenuImage(mi.getIcon());
+                    bm = convertMenuIcon(mi.getIcon());
 
                 OSXSysTrayAction action = new OSXSysTrayAction(mi);
-                menuActions.add(action);
+                actionKeeper.add(action);
 
                 NSMenuItem item = new NSMenuItem();
                 item.setTitle(new NSString(mi.getText()));
@@ -230,10 +243,9 @@ public class OSXSysTray extends DesktopSysTray {
     @Override
     public void hide() {
         if (statusItem != null) {
-            NSStatusBar b = NSStatusBar.systemStatusBar();
-            b.removeStatusItem(statusItem);
+            statusbar.removeStatusItem(statusItem);
             statusItem = null;
-            menuActions.clear();
+            actionKeeper.clear();
         }
     }
 
@@ -246,5 +258,4 @@ public class OSXSysTray extends DesktopSysTray {
     public void close() {
         hide();
     }
-
 }

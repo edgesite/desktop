@@ -3,8 +3,8 @@ package com.github.axet.desktop.os.win.libs;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.github.axet.desktop.os.win.GUID;
 import com.github.axet.desktop.os.win.handle.NOTIFYICONDATA;
+import com.github.axet.desktop.os.win.wrap.GUID;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.WinDef.HWND;

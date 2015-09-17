@@ -12,15 +12,39 @@ public class DesktopTest {
     public static void main(String[] args) {
         DesktopFolders d = Desktop.getDesktopFolders();
 
-        // Home folder: /Users/user
+        // Home folder
+        //
+        // osx: /Users/user
+        // windows: C:\Users\user
+        // linux: /home/user
         System.out.println("Home: " + d.getHome());
-        // Documents folder /Users/user/Documents
+        
+        // Documents folder
+        //
+        // osx: /Users/user/Documents
+        // windows: C:\Users\user\Documents
+        // linux: /home/user/Documents
         System.out.println("Documents: " + d.getDocuments());
-        // Config folder /Users/axet/Library/Application Support
+
+        // Config folder
+        //
+        // osx: /Users/user/Library/Application Support
+        // windows: C:\Users\user\AppData\Local
+        // linux: /home/user/.config
         System.out.println("AppFolder: " + d.getAppData());
-        // Desktop folder /Users/axet/Desktop
+
+        // Desktop folder
+        //
+        // osx: /Users/user/Desktop
+        // windows: C:\Users\user\Desktop
+        // linux: /home/user/Desktop
         System.out.println("Desktop: " + d.getDesktop());
-        // Downloads folder /Users/axet/Downloads
+        
+        // Downloads folder
+        //
+        // osx: /Users/user/Downloads
+        // windows: C:\Users\user\Downloads
+        // linux: /home/user/Desktop
         System.out.println("Downloads: " + d.getDownloads());
     }
 }
@@ -31,21 +55,31 @@ public class DesktopTest {
 
 Supports: JMenu (submenu), JCheckBoxMenuItem, JMenuItem, JPopupMenu.Separator, setImage() and setEnabled() on JMenuItem.
 
+Full example with submenus, icons, checkboxes can be found in test folder:
+
+  * [SysTrayTest.java](src/test/java/com/github/axet/desktop/SysTrayTest.java)
+
 ```java
 package com.github.axet.desktop;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
-import javax.swing.JCheckBoxMenuItem;
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
+
+import net.sf.image4j.codec.ico.ICODecoder;
 
 public class SimpleTrayTest extends JFrame {
-    private static final long serialVersionUID = -8634052159132145737L;
+    private static final long serialVersionUID = 1L;
 
     DesktopSysTray sys = Desktop.getDesktopSysTray();
     JPopupMenu menu;
@@ -60,6 +94,7 @@ public class SimpleTrayTest extends JFrame {
         public void mouseLeftDoubleClick() {
             System.out.println("double click");
         }
+
     };
 
     public SimpleTrayTest() {
@@ -68,64 +103,39 @@ public class SimpleTrayTest extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         menu = new JPopupMenu();
-        JMenuItem menuItem1 = new JMenuItem("test disabled");
+        JMenuItem menuItem1 = new JMenuItem("test1");
         menuItem1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                System.out.println("test disabled");
+                System.out.println("test1");
             }
         });
-        menuItem1.setEnabled(false);
         menu.add(menuItem1);
-        JMenuItem menuItem2 = new JMenuItem("test icon");
-        menuItem2.setIcon(Utils.loadIcon("icon.png"));
+        menu.addSeparator();
+        JMenuItem menuItem2 = new JMenuItem("test2");
         menuItem2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                System.out.println("test icon");
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        JOptionPane.showMessageDialog(null, "test icon");
-                    }
-                });
+                System.out.println("test2");
             }
         });
         menu.add(menuItem2);
-        menu.addSeparator();
-        final JCheckBoxMenuItem menuItem3 = new JCheckBoxMenuItem("test checkbox");
-        menuItem3.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                System.out.println("test checkbox");
-                sys.update();
-            }
-        });
-        menu.add(menuItem3);
-        JMenuItem menuItem4 = new JMenuItem("test normal");
-        menuItem4.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                System.out.println("test normal");
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        JOptionPane.showMessageDialog(null, "test normal");
-                    }
-                });
-            }
-        });
-        menu.add(menuItem4);
+
+        Icon icon = null;
+
+        try {
+            InputStream is = getClass().getResourceAsStream("bug.ico");
+            List<BufferedImage> bmp = ICODecoder.read(is);
+            icon = new ImageIcon(bmp.get(0));
+        } catch (IOException e1) {
+            throw new RuntimeException(e1);
+        }
 
         sys.addListener(ml);
-        sys.setIcon(Utils.loadIcon("icon.png"));
         sys.setTitle("Java tool2");
+        sys.setIcon(icon);
         sys.setMenu(menu);
         sys.show();
-
-        setSize(300, 200);
-        setLocationRelativeTo(null);
-        setVisible(true);
     }
 
     public static void main(String[] args) {

@@ -2,13 +2,22 @@
 
 Java && Go Desktop functions. Have you tried to find user default Download folder using java? It is very complicated. If so, you would find this library very helpful.
 
+Using this library you can use Java or Go language to write a desktop applications and services, without a restriction to be console only or limited Swing/AWT application.
+
+Script nature of Java or Go now not limited by system programming working with sockets and system files. But extened to desktop features like working with user desktop objects. Now you can write a http server which have status systray icon and can download a file into Download folder without hacking.
+
 ## Features
 
-  * Cross platform user specific folders: Download folder, Home folder, Documents folder
-  * Cross platform SysTray Icon
-  * Cross platform Browser Pop Window
+  - [X] Cross platform user specific folders: Download folder, Home folder, Documents folder, etc ...
+  - [X] Cross platform SysTray Icon
+  - [ ] Cross platform Browser Pop Window
+  - [ ] Cross platform Power Events (reboot, logout)
+  - [ ] Register URL handlers (open a application from a browser)
+  - [ ] Sound and Volume control
 
 ## Example Desktop Folders
+
+
 
 Java:
 
@@ -19,15 +28,10 @@ public class DesktopTest {
     public static void main(String[] args) {
         DesktopFolders d = Desktop.getDesktopFolders();
 
-        // Home folder: /Users/user
         System.out.println("Home: " + d.getHome());
-        // Documents folder /Users/user/Documents
         System.out.println("Documents: " + d.getDocuments());
-        // Config folder /Users/axet/Library/Application Support
         System.out.println("AppFolder: " + d.getAppData());
-        // Desktop folder /Users/axet/Desktop
         System.out.println("Desktop: " + d.getDesktop());
-        // Downloads folder /Users/axet/Downloads
         System.out.println("Downloads: " + d.getDownloads());
     }
 }
@@ -49,5 +53,4 @@ func main() {
   fmt.Println("Desktop:" desktop.GetDesktopFolder())
   fmt.Println("Downloads:" desktop.GetDownloadsFolder())
 }
-
 ```

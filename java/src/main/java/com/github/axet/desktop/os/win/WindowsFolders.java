@@ -7,6 +7,8 @@ import org.apache.commons.lang.SystemUtils;
 import com.github.axet.desktop.DesktopFolders;
 import com.github.axet.desktop.os.win.libs.Ole32Ex;
 import com.github.axet.desktop.os.win.libs.Shell32Ex;
+import com.github.axet.desktop.os.win.wrap.GUID;
+import com.github.axet.desktop.os.win.wrap.HRESULTException;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.PointerByReference;
@@ -36,13 +38,39 @@ public class WindowsFolders implements DesktopFolders {
         return getDownloadsVista();
     }
 
+    public File getDownloadsVista() {
+        GUID guid = new GUID("374DE290-123F-4565-9164-39C4925E467B");
+        return knowpath(guid);
+    }
+
+    @Override
+    public File getAppData() {
+        return path(Shell32Ex.CSIDL_LOCAL_APPDATA);
+    }
+
+    @Override
+    public File getDesktop() {
+        return path(Shell32Ex.CSIDL_DESKTOPDIRECTORY);
+    }
+
+    public File path(int nFolder) {
+        int dwFlags = Shell32Ex.SHGFP_TYPE_CURRENT;
+        char[] pszPath = new char[Shell32Ex.MAX_PATH];
+        int hResult = Shell32Ex.INSTANCE.SHGetFolderPath(null, nFolder, null, dwFlags, pszPath);
+        if (Shell32Ex.S_OK == hResult) {
+            String path = new String(pszPath);
+            int len = path.indexOf('\0');
+            path = path.substring(0, len);
+            return new File(path);
+        } else {
+            throw new HRESULTException(hResult);
+        }
+    }
+
     //
     // http://stackoverflow.com/questions/7672774/how-do-i-determine-the-windows-download-folder-path
     //
-
-    public File getDownloadsVista() {
-        GUID guid = new GUID("374DE290-123F-4565-9164-39C4925E467B");
-
+    public File knowpath(GUID guid) {
         int dwFlags = Shell32Ex.SHGFP_TYPE_CURRENT;
         PointerByReference pszPath = new PointerByReference();
 
@@ -58,31 +86,4 @@ public class WindowsFolders implements DesktopFolders {
             throw new RuntimeException("Error: " + Integer.toHexString(hResult));
         }
     }
-
-    @Override
-    public File getAppData() {
-        return path(Shell32Ex.CSIDL_LOCAL_APPDATA);
-    }
-
-    @Override
-    public File getDesktop() {
-        return path(Shell32Ex.CSIDL_DESKTOPDIRECTORY);
-    }
-
-    public File path(int nFolder) {
-        HWND hwndOwner = null;
-        HANDLE hToken = null;
-        int dwFlags = Shell32Ex.SHGFP_TYPE_CURRENT;
-        char[] pszPath = new char[Shell32Ex.MAX_PATH];
-        int hResult = Shell32Ex.INSTANCE.SHGetFolderPath(hwndOwner, nFolder, hToken, dwFlags, pszPath);
-        if (Shell32Ex.S_OK == hResult) {
-            String path = new String(pszPath);
-            int len = path.indexOf('\0');
-            path = path.substring(0, len);
-            return new File(path);
-        } else {
-            throw new HResultException(hResult);
-        }
-    }
-
 }

@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,7 +24,6 @@ import com.github.axet.desktop.DesktopSysTray;
 import com.github.axet.desktop.Utils;
 import com.github.axet.desktop.os.win.handle.BLENDFUNCTION;
 import com.github.axet.desktop.os.win.handle.DRAWITEMSTRUCT;
-import com.github.axet.desktop.os.win.handle.LOGFONT;
 import com.github.axet.desktop.os.win.handle.MEASUREITEMSTRUCT;
 import com.github.axet.desktop.os.win.handle.MENUITEMINFO;
 import com.github.axet.desktop.os.win.handle.NONCLIENTMETRICS;
@@ -33,9 +33,10 @@ import com.github.axet.desktop.os.win.libs.GDI32Ex;
 import com.github.axet.desktop.os.win.libs.Msimg32;
 import com.github.axet.desktop.os.win.libs.Shell32Ex;
 import com.github.axet.desktop.os.win.libs.User32Ex;
-import com.github.axet.desktop.os.win.wrap.HBitmapWrap;
-import com.github.axet.desktop.os.win.wrap.HIconWrap;
-import com.github.axet.desktop.os.win.wrap.WndClassExWrap;
+import com.github.axet.desktop.os.win.wrap.GetLastErrorException;
+import com.github.axet.desktop.os.win.wrap.HBITMAPWrap;
+import com.github.axet.desktop.os.win.wrap.HICONWrap;
+import com.github.axet.desktop.os.win.wrap.WNDCLASSEXWrap;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.BaseTSD.ULONG_PTR;
 import com.sun.jna.platform.win32.GDI32;
@@ -104,7 +105,7 @@ public class WindowsSysTray extends DesktopSysTray {
     public class MessagePump implements Runnable {
         Thread t;
 
-        WndClassExWrap wc;
+        WNDCLASSEXWrap wc;
         WNDPROC WndProc;
         HWND hWnd;
         HINSTANCE hInstance;
@@ -189,7 +190,7 @@ public class WindowsSysTray extends DesktopSysTray {
         HWND createWindow() {
             hInstance = Kernel32.INSTANCE.GetModuleHandle(null);
 
-            wc = new WndClassExWrap(hInstance, WndProc, WindowsSysTray.class.getSimpleName());
+            wc = new WNDCLASSEXWrap(hInstance, WndProc, WindowsSysTray.class.getSimpleName());
 
             HWND hwnd = User32Ex.INSTANCE.CreateWindowEx(0, wc.getName(), wc.getName(), User32Ex.WS_OVERLAPPEDWINDOW, 0,
                     0, 0, 0, null, null, hInstance, null);
@@ -210,7 +211,8 @@ public class WindowsSysTray extends DesktopSysTray {
 
             MSG msg = new MSG();
 
-            while (User32.INSTANCE.GetMessage(msg, hWnd, 0, 0) > 0) {
+            while (User32.INSTANCE.GetMessage(msg, null, 0, 0) > 0) {
+                User32.INSTANCE.TranslateMessage(msg);
                 User32.INSTANCE.DispatchMessage(msg);
             }
 
@@ -219,7 +221,7 @@ public class WindowsSysTray extends DesktopSysTray {
 
         SIZE measureItem(HWND hWnd, MenuMap mm) {
             HDC hdc = User32.INSTANCE.GetDC(hWnd);
-            HFONT hfntOld = (HFONT) GDI32.INSTANCE.SelectObject(hdc, getSystemMenuFont());
+            HANDLE hfntOld = (HANDLE) GDI32.INSTANCE.SelectObject(hdc, createSystemMenuFont());
             SIZE size = new SIZE();
             if (!GDI32Ex.INSTANCE.GetTextExtentPoint32(hdc, mm.item.getText(), mm.item.getText().length(), size))
                 throw new GetLastErrorException();
@@ -264,7 +266,7 @@ public class WindowsSysTray extends DesktopSysTray {
     }
 
     static class MenuMap {
-        public HBitmapWrap hbm;
+        public HBITMAPWrap hbm;
         public JMenuItem item;
 
         public MenuMap(JMenuItem item) {
@@ -272,7 +274,7 @@ public class WindowsSysTray extends DesktopSysTray {
 
             if (item.getIcon() != null) {
                 Icon icon = item.getIcon();
-                hbm = getMenuImage(icon);
+                hbm = convertMenuImage(icon);
             }
         }
 
@@ -294,18 +296,19 @@ public class WindowsSysTray extends DesktopSysTray {
         }
     }
 
+    // meessage pump ref count
     static int count = 0;
     static MessagePump mp;
-
+    // close flat for ref count
     boolean close = false;
 
     String title;
     JPopupMenu menu;
 
-    HBitmapWrap hbitmapChecked;
-    HBitmapWrap hbitmapUnchecked;
-    HBitmapWrap hbitmapTrayIcon;
-    HIconWrap hicoTrayIcon;
+    HBITMAPWrap hbitmapChecked;
+    HBITMAPWrap hbitmapUnchecked;
+    HBITMAPWrap hbitmapTrayIcon;
+    HICONWrap hicoTrayIcon;
     HMENU hMenus;
     // position in this list == id of HMENU item
     List<MenuMap> hMenusIDs = new ArrayList<MenuMap>();
@@ -315,9 +318,9 @@ public class WindowsSysTray extends DesktopSysTray {
 
         try {
             BufferedImage checked = ImageIO.read(WindowsSysTray.class.getResourceAsStream("checked.png"));
-            hbitmapChecked = getMenuImage(new ImageIcon(checked));
+            hbitmapChecked = convertMenuImage(new ImageIcon(checked));
             BufferedImage unchecked = ImageIO.read(WindowsSysTray.class.getResourceAsStream("unchecked.png"));
-            hbitmapUnchecked = getMenuImage(new ImageIcon(unchecked));
+            hbitmapUnchecked = convertMenuImage(new ImageIcon(unchecked));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -374,7 +377,7 @@ public class WindowsSysTray extends DesktopSysTray {
 
     static void drawHBITMAP(HBITMAP hbm, int x, int y, int cx, int cy, HDC hdcDst) {
         HDC hdcSrc = GDI32.INSTANCE.CreateCompatibleDC(hdcDst);
-        HANDLE h = GDI32.INSTANCE.SelectObject(hdcSrc, hbm);
+        HANDLE old = GDI32.INSTANCE.SelectObject(hdcSrc, hbm);
 
         BLENDFUNCTION.ByValue bld = new BLENDFUNCTION.ByValue();
         bld.BlendOp = WinUser.AC_SRC_OVER;
@@ -384,7 +387,7 @@ public class WindowsSysTray extends DesktopSysTray {
 
         if (!Msimg32.INSTANCE.AlphaBlend(hdcDst, x, y, cx, cy, hdcSrc, 0, 0, cx, cy, bld))
             throw new GetLastErrorException();
-        GDI32.INSTANCE.SelectObject(hdcSrc, h);
+        GDI32.INSTANCE.SelectObject(hdcSrc, old);
         if (!GDI32.INSTANCE.DeleteDC(hdcSrc))
             throw new GetLastErrorException();
     }
@@ -405,7 +408,7 @@ public class WindowsSysTray extends DesktopSysTray {
 
         x += (getSystemMenuImageSize() + SPACE_ICONS) * 2;
 
-        GDI32.INSTANCE.SelectObject(hDC, getSystemMenuFont());
+        GDI32.INSTANCE.SelectObject(hDC, createSystemMenuFont());
         GDI32Ex.INSTANCE.ExtTextOut(hDC, x, y, GDI32Ex.ETO_OPAQUE, rcItem, mm.item.getText(),
                 mm.item.getText().length(), null);
 
@@ -429,34 +432,37 @@ public class WindowsSysTray extends DesktopSysTray {
         }
     }
 
-    static LOGFONT getSystemMenuFont() {
+    static HFONT createSystemMenuFont() {
         NONCLIENTMETRICS nm = new NONCLIENTMETRICS();
 
         User32Ex.INSTANCE.SystemParametersInfo(User32Ex.SPI_GETNONCLIENTMETRICS, 0, nm, 0);
-        return nm.lfMenuFont;
+        return GDI32Ex.INSTANCE.CreateFontIndirect(nm.lfMenuFont);
     }
 
     static int getSystemMenuImageSize() {
         return User32.INSTANCE.GetSystemMetrics(SM_CYMENUCHECK);
     }
 
-    static HBitmapWrap getMenuImage(Icon icon) {
+    static HBITMAPWrap convertMenuImage(Icon icon) {
         BufferedImage img = Utils.createBitmap(icon);
 
         int menubarHeigh = getSystemMenuImageSize();
 
         BufferedImage scaledImage = new BufferedImage(menubarHeigh, menubarHeigh, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = scaledImage.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
         g.drawImage(img, 0, 0, menubarHeigh, menubarHeigh, null);
         g.dispose();
 
-        return new HBitmapWrap(scaledImage);
+        return new HBITMAPWrap(scaledImage);
     }
 
     public void setIcon(Icon icon) {
-        this.hbitmapTrayIcon = new HBitmapWrap(Utils.createBitmap(icon));
-        this.hicoTrayIcon = new HIconWrap(hbitmapTrayIcon);
+        this.hbitmapTrayIcon = new HBITMAPWrap(Utils.createBitmap(icon));
+        this.hicoTrayIcon = new HICONWrap(hbitmapTrayIcon);
 
     }
 

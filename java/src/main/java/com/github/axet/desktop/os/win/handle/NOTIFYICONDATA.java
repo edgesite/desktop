@@ -3,7 +3,7 @@ package com.github.axet.desktop.os.win.handle;
 import java.util.Arrays;
 import java.util.List;
 
-import com.github.axet.desktop.os.win.GUID;
+import com.github.axet.desktop.os.win.wrap.GUID;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinDef.HICON;
 import com.sun.jna.platform.win32.WinDef.HWND;
@@ -51,7 +51,7 @@ public class NOTIFYICONDATA extends Structure {
     // notification message, pass to hwnd WM_USER + 1
     public int uCallbackMessage = 0;
     public HICON hIcon = null;
-    public char[] szTip = new char[64];
+    public char[] szTip = new char[128];
     public int dwState = 0;
     public int dwStateMask = 0;
     public char[] szInfo = new char[256];
@@ -72,9 +72,12 @@ public class NOTIFYICONDATA extends Structure {
     }
 
     public void setTooltip(String s) {
-        uFlags |= NIF_INFO | NIF_TIP;
+        uFlags |= NIF_TIP;
+        // windows xp icon tool tip
         System.arraycopy(s.toCharArray(), 0, szTip, 0, Math.min(s.length(), szTip.length));
-        System.arraycopy(s.toCharArray(), 0, szInfoTitle, 0, Math.min(s.length(), szInfoTitle.length));
-        System.arraycopy(s.toCharArray(), 0, szInfo, 0, Math.min(s.length(), szInfo.length));
+        
+        //uFlags |= NIF_INFO;
+        //System.arraycopy(s.toCharArray(), 0, szInfoTitle, 0, Math.min(s.length(), szInfoTitle.length));
+        //System.arraycopy(s.toCharArray(), 0, szInfo, 0, Math.min(s.length(), szInfo.length));
     }
 }
