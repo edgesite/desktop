@@ -52,10 +52,10 @@ public class HBITMAPWrap extends HBITMAP {
             for (int y = 0; y < h; y++) {
                 for (int x = 0; x < w; x++) {
                     raster.getPixel(x, h - y - 1, pixel);
-                    int alpha = (pixel[3] & 0xFF) << 24;
-                    int red = (pixel[2] & 0xFF);
+                    int red = (pixel[2] & 0xFF) << 0;
                     int green = (pixel[1] & 0xFF) << 8;
                     int blue = (pixel[0] & 0xFF) << 16;
+                    int alpha = (pixel[3] & 0xFF) << 24;
                     bits[x + y * w] = alpha | red | green | blue;
                 }
             }

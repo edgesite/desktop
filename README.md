@@ -8,12 +8,12 @@ Script nature of Java or Go now not limited by system programming working with s
 
 ## Features
 
-  * Cross platform user specific folders: Download folder, Home folder, Documents folder, etc ...
-  * Cross platform SysTray Icon
-  * Cross platform Browser Pop Window
-  * Cross platform Power Events (reboot, logout)
-  * Register URL handlers (open a application from a browser)
-  * Sound and Volume control
+  - [X] Cross platform user specific folders: Download folder, Home folder, Documents folder, etc ...
+  - [X] Cross platform SysTray Icon
+  - [ ] Cross platform Browser Pop Window
+  - [ ] Cross platform Power Events (reboot, logout)
+  - [ ] Register URL handlers (open a application from a browser)
+  - [ ] Sound and Volume control
 
 ## Example Desktop Folders
 

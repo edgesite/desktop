@@ -16,5 +16,4 @@ public class Utils {
         g.dispose();
         return bi;
     }
-
 }

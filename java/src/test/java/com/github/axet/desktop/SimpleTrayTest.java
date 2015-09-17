@@ -61,14 +61,23 @@ public class SimpleTrayTest extends JFrame {
 
         Icon icon = null;
 
+        // try {
+        // InputStream is = getClass().getResourceAsStream("bug.ico");
+        // List<BufferedImage> bmp = ICODecoder.read(is);
+        // icon = new ImageIcon(bmp.get(0));
+        // } catch (IOException e1) {
+        // throw new RuntimeException(e1);
+        // }
         try {
-            InputStream is = getClass().getResourceAsStream("bug.ico");
-            List<BufferedImage> bmp = ICODecoder.read(is);
-            icon = new ImageIcon(bmp.get(0));
+            InputStream is = getClass().getResourceAsStream("icon.png");
+            BufferedImage bmp = ImageIO.read(is);
+            icon = new ImageIcon(bmp);
         } catch (IOException e1) {
             throw new RuntimeException(e1);
         }
 
+        menuItem2.setIcon(icon);
+        
         sys.addListener(ml);
         sys.setTitle("Java tool2");
         sys.setIcon(icon);
