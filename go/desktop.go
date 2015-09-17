@@ -1,11 +1,11 @@
 package desktop
 
 import (
-	"image"
-    _ "image/gif"
-	_ "image/png"
-	_ "image/jpeg"
 	"encoding/base64"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"strings"
 )
 

@@ -7,12 +7,12 @@ import (
 )
 
 type MEASUREITEMSTRUCT struct {
-  CtlType  UINT      
-  CtlID UINT      
-  itemID UINT      
-  itemWidth UINT      
-  itemHeight UINT      
-  itemData ULONG_PTR
+	CtlType    UINT
+	CtlID      UINT
+	itemID     UINT
+	itemWidth  UINT
+	itemHeight UINT
+	itemData   ULONG_PTR
 }
 
 func MEASUREITEMSTRUCTPtr(p uintptr) *MEASUREITEMSTRUCT {

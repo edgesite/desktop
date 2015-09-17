@@ -45,7 +45,7 @@ func WStringPtr(r1, r2 uintptr, err error) WString {
 func WStringNew(s string) WString {
 	u := utf16.Encode([]rune(s + "\x00"))
 
-    l := len(u) * int(unsafe.Sizeof(u[0]))
+	l := len(u) * int(unsafe.Sizeof(u[0]))
 
 	m := WStringPtr(GlobalAlloc.Call(Arg(GMEM_FIXED), Arg(l)))
 	if m == 0 {
@@ -96,7 +96,7 @@ var Bool2Int = map[bool]int{
 
 func Arg(d interface{}) uintptr {
 	switch d.(type) {
-		case bool:
+	case bool:
 		return uintptr(Bool2Int[d.(bool)])
 	}
 

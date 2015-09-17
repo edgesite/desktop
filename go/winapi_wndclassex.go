@@ -46,7 +46,7 @@ func (m *WNDCLASSEX) Close() {
 	if !BOOLPtr(UnregisterClass.Call(Arg(m.lpszClassName), Arg(m.hInstance))).Bool() {
 		panic(GetLastErrorString())
 	}
-	
+
 	w := WString(m.lpszClassName)
 	w.Close()
 }

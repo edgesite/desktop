@@ -4,6 +4,7 @@ package desktop
 
 import (
 	"image"
+	"image/color"
 	"unsafe"
 )
 
@@ -12,15 +13,15 @@ import (
 //
 
 type BitmapImage struct {
-	hbm HBITMAP
+	hbm   HBITMAP
 	image image.Image
 }
 
 func BitmapImageNew(i image.Image) *BitmapImage {
 	m := &BitmapImage{}
-	
+
 	m.image = i
-	
+
 	w := m.Width()
 	h := m.Height()
 
@@ -57,12 +58,17 @@ func BitmapImageNew(i image.Image) *BitmapImage {
 	for y := 0; y < h; y++ {
 		for x := 0; x < w; x++ {
 			c := i.At(i.Bounds().Min.X+x, i.Bounds().Min.Y+y)
-			r, g, b, a := c.RGBA()
-			r = r << 0
-			g = g << 8
-			b = b << 16
-			a = a << 24
-			buf[x+(h-y-1)*w] = r | g | b | a
+			r, g, b, a := color.RGBAModel.Convert(c).RGBA()
+
+			r = r & 0xff
+			g = g & 0xff
+			b = b & 0xff
+			a = a & 0xff
+
+			// windows images are upside down and BGRA encoded.
+			// yes. it is not just slash \\
+			wy := h - y - 1
+			buf[x+wy*w] = (r << 16) | (g << 8) | (b << 0) | (a << 24)
 		}
 	}
 
@@ -84,30 +90,28 @@ func (m *BitmapImage) Height() int {
 func (m *BitmapImage) Draw(x LONG, y LONG, hdcDst HDC) {
 	cx := LONG(m.Width())
 	cy := LONG(m.Height())
-	
-    hdcSrc := HDCPtr(CreateCompatibleDC.Call(Arg(hdcDst)))
+
+	hdcSrc := HDCPtr(CreateCompatibleDC.Call(Arg(hdcDst)))
 	if hdcSrc == 0 {
 		panic(GetLastErrorString())
 	}
-    old := HANDLEPtr(SelectObject.Call(Arg(hdcSrc), Arg(m.hbm)))
+	old := HANDLEPtr(SelectObject.Call(Arg(hdcSrc), Arg(m.hbm)))
 
-    bld := BLENDFUNCTION{}
-    bld.BlendOp = AC_SRC_OVER
-    bld.BlendFlags = 0
-    bld.SourceConstantAlpha = 255
-    bld.AlphaFormat = AC_SRC_ALPHA
+	bld := BLENDFUNCTION{}
+	bld.BlendOp = AC_SRC_OVER
+	bld.BlendFlags = 0
+	bld.SourceConstantAlpha = 255
+	bld.AlphaFormat = AC_SRC_ALPHA
 
-    b := *(*uint32)(unsafe.Pointer(&bld))
-
-    if !BOOLPtr(AlphaBlend.Call(Arg(hdcDst), Arg(x), Arg(y), Arg(cx), Arg(cy),
-			Arg(hdcSrc), NULL, NULL, Arg(cx), Arg(cy),
-			Arg(b))).Bool() {
-        panic(GetLastErrorString())
+	if !BOOLPtr(AlphaBlend.Call(Arg(hdcDst), Arg(x), Arg(y), Arg(cx), Arg(cy),
+		Arg(hdcSrc), NULL, NULL, Arg(cx), Arg(cy),
+		Arg(*(*uint32)(unsafe.Pointer(&bld))))).Bool() {
+		panic(GetLastErrorString())
 	}
 
-    SelectObject.Call(Arg(hdcSrc), Arg(old))
-	
-    if !BOOLPtr(DeleteDC.Call(Arg(hdcSrc))).Bool() {
+	SelectObject.Call(Arg(hdcSrc), Arg(old))
+
+	if !BOOLPtr(DeleteDC.Call(Arg(hdcSrc))).Bool() {
 		panic(GetLastErrorString())
 	}
 }

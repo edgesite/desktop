@@ -11,6 +11,7 @@ func desktopMain() {
 		TranslateMessage.Call(Arg(msg))
 		DispatchMessage.Call(Arg(msg))
 	}
-	
+
+	// get locked when window created in desktop
 	runtime.UnlockOSThread()
 }

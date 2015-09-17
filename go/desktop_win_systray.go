@@ -3,10 +3,10 @@
 package desktop
 
 import (
-	"image"
 	"github.com/nfnt/resize"
-	"unsafe"
+	"image"
 	"runtime"
+	"unsafe"
 )
 
 const (
@@ -75,7 +75,7 @@ func SystemMenuFontNew() HFONT {
 	if h == 0 {
 		panic(GetLastErrorString())
 	}
-	
+
 	return h
 }
 
@@ -84,7 +84,7 @@ func SystemMenuFontNew() HFONT {
 //
 
 type MenuItemWin struct {
-	Menu *Menu
+	Menu  *Menu
 	Image *BitmapImage
 }
 
@@ -94,18 +94,18 @@ func (m *MenuItemWin) Close() {
 
 //
 // DesktopSysTrayWin
-// 
+//
 
 type DesktopSysTrayWin struct {
-	MainMenu    HMENU
+	MainMenu  HMENU
 	MenuItems []*MenuItemWin
-	Icon    HICON
-	MainWnd *Window
+	Icon      HICON
+	MainWnd   *Window
 
-	Checked_png *BitmapImage
+	Checked_png   *BitmapImage
 	Unchecked_png *BitmapImage
 
-	TaskbarCreated WString
+	TaskbarCreated    WString
 	WM_TASKBARCREATED UINT
 }
 
@@ -154,7 +154,7 @@ func (m *DesktopSysTray) WndProc(hWnd HWND, msg UINT, wParam WPARAM, lParam LPAR
 
 		i := int(ms.itemData)
 		mn := d.MenuItems[i]
-		
+
 		hdc := HDCPtr(GetDC.Call(Arg(d.MainWnd.Wnd)))
 		defer ReleaseDC.Call(Arg(d.MainWnd.Wnd), Arg(hdc))
 		font := SystemMenuFontNew()
@@ -164,33 +164,33 @@ func (m *DesktopSysTray) WndProc(hWnd HWND, msg UINT, wParam WPARAM, lParam LPAR
 		w := WStringNew(mn.Menu.Name)
 		GetTextExtentPoint32.Call(Arg(hdc), Arg(w), Arg(w.Size()), Arg(&size))
 		SelectObject.Call(Arg(hdc), Arg(fontold))
-		size.cx += LONG(GetSystemMenuImageSize() + SPACE_ICONS) * 2
+		size.cx += LONG(GetSystemMenuImageSize()+SPACE_ICONS) * 2
 		ms.itemWidth = UINT(size.cx)
 		ms.itemHeight = UINT(size.cy)
 	case WM_DRAWITEM:
 		di := (*DRAWITEMSTRUCT)(unsafe.Pointer(lParam))
-		
+
 		i := int(di.itemData)
 		mn := d.MenuItems[i]
-		
+
 		if !mn.Menu.Enabled {
 			SetTextColor.Call(Arg(di.hDC), Arg(COLORREFPtr(GetSysColor.Call(Arg(COLOR_GRAYTEXT)))))
 			SetBkColor.Call(Arg(di.hDC), Arg(COLORREFPtr(GetSysColor.Call(Arg(COLOR_MENU)))))
-		} else if ((di.itemState & ODS_SELECTED) == ODS_SELECTED) {
+		} else if (di.itemState & ODS_SELECTED) == ODS_SELECTED {
 			SetTextColor.Call(Arg(di.hDC), Arg(COLORREFPtr(GetSysColor.Call(Arg(COLOR_HIGHLIGHTTEXT)))))
 			SetBkColor.Call(Arg(di.hDC), Arg(COLORREFPtr(GetSysColor.Call(Arg(COLOR_HIGHLIGHT)))))
 		} else {
 			SetTextColor.Call(Arg(di.hDC), Arg(COLORREFPtr(GetSysColor.Call(Arg(COLOR_MENUTEXT)))))
 			SetBkColor.Call(Arg(di.hDC), Arg(COLORREFPtr(GetSysColor.Call(Arg(COLOR_MENU)))))
 		}
-		
+
 		x := di.rcItem.left
 		y := di.rcItem.top
 		//w := di.rcItem.right - di.rcItem.left
 		//h := di.rcItem.bottom - di.rcItem.top
-		
-		x += LONG(GetSystemMenuImageSize() + SPACE_ICONS) * 2;
-		
+
+		x += LONG(GetSystemMenuImageSize()+SPACE_ICONS) * 2
+
 		font := SystemMenuFontNew()
 		defer font.Close()
 		SelectObject.Call(Arg(di.hDC), Arg(font))
@@ -199,19 +199,19 @@ func (m *DesktopSysTray) WndProc(hWnd HWND, msg UINT, wParam WPARAM, lParam LPAR
 		ExtTextOut.Call(Arg(di.hDC), Arg(x), Arg(y), Arg(ETO_OPAQUE), Arg(&di.rcItem), Arg(w), Arg(w.Size()), NULL)
 
 		x = di.rcItem.left
-		
+
 		if mn.Menu.Type == MenuCheckBox {
-			if mn.Menu.State  {
-                d.Checked_png.Draw(x, y, di.hDC)
+			if mn.Menu.State {
+				d.Checked_png.Draw(x, y, di.hDC)
 			} else {
-                d.Unchecked_png.Draw(x, y, di.hDC)
+				d.Unchecked_png.Draw(x, y, di.hDC)
 			}
 		}
 
-        x += LONG(GetSystemMenuImageSize() + SPACE_ICONS)
-        if (mn.Image != nil) {
-            mn.Image.Draw(x, y, di.hDC)
-        }
+		x += LONG(GetSystemMenuImageSize() + SPACE_ICONS)
+		if mn.Image != nil {
+			mn.Image.Draw(x, y, di.hDC)
+		}
 	case WM_QUIT:
 		PostMessage.Call(Arg(d.MainWnd.Wnd), Arg(WM_QUIT), NULL, NULL)
 	}
@@ -283,7 +283,7 @@ func (m *DesktopSysTray) close() {
 		d.MainMenu.Close()
 		d.MainMenu = 0
 	}
-	
+
 	if d.TaskbarCreated != 0 {
 		d.TaskbarCreated.Close()
 		d.TaskbarCreated = 0
@@ -294,12 +294,16 @@ func (m *DesktopSysTray) showContextMenu() {
 	d := m.os.(*DesktopSysTrayWin)
 
 	m.updateMenus()
-	
+
+	if !BOOLPtr(SetForegroundWindow.Call(Arg(d.MainWnd.Wnd))).Bool() {
+		panic(GetLastErrorString())
+	}
+
 	var pos POINT
 	if !BOOLPtr(GetCursorPos.Call(Arg(&pos))).Bool() {
 		panic(GetLastErrorString())
 	}
-	
+
 	for !BOOLPtr(TrackPopupMenu.Call(Arg(d.MainMenu), TPM_RIGHTBUTTON, Arg(pos.x), Arg(pos.y), NULL, Arg(d.MainWnd.Wnd), NULL)).Bool() {
 		var hWnd HWND
 		// in case popup menu lost focus, did not die, and user right clied icon again
@@ -308,15 +312,17 @@ func (m *DesktopSysTray) showContextMenu() {
 		// 0x000005a6 - "Popup menu already active."
 		if LastError == 0x000005a6 {
 			for {
-                // "#32768" - pop up menu window class
-				hWnd = HWNDPtr(FindWindowEx.Call(NULL, Arg(hWnd), Arg("#32768"), NULL))
+				// "#32768" - pop up menu window class
+				w := WStringNew("#32768")
+				defer w.Close()
+				hWnd = HWNDPtr(FindWindowEx.Call(NULL, Arg(hWnd), Arg(w), NULL))
 				if hWnd == 0 {
 					break
 				}
 				SendMessage.Call(Arg(hWnd), Arg(WM_KEYDOWN), Arg(VK_ESCAPE), NULL)
 			}
-            // noting is working...
-            // just return.
+			// noting is working...
+			// just return.
 			return
 		} else {
 			panic(GetLastErrorString())
@@ -327,11 +333,11 @@ func (m *DesktopSysTray) showContextMenu() {
 func (m *DesktopSysTray) updateMenus() {
 	d := m.os.(*DesktopSysTrayWin)
 
-    if d.MainMenu != 0 {
+	if d.MainMenu != 0 {
 		d.MainMenu.Close()
 	}
 
-    d.MainMenu = m.createSubMenu(m.Menu)
+	d.MainMenu = m.createSubMenu(m.Menu)
 }
 
 func (m *DesktopSysTray) createSubMenu(mm []Menu) HMENU {
@@ -359,9 +365,9 @@ func (m *DesktopSysTray) createSubMenu(mm []Menu) HMENU {
 
 			if mn.Menu != nil {
 				sub := m.createSubMenu(mn.Menu)
-		        // seems like you dont have to free this menu, since it already attached
-		        // to main HMENU handler
-				if !BOOLPtr(AppendMenu.Call(Arg(hmenu), Arg(MF_POPUP | MFT_OWNERDRAW), Arg(sub), NULL)).Bool() {
+				// seems like you dont have to free this menu, since it already attached
+				// to main HMENU handler
+				if !BOOLPtr(AppendMenu.Call(Arg(hmenu), Arg(MF_POPUP|MFT_OWNERDRAW), Arg(sub), NULL)).Bool() {
 					panic(GetLastErrorString())
 				}
 				mi := MENUITEMINFO{}

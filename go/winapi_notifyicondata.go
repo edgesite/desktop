@@ -52,10 +52,10 @@ func (m *NOTIFYICONDATA) SetCallback(i UINT) {
 func (m *NOTIFYICONDATA) SetTooltip(s string) {
 	m.uFlags |= NIF_TIP
 	//m.uFlags |= NIF_INFO
-	
-	p :=WStringNew(s)
+
+	p := WStringNew(s)
 	defer p.Close()
-	
+
 	i := 0
 	for p := uintptr(unsafe.Pointer(p)); ; p += 2 {
 		u := *(*TCHAR)(unsafe.Pointer(p))

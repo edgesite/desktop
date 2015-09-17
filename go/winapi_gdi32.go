@@ -10,10 +10,9 @@ const (
 	BI_RGB = 0
 
 	DIB_RGB_COLORS = 0
-	
-	ETO_OPAQUE = 2
-    SRCCOPY = 0xCC0020
 
+	ETO_OPAQUE = 2
+	SRCCOPY    = 0xCC0020
 )
 
 var Gdi32Dll = syscall.MustLoadDLL("Gdi32.dll")

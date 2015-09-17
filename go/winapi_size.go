@@ -3,6 +3,6 @@
 package desktop
 
 type SIZE struct {
-  cx LONG
-  cy LONG
+	cx LONG
+	cy LONG
 }

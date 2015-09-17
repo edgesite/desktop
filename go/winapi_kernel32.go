@@ -8,7 +8,7 @@ import (
 
 const (
 	FORMAT_MESSAGE_FROM_SYSTEM = 0x00001000
-	GMEM_FIXED = 0
+	GMEM_FIXED                 = 0
 )
 
 var Kernel32Dll = syscall.MustLoadDLL("Kernel32.dll")
