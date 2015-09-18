@@ -7,10 +7,6 @@ import (
 	"image"
 )
 
-func desktopMain() {
-	Runtime_Main()
-}
-
 func convertTrayIcon(i image.Image) NSImage {
 	var f NSFont = NSFontMenuBarFontOfSize(0)
 	defer f.Release()

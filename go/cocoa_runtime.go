@@ -88,12 +88,6 @@ func UInt2Pointer(i uint) unsafe.Pointer {
 	return unsafe.Pointer(uintptr(i))
 }
 
-func Runtime_Main() {
-	app := NSApplicationMainSharedApplication()
-	defer app.Release()
-	app.Run()
-}
-
 func Runtime_Loop() {
 	app := NSApplicationMainSharedApplication()
 	defer app.Release()
