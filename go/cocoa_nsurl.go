@@ -13,9 +13,16 @@ import (
 var NSURLClass unsafe.Pointer = Runtime_objc_lookUpClass("NSURL")
 var NSURLAbsoluteString unsafe.Pointer = Runtime_sel_getUid("absoluteString")
 var NSURLPath unsafe.Pointer = Runtime_sel_getUid("path")
+var NSURLURLWithString unsafe.Pointer = Runtime_sel_getUid("URLWithString:")
 
 type NSURL struct {
 	NSObject
+}
+
+func NSURLNew(s string) NSURL {
+  w := NSStringNew(s)
+  defer w.Release()
+	return NSURLPointer(Runtime_objc_msgSend(NSURLClass, NSURLURLWithString, w.Pointer))
 }
 
 func NSURLPointer(p unsafe.Pointer) NSURL {
