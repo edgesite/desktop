@@ -54,13 +54,14 @@ public class LinuxFolders implements DesktopFolders {
         return path("XDG_DOWNLOAD_DIR", "DOWNLOAD", "$HOME/Downloads");
     }
 
-    String trim(String s) {
+    static String trim(String s) {
         s = s.trim();
         s = StringUtils.strip(s, "\"");
+        s = s.trim();
         return s;
     }
 
-    Map<String, String> getIni(File file) {
+    static Map<String, String> getIni(File file) {
         try {
             TreeMap<String, String> map = new TreeMap<String, String>();
 

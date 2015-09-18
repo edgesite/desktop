@@ -24,4 +24,3 @@ func (m *DesktopSysTray) close() {
 
 func (m *DesktopSysTray) setIcon(i image.Image) {
 }
-

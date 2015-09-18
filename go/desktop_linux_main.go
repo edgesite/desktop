@@ -4,4 +4,3 @@ package desktop
 
 func desktopMain() {
 }
-
