@@ -1,6 +1,8 @@
 package com.github.axet.desktop;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.commons.lang.SystemUtils;
 
@@ -21,6 +23,10 @@ public abstract class Desktop {
     static DesktopFolders desktopFolders = null;
     static DesktopSysTray desktopSysTray = null;
     static DesktopPower desktopPower = null;
+
+    //
+    // Desktop Folders
+    //
 
     public static File getHomeFolder() {
         return getDesktopFolders().getHome();
@@ -60,6 +66,31 @@ public abstract class Desktop {
         return desktopFolders;
     }
 
+    //
+    // Browser
+    //
+
+    public static void browserOpenURI(String s) {
+        try {
+            URI uri;
+            uri = new URI(s);
+            java.awt.Desktop desktop = java.awt.Desktop.isDesktopSupported() ? java.awt.Desktop.getDesktop() : null;
+            if (desktop != null && desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
+                try {
+                    desktop.browse(uri);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    //
+    // SysTray
+    //
+
     public static DesktopSysTray getDesktopSysTray() {
         if (desktopSysTray == null) {
             if (com.sun.jna.Platform.isWindows()) {
@@ -78,6 +109,10 @@ public abstract class Desktop {
 
         return desktopSysTray;
     }
+
+    //
+    // Power
+    //
 
     public static DesktopPower getDesktopPower() {
         if (desktopPower == null) {
