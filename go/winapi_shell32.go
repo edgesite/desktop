@@ -26,7 +26,7 @@ const (
 	NIM_ADD    DWORD = 0
 	NIM_MODIFY DWORD = 1
 	NIM_DELETE DWORD = 2
-	
+
 	SW_SHOWNORMAL = 1
 )
 

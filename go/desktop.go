@@ -75,7 +75,7 @@ func Main() {
 //
 
 func BrowserOpenURI(s string) {
-  browserOpenURI(s)
+	browserOpenURI(s)
 }
 
 //

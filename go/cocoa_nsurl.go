@@ -20,8 +20,8 @@ type NSURL struct {
 }
 
 func NSURLNew(s string) NSURL {
-  w := NSStringNew(s)
-  defer w.Release()
+	w := NSStringNew(s)
+	defer w.Release()
 	return NSURLPointer(Runtime_objc_msgSend(NSURLClass, NSURLURLWithString, w.Pointer))
 }
 

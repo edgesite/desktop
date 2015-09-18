@@ -5,8 +5,8 @@ package desktop
 import (
 	"bufio"
 	"os"
-	"strings"
 	"regexp"
+	"strings"
 )
 
 const ROOT_FILE string = "/etc/xdg/user-dirs.conf"
@@ -155,4 +155,3 @@ func path(k string, dk string, dp string) string {
 
 	return expand(dp)
 }
-
