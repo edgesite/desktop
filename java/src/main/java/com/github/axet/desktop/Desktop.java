@@ -1,5 +1,7 @@
 package com.github.axet.desktop;
 
+import java.io.File;
+
 import org.apache.commons.lang.SystemUtils;
 
 import com.github.axet.desktop.os.linux.LinuxFolders;
@@ -19,6 +21,26 @@ public abstract class Desktop {
     static DesktopFolders desktopFolders = null;
     static DesktopSysTray desktopSysTray = null;
     static DesktopPower desktopPower = null;
+
+    public static File getHomeFolder() {
+        return getDesktopFolders().getHome();
+    }
+
+    public static File getDocumentsFolder() {
+        return getDesktopFolders().getDocuments();
+    }
+
+    public static File getAppDataFolder() {
+        return getDesktopFolders().getAppData();
+    }
+
+    public static File getDesktopFolder() {
+        return getDesktopFolders().getDesktop();
+    }
+
+    public static File getDownloadsFolder() {
+        return getDesktopFolders().getDownloads();
+    }
 
     public static DesktopFolders getDesktopFolders() {
         if (desktopFolders == null) {
