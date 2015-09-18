@@ -26,13 +26,11 @@ package com.github.axet.desktop;
 
 public class DesktopTest {
     public static void main(String[] args) {
-        DesktopFolders d = Desktop.getDesktopFolders();
-
-        System.out.println("Home: " + d.getHome());
-        System.out.println("Documents: " + d.getDocuments());
-        System.out.println("AppFolder: " + d.getAppData());
-        System.out.println("Desktop: " + d.getDesktop());
-        System.out.println("Downloads: " + d.getDownloads());
+        System.out.println("Home: " + Desktop.getHomeFolder());
+        System.out.println("Documents: " + Desktop.getDocumentsFolder());
+        System.out.println("AppFolder: " + Desktop.getAppDataFolder());
+        System.out.println("Desktop: " + Desktop.getDesktopFolder());
+        System.out.println("Downloads: " + Desktop.getDownloadsFolder());
     }
 }
 ```
