@@ -12,7 +12,7 @@ Script nature of Java or Go now not limited by system programming working with s
   - [X] Cross platform SysTray Icon
   - [X] Cross platform Open Browser URL
   - [ ] Cross platform Browser Pop Window
-  - [ ] Cross platform Power Events (reboot, logout)
+  - [ ] Cross platform Power Events (control reboot, logout, suspend)
   - [ ] Register URL handlers (open an application from a browser)
   - [ ] Sound and Volume control
 
