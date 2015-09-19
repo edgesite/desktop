@@ -4,7 +4,6 @@ import com.github.axet.desktop.os.linux.handle.GBytes;
 import com.github.axet.desktop.os.linux.handle.GIcon;
 import com.github.axet.desktop.os.linux.handle.GMainContext;
 import com.github.axet.desktop.os.linux.handle.GMainLoop;
-import com.github.axet.desktop.os.linux.handle.GObject;
 import com.github.axet.desktop.os.linux.handle.GSourceFunc;
 import com.github.axet.desktop.os.linux.handle.GtkStatusIcon;
 import com.github.axet.desktop.os.linux.handle.GtkWidget;
@@ -53,13 +52,15 @@ public interface LibGtk extends Library {
     // gtk calls
     //
 
-    void g_signal_connect_data(GObject item, String action, Callback callback, Pointer data, Pointer pzero1, int pzero2);
+    void g_signal_connect_data(Pointer item, String action, Callback callback, Pointer data, Pointer pzero1, int pzero2);
 
     void gtk_init(Pointer pargc, Pointer pargv);
 
     void g_object_ref(Pointer p);
 
     void g_object_unref(Pointer p);
+
+    void gtk_widget_destroy(Pointer p);
 
     int gtk_get_current_event_time();
 
@@ -117,6 +118,14 @@ public interface LibGtk extends Library {
     GtkWidget gtk_image_new();
 
     GtkWidget gtk_image_new_from_gicon(GIcon g, int size);
+
+    void gtk_status_icon_set_title(GtkStatusIcon icon, String title);
+
+    String gtk_status_icon_get_title(GtkStatusIcon icon);
+
+    void gtk_status_icon_set_tooltip_text(GtkStatusIcon icon, String title);
+
+    String gtk_status_icon_get_tooltip_text(GtkStatusIcon icon);
 
     // GBytes
 

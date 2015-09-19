@@ -1,5 +1,6 @@
 package com.github.axet.desktop.os.linux.handle;
 
+import com.github.axet.desktop.os.linux.libs.LibGtk;
 import com.sun.jna.Pointer;
 
 public class GtkWidget extends GObject {
@@ -8,5 +9,13 @@ public class GtkWidget extends GObject {
 
     public GtkWidget(Pointer p) {
         super(p);
+    }
+
+    protected void finalize() throws Throwable {
+        super.finalize();
+    }
+
+    public void destory() {
+        LibGtk.INSTANCE.gtk_widget_destroy(getPointer());
     }
 }

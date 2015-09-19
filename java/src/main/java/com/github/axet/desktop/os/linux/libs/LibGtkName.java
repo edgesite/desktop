@@ -9,7 +9,7 @@ public class LibGtkName {
 
     static String NAME = null;
 
-    static boolean APPINDICATOR = true;
+    static boolean APPINDICATOR = false;
     static boolean GTK = true;
 
     public static DesktopSysTray createSysTray() {
@@ -29,11 +29,20 @@ public class LibGtkName {
         }
 
         if (GTK) {
-            NAME = "Gtk3";
-            return new LinuxSysTrayGtk();
+            String ss[] = new String[] { "gtk-3" };
+
+            for (String s : ss) {
+                try {
+                    NativeLibrary.getInstance(s);
+                    NAME = s;
+                    return new LinuxSysTrayGtk();
+                } catch (java.lang.UnsatisfiedLinkError e) {
+                    ;
+                }
+            }
         }
 
-        throw new RuntimeException("library not found");
+        throw new RuntimeException("no compatible trayicon library found");
     }
 
     public static String getName() {

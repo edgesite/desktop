@@ -18,7 +18,7 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
     void createAppIndicator() {
         if (appindicator == null) {
             appindicator = LibAppIndicator.INSTANCE.app_indicator_new(LinuxSysTrayAppIndicator.class.getSimpleName(),
-                    "", AppIndicatorCategory.APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
+                    "fallback_please", AppIndicatorCategory.APP_INDICATOR_CATEGORY_APPLICATION_STATUS);
 
             // hacking took from https://github.com/dorkbox/SystemTray
             // we should not do this. but we can't avoid it. so lets do

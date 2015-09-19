@@ -10,14 +10,10 @@ public class GObject extends PointerType {
 
     public GObject(Pointer p) {
         super(p);
-        
-        ref();
     }
 
     protected void finalize() throws Throwable {
         super.finalize();
-        
-        unref();
     }
 
     public void ref() {

@@ -88,7 +88,7 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
         LibGtk.INSTANCE.gtk_widget_show_all(menu);
 
         if (b != null) {
-            LibGtk.INSTANCE.g_signal_connect_data(menu, "activate", new SignalCallback() {
+            LibGtk.INSTANCE.g_signal_connect_data(menu.getPointer(), "activate", new SignalCallback() {
                 @Override
                 public void signal(Pointer data) {
                     b.doClick();
@@ -168,9 +168,10 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
 
     GtkStatusIcon createGStatusIcon() {
         GtkStatusIcon gicon = LibGtk.INSTANCE.gtk_status_icon_new_from_gicon(convertMenuImage(icon));
+        gicon.ref();
         LibGtk.INSTANCE.gtk_status_icon_set_visible(gicon, true);
 
-        LibGtk.INSTANCE.g_signal_connect_data(gicon, "activate", new SignalCallback() {
+        LibGtk.INSTANCE.g_signal_connect_data(gicon.getPointer(), "activate", new SignalCallback() {
             @Override
             public void signal(Pointer data) {
                 for (Listener l : Collections.synchronizedCollection(listeners)) {
@@ -179,13 +180,15 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
             }
         }, null, null, 0);
 
-        LibGtk.INSTANCE.g_signal_connect_data(gicon, "popup-menu", new SignalCallback() {
+        LibGtk.INSTANCE.g_signal_connect_data(gicon.getPointer(), "popup-menu", new SignalCallback() {
             @Override
             public void signal(Pointer data) {
                 LibGtk.INSTANCE.gtk_menu_popup(gtkmenu, null, null, LibGtk.gtk_status_icon_position_menu, data, 1,
                         LibGtk.INSTANCE.gtk_get_current_event_time());
             }
         }, null, null, 0);
+
+        LibGtk.INSTANCE.gtk_status_icon_set_tooltip_text(gicon, title);
 
         return gicon;
     }
@@ -212,16 +215,27 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
 
     @Override
     public void show() {
-        updateMenus();
+        GtkMessageLoop.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                updateMenus();
 
-        gtkstatusicon = createGStatusIcon();
+                gtkstatusicon = createGStatusIcon();
+            }
+        });
     }
 
     @Override
     public void update() {
-        updateMenus();
+        GtkMessageLoop.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                updateMenus();
 
-        LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
+                LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
+                LibGtk.INSTANCE.gtk_status_icon_set_tooltip_text(gtkstatusicon, title);
+            }
+        });
     }
 
     @Override
