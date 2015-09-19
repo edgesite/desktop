@@ -9,7 +9,7 @@ public class LibGtkName {
 
     // set those variables to control what linux systray algorithm will be used
 
-    public static boolean APPINDICATOR = false;
+    public static boolean APPINDICATOR = true;
     public static boolean GTK = true;
 
     static String NAME = null;

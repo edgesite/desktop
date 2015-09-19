@@ -52,9 +52,44 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
             @Override
             public void run() {
                 updateMenus();
+
                 createAppIndicator();
+
                 LibAppIndicator.INSTANCE.app_indicator_set_status(appindicator,
                         AppIndicatorStatus.APP_INDICATOR_STATUS_ACTIVE);
+                LibAppIndicator.INSTANCE.app_indicator_set_menu(appindicator, gtkmenu);
+            }
+        });
+    }
+
+    @Override
+    public void update() {
+        GtkMessageLoop.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                updateMenus();
+
+                LibAppIndicator.INSTANCE.app_indicator_set_menu(appindicator, gtkmenu);
+
+                if (gtkstatusicon != null) {
+                    LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
+                    LibGtk.INSTANCE.gtk_status_icon_set_tooltip_text(gtkstatusicon, title);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void hide() {
+        GtkMessageLoop.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (gtkstatusicon != null) {
+                    LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, false);
+                }
+
+                LibAppIndicator.INSTANCE.app_indicator_set_status(appindicator,
+                        AppIndicatorStatus.APP_INDICATOR_STATUS_PASSIVE);
             }
         });
     }

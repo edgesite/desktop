@@ -250,7 +250,9 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
         GtkMessageLoop.invokeLater(new Runnable() {
             @Override
             public void run() {
-                LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, false);
+                if (gtkstatusicon != null) {
+                    LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, false);
+                }
             }
         });
     }
