@@ -4,17 +4,19 @@ import com.github.axet.desktop.os.linux.handle.AppIndicator;
 import com.github.axet.desktop.os.linux.handle.AppIndicatorClassStruct;
 import com.github.axet.desktop.os.linux.handle.AppIndicatorInstanceStruct;
 import com.github.axet.desktop.os.linux.handle.Fallback;
+import com.github.axet.desktop.os.linux.handle.GtkIconSet;
 import com.github.axet.desktop.os.linux.handle.GtkMessageLoop;
 import com.github.axet.desktop.os.linux.handle.GtkStatusIcon;
 import com.github.axet.desktop.os.linux.libs.LibAppIndicator;
-import com.github.axet.desktop.os.linux.libs.LibGtk;
 import com.github.axet.desktop.os.linux.libs.LibAppIndicator.AppIndicatorCategory;
 import com.github.axet.desktop.os.linux.libs.LibAppIndicator.AppIndicatorStatus;
+import com.github.axet.desktop.os.linux.libs.LibGtk;
 import com.sun.jna.Pointer;
 
 public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
 
     AppIndicator appindicator;
+    GtkIconSet iconset;
 
     void createAppIndicator() {
         if (appindicator == null) {
@@ -39,6 +41,17 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
         }
     }
 
+    void updateIcon() {
+        if (icon == null) {
+            return;
+        }
+
+        iconset = new GtkIconSet();
+        String p = iconset.addIcon(icon);
+        LibAppIndicator.INSTANCE.app_indicator_set_icon_theme_path(appindicator, iconset.getPath());
+        LibAppIndicator.INSTANCE.app_indicator_set_icon_full(appindicator, p, getClass().getSimpleName());
+    }
+
     //
     // public
     //
@@ -58,6 +71,8 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
                 LibAppIndicator.INSTANCE.app_indicator_set_status(appindicator,
                         AppIndicatorStatus.APP_INDICATOR_STATUS_ACTIVE);
                 LibAppIndicator.INSTANCE.app_indicator_set_menu(appindicator, gtkmenu);
+
+                updateIcon();
             }
         });
     }
@@ -75,6 +90,8 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
                     LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
                     LibGtk.INSTANCE.gtk_status_icon_set_tooltip_text(gtkstatusicon, title);
                 }
+
+                updateIcon();
             }
         });
     }
