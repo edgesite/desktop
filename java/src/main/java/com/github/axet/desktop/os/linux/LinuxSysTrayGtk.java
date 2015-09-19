@@ -27,17 +27,6 @@ import com.github.axet.desktop.os.linux.libs.LibGtk;
 import com.github.axet.desktop.os.linux.libs.LibGtk.GtkIconSize;
 import com.sun.jna.Pointer;
 
-/**
- * System Tray Protocol Specification
- * 
- * http://standards.freedesktop.org/systemtray-spec/systemtray-spec-latest.html
- * 
- * TODO rewrite plugin for native menus
- * 
- * see for example XSystemTrayPeer.java
- * 
- */
-
 public class LinuxSysTrayGtk extends DesktopSysTray {
     GtkWidget gtkmenu;
 
@@ -68,59 +57,6 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
         GBytes bg = LibGtk.INSTANCE.g_bytes_new(buf, buf.length);
         GIcon gg = LibGtk.INSTANCE.g_bytes_icon_new(bg);
         return gg;
-    }
-
-    public LinuxSysTrayGtk() {
-        GtkMessageLoop.inc();
-    }
-
-    protected void finalize() throws Throwable {
-        super.finalize();
-
-        GtkMessageLoop.dec();
-    }
-
-    @Override
-    public void setIcon(Icon icon) {
-        this.icon = icon;
-    }
-
-    @Override
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    @Override
-    public void show() {
-        updateMenus();
-
-        GIcon gicon = convertMenuImage(icon);
-        gtkstatusicon = LibGtk.INSTANCE.gtk_status_icon_new_from_gicon(gicon);
-        LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, true);
-
-        LibGtk.INSTANCE.g_signal_connect_data(gtkstatusicon, "activate", new SignalCallback() {
-            @Override
-            public void signal(Pointer data) {
-                for (Listener l : Collections.synchronizedCollection(listeners)) {
-                    l.mouseLeftClick();
-                }
-            }
-        }, null, null, 0);
-
-        LibGtk.INSTANCE.g_signal_connect_data(gtkstatusicon, "popup-menu", new SignalCallback() {
-            @Override
-            public void signal(Pointer data) {
-                LibGtk.INSTANCE.gtk_menu_popup(gtkmenu, null, null, LibGtk.gtk_status_icon_position_menu, data, 1,
-                        LibGtk.INSTANCE.gtk_get_current_event_time());
-            }
-        }, null, null, 0);
-    }
-
-    @Override
-    public void update() {
-        updateMenus();
-
-        LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
     }
 
     GtkWidget createMenuItem(String n, final AbstractButton b, Boolean check, Icon img) {
@@ -163,38 +99,6 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
         return menu;
     }
 
-    void updateMenus() {
-        gtkmenu = LibGtk.INSTANCE.gtk_menu_new();
-
-        for (int i = 0; i < menu.getComponentCount(); i++) {
-            Component e = menu.getComponent(i);
-
-            if (e instanceof JMenu) {
-                JMenu sub = (JMenu) e;
-
-                GtkWidget ss = createSubmenu(sub);
-                GtkWidget item1 = createMenuItem(sub.getText(), null, null, sub.getIcon());
-                LibGtk.INSTANCE.gtk_menu_item_set_submenu(item1, ss);
-                LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
-            } else if (e instanceof JCheckBoxMenuItem) {
-                final JCheckBoxMenuItem ch = (JCheckBoxMenuItem) e;
-
-                GtkWidget item1 = createMenuItem(ch.getText(), ch, ch.getState(), ch.getIcon());
-                LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
-            } else if (e instanceof JMenuItem) {
-                final JMenuItem mi = (JMenuItem) e;
-
-                GtkWidget item1 = createMenuItem(mi.getText(), mi, null, mi.getIcon());
-                LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
-            }
-
-            if (e instanceof JPopupMenu.Separator) {
-                GtkWidget item1 = LibGtk.INSTANCE.gtk_separator_menu_item_new();
-                LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
-            }
-        }
-    }
-
     GtkWidget createSubmenu(JMenu menu) {
         GtkWidget gmenu = LibGtk.INSTANCE.gtk_menu_new();
 
@@ -228,6 +132,96 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
 
         return gmenu;
 
+    }
+
+    void updateMenus() {
+        gtkmenu = LibGtk.INSTANCE.gtk_menu_new();
+
+        for (int i = 0; i < menu.getComponentCount(); i++) {
+            Component e = menu.getComponent(i);
+
+            if (e instanceof JMenu) {
+                JMenu sub = (JMenu) e;
+
+                GtkWidget ss = createSubmenu(sub);
+                GtkWidget item1 = createMenuItem(sub.getText(), null, null, sub.getIcon());
+                LibGtk.INSTANCE.gtk_menu_item_set_submenu(item1, ss);
+                LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
+            } else if (e instanceof JCheckBoxMenuItem) {
+                final JCheckBoxMenuItem ch = (JCheckBoxMenuItem) e;
+
+                GtkWidget item1 = createMenuItem(ch.getText(), ch, ch.getState(), ch.getIcon());
+                LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
+            } else if (e instanceof JMenuItem) {
+                final JMenuItem mi = (JMenuItem) e;
+
+                GtkWidget item1 = createMenuItem(mi.getText(), mi, null, mi.getIcon());
+                LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
+            }
+
+            if (e instanceof JPopupMenu.Separator) {
+                GtkWidget item1 = LibGtk.INSTANCE.gtk_separator_menu_item_new();
+                LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
+            }
+        }
+    }
+
+    GtkStatusIcon createGStatusIcon() {
+        GtkStatusIcon gicon = LibGtk.INSTANCE.gtk_status_icon_new_from_gicon(convertMenuImage(icon));
+        LibGtk.INSTANCE.gtk_status_icon_set_visible(gicon, true);
+
+        LibGtk.INSTANCE.g_signal_connect_data(gicon, "activate", new SignalCallback() {
+            @Override
+            public void signal(Pointer data) {
+                for (Listener l : Collections.synchronizedCollection(listeners)) {
+                    l.mouseLeftClick();
+                }
+            }
+        }, null, null, 0);
+
+        LibGtk.INSTANCE.g_signal_connect_data(gicon, "popup-menu", new SignalCallback() {
+            @Override
+            public void signal(Pointer data) {
+                LibGtk.INSTANCE.gtk_menu_popup(gtkmenu, null, null, LibGtk.gtk_status_icon_position_menu, data, 1,
+                        LibGtk.INSTANCE.gtk_get_current_event_time());
+            }
+        }, null, null, 0);
+
+        return gicon;
+    }
+
+    public LinuxSysTrayGtk() {
+        GtkMessageLoop.inc();
+    }
+
+    protected void finalize() throws Throwable {
+        super.finalize();
+
+        GtkMessageLoop.dec();
+    }
+
+    @Override
+    public void setIcon(Icon icon) {
+        this.icon = icon;
+    }
+
+    @Override
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @Override
+    public void show() {
+        updateMenus();
+
+        gtkstatusicon = createGStatusIcon();
+    }
+
+    @Override
+    public void update() {
+        updateMenus();
+
+        LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
     }
 
     @Override
