@@ -17,7 +17,6 @@ import javax.swing.JPopupMenu;
 
 import com.github.axet.desktop.DesktopSysTray;
 import com.github.axet.desktop.Utils;
-import com.github.axet.desktop.DesktopSysTray.Listener;
 import com.github.axet.desktop.os.linux.handle.AppIndicator;
 import com.github.axet.desktop.os.linux.handle.AppIndicatorClassStruct;
 import com.github.axet.desktop.os.linux.handle.AppIndicatorInstanceStruct;
@@ -31,8 +30,8 @@ import com.github.axet.desktop.os.linux.handle.SignalCallback;
 import com.github.axet.desktop.os.linux.libs.LibAppIndicator;
 import com.github.axet.desktop.os.linux.libs.LibAppIndicator.AppIndicatorCategory;
 import com.github.axet.desktop.os.linux.libs.LibAppIndicator.AppIndicatorStatus;
-import com.github.axet.desktop.os.linux.libs.LibAppIndicator.GtkIconSize;
-import com.sun.jna.Function;
+import com.github.axet.desktop.os.linux.libs.LibGtk;
+import com.github.axet.desktop.os.linux.libs.LibGtk.GtkIconSize;
 import com.sun.jna.Pointer;
 
 /**
@@ -62,13 +61,13 @@ public class LinuxSysTrayAppIndicator extends DesktopSysTray {
     static Thread MessageLoop = new Thread(new Runnable() {
         @Override
         public void run() {
-            GMainLoop mainloop = LibAppIndicator.INSTANCE.g_main_loop_new(null, false);
-            LibAppIndicator.INSTANCE.g_main_loop_run(mainloop);
+            GMainLoop mainloop = LibGtk.INSTANCE.g_main_loop_new(null, false);
+            LibGtk.INSTANCE.g_main_loop_run(mainloop);
         }
     });
 
     static {
-        LibAppIndicator.INSTANCE.gtk_init(null, null);
+        LibGtk.INSTANCE.gtk_init(null, null);
         MessageLoop.start();
     }
 
@@ -87,8 +86,8 @@ public class LinuxSysTrayAppIndicator extends DesktopSysTray {
         g.dispose();
 
         byte[] buf = Utils.BufferedImage2Bytes(scaledImage);
-        GBytes bg = LibAppIndicator.INSTANCE.g_bytes_new(buf, buf.length);
-        GIcon gg = LibAppIndicator.INSTANCE.g_bytes_icon_new(bg);
+        GBytes bg = LibGtk.INSTANCE.g_bytes_new(buf, buf.length);
+        GIcon gg = LibGtk.INSTANCE.g_bytes_icon_new(bg);
         return gg;
     }
 
@@ -120,10 +119,10 @@ public class LinuxSysTrayAppIndicator extends DesktopSysTray {
             aiclass.fallback = new Fallback() {
                 @Override
                 public GtkStatusIcon fallback(Pointer app) {
-                    gicon = LibAppIndicator.INSTANCE.gtk_status_icon_new_from_gicon(convertMenuImage(icon));
-                    LibAppIndicator.INSTANCE.gtk_status_icon_set_visible(gicon, true);
+                    gicon = LibGtk.INSTANCE.gtk_status_icon_new_from_gicon(convertMenuImage(icon));
+                    LibGtk.INSTANCE.gtk_status_icon_set_visible(gicon, true);
 
-                    LibAppIndicator.INSTANCE.g_signal_connect_data(gicon, "activate", new SignalCallback() {
+                    LibGtk.INSTANCE.g_signal_connect_data(gicon, "activate", new SignalCallback() {
                         @Override
                         public void signal(Pointer data) {
                             for (Listener l : Collections.synchronizedCollection(listeners)) {
@@ -132,12 +131,11 @@ public class LinuxSysTrayAppIndicator extends DesktopSysTray {
                         }
                     }, null, null, 0);
 
-                    LibAppIndicator.INSTANCE.g_signal_connect_data(gicon, "popup-menu", new SignalCallback() {
+                    LibGtk.INSTANCE.g_signal_connect_data(gicon, "popup-menu", new SignalCallback() {
                         @Override
                         public void signal(Pointer data) {
-                            LibAppIndicator.INSTANCE.gtk_menu_popup(gtkmenu, null, null,
-                                    LibAppIndicator.gtk_status_icon_position_menu, data, 1,
-                                    LibAppIndicator.INSTANCE.gtk_get_current_event_time());
+                            LibGtk.INSTANCE.gtk_menu_popup(gtkmenu, null, null, LibGtk.gtk_status_icon_position_menu,
+                                    data, 1, LibGtk.INSTANCE.gtk_get_current_event_time());
                         }
                     }, null, null, 0);
 
@@ -156,8 +154,8 @@ public class LinuxSysTrayAppIndicator extends DesktopSysTray {
         updateMenus();
         LibAppIndicator.INSTANCE.app_indicator_set_menu(appindicator, gtkmenu);
 
-        LibAppIndicator.INSTANCE.gtk_status_icon_set_from_gicon(gicon, convertMenuImage(icon));
-        LibAppIndicator.INSTANCE.g_signal_connect_data(gicon, "activate", new SignalCallback() {
+        LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gicon, convertMenuImage(icon));
+        LibGtk.INSTANCE.g_signal_connect_data(gicon, "activate", new SignalCallback() {
             @Override
             public void signal(Pointer data) {
                 for (Listener l : Collections.synchronizedCollection(listeners)) {
@@ -166,12 +164,11 @@ public class LinuxSysTrayAppIndicator extends DesktopSysTray {
             }
         }, null, null, 0);
 
-        LibAppIndicator.INSTANCE.g_signal_connect_data(gicon, "popup-menu", new SignalCallback() {
+        LibGtk.INSTANCE.g_signal_connect_data(gicon, "popup-menu", new SignalCallback() {
             @Override
             public void signal(Pointer data) {
-                LibAppIndicator.INSTANCE.gtk_menu_popup(gtkmenu, null, null,
-                        LibAppIndicator.gtk_status_icon_position_menu, data, 1,
-                        LibAppIndicator.INSTANCE.gtk_get_current_event_time());
+                LibGtk.INSTANCE.gtk_menu_popup(gtkmenu, null, null, LibGtk.gtk_status_icon_position_menu, data, 1,
+                        LibGtk.INSTANCE.gtk_get_current_event_time());
             }
         }, null, null, 0);
     }
@@ -179,34 +176,33 @@ public class LinuxSysTrayAppIndicator extends DesktopSysTray {
     GtkWidget createMenuItem(String n, final AbstractButton b, Boolean check, Icon img) {
         int spacing = 6;
 
-        GtkWidget box = LibAppIndicator.INSTANCE.gtk_hbox_new(false, spacing);
+        GtkWidget box = LibGtk.INSTANCE.gtk_hbox_new(false, spacing);
 
         GtkWidget wicon = null;
         if (img != null) {
-            wicon = LibAppIndicator.INSTANCE.gtk_image_new_from_gicon(convertMenuImage(img),
-                    GtkIconSize.GTK_ICON_SIZE_MENU);
+            wicon = LibGtk.INSTANCE.gtk_image_new_from_gicon(convertMenuImage(img), GtkIconSize.GTK_ICON_SIZE_MENU);
         } else {
-            wicon = LibAppIndicator.INSTANCE.gtk_image_new_from_gicon(convertMenuImage(SpaceIcon),
+            wicon = LibGtk.INSTANCE.gtk_image_new_from_gicon(convertMenuImage(SpaceIcon),
                     GtkIconSize.GTK_ICON_SIZE_MENU);
         }
-        LibAppIndicator.INSTANCE.gtk_box_pack_start(box, wicon, false, false, spacing);
+        LibGtk.INSTANCE.gtk_box_pack_start(box, wicon, false, false, spacing);
 
-        GtkWidget label = LibAppIndicator.INSTANCE.gtk_label_new(n);
+        GtkWidget label = LibGtk.INSTANCE.gtk_label_new(n);
         GtkWidget menu = null;
 
         if (check != null) {
-            menu = LibAppIndicator.INSTANCE.gtk_check_menu_item_new();
-            LibAppIndicator.INSTANCE.gtk_check_menu_item_set_active(menu, check.booleanValue());
+            menu = LibGtk.INSTANCE.gtk_check_menu_item_new();
+            LibGtk.INSTANCE.gtk_check_menu_item_set_active(menu, check.booleanValue());
         } else {
-            menu = LibAppIndicator.INSTANCE.gtk_menu_item_new();
+            menu = LibGtk.INSTANCE.gtk_menu_item_new();
         }
 
-        LibAppIndicator.INSTANCE.gtk_box_pack_start(box, label, false, false, spacing);
-        LibAppIndicator.INSTANCE.gtk_container_add(menu, box);
-        LibAppIndicator.INSTANCE.gtk_widget_show_all(menu);
+        LibGtk.INSTANCE.gtk_box_pack_start(box, label, false, false, spacing);
+        LibGtk.INSTANCE.gtk_container_add(menu, box);
+        LibGtk.INSTANCE.gtk_widget_show_all(menu);
 
         if (b != null) {
-            LibAppIndicator.INSTANCE.g_signal_connect_data(menu, "activate", new SignalCallback() {
+            LibGtk.INSTANCE.g_signal_connect_data(menu, "activate", new SignalCallback() {
                 @Override
                 public void signal(Pointer data) {
                     b.doClick();
@@ -218,7 +214,7 @@ public class LinuxSysTrayAppIndicator extends DesktopSysTray {
     }
 
     void updateMenus() {
-        gtkmenu = LibAppIndicator.INSTANCE.gtk_menu_new();
+        gtkmenu = LibGtk.INSTANCE.gtk_menu_new();
 
         for (int i = 0; i < menu.getComponentCount(); i++) {
             Component e = menu.getComponent(i);
@@ -228,29 +224,29 @@ public class LinuxSysTrayAppIndicator extends DesktopSysTray {
 
                 GtkWidget ss = createSubmenu(sub);
                 GtkWidget item1 = createMenuItem(sub.getText(), null, null, sub.getIcon());
-                LibAppIndicator.INSTANCE.gtk_menu_item_set_submenu(item1, ss);
-                LibAppIndicator.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
+                LibGtk.INSTANCE.gtk_menu_item_set_submenu(item1, ss);
+                LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
             } else if (e instanceof JCheckBoxMenuItem) {
                 final JCheckBoxMenuItem ch = (JCheckBoxMenuItem) e;
 
                 GtkWidget item1 = createMenuItem(ch.getText(), ch, ch.getState(), ch.getIcon());
-                LibAppIndicator.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
+                LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
             } else if (e instanceof JMenuItem) {
                 final JMenuItem mi = (JMenuItem) e;
 
                 GtkWidget item1 = createMenuItem(mi.getText(), mi, null, mi.getIcon());
-                LibAppIndicator.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
+                LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
             }
 
             if (e instanceof JPopupMenu.Separator) {
-                GtkWidget item1 = LibAppIndicator.INSTANCE.gtk_separator_menu_item_new();
-                LibAppIndicator.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
+                GtkWidget item1 = LibGtk.INSTANCE.gtk_separator_menu_item_new();
+                LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
             }
         }
     }
 
     GtkWidget createSubmenu(JMenu menu) {
-        GtkWidget gmenu = LibAppIndicator.INSTANCE.gtk_menu_new();
+        GtkWidget gmenu = LibGtk.INSTANCE.gtk_menu_new();
 
         for (int i = 0; i < menu.getMenuComponentCount(); i++) {
             Component e = menu.getMenuComponent(i);
@@ -260,23 +256,23 @@ public class LinuxSysTrayAppIndicator extends DesktopSysTray {
 
                 GtkWidget ss = createSubmenu(sub);
                 GtkWidget item = createMenuItem(sub.getText(), null, null, sub.getIcon());
-                LibAppIndicator.INSTANCE.gtk_menu_item_set_submenu(item, ss);
-                LibAppIndicator.INSTANCE.gtk_menu_shell_append(gmenu, item);
+                LibGtk.INSTANCE.gtk_menu_item_set_submenu(item, ss);
+                LibGtk.INSTANCE.gtk_menu_shell_append(gmenu, item);
             } else if (e instanceof JCheckBoxMenuItem) {
                 final JCheckBoxMenuItem ch = (JCheckBoxMenuItem) e;
 
                 GtkWidget item = createMenuItem(ch.getText(), ch, ch.getState(), ch.getIcon());
-                LibAppIndicator.INSTANCE.gtk_menu_shell_append(gmenu, item);
+                LibGtk.INSTANCE.gtk_menu_shell_append(gmenu, item);
             } else if (e instanceof JMenuItem) {
                 final JMenuItem mi = (JMenuItem) e;
 
                 GtkWidget item = createMenuItem(mi.getText(), mi, null, mi.getIcon());
-                LibAppIndicator.INSTANCE.gtk_menu_shell_append(gmenu, item);
+                LibGtk.INSTANCE.gtk_menu_shell_append(gmenu, item);
             }
 
             if (e instanceof JPopupMenu.Separator) {
-                GtkWidget item = LibAppIndicator.INSTANCE.gtk_separator_menu_item_new();
-                LibAppIndicator.INSTANCE.gtk_menu_shell_append(gmenu, item);
+                GtkWidget item = LibGtk.INSTANCE.gtk_separator_menu_item_new();
+                LibGtk.INSTANCE.gtk_menu_shell_append(gmenu, item);
             }
         }
 

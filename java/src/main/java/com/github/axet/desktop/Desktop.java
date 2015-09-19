@@ -102,7 +102,7 @@ public abstract class Desktop {
                 desktopSysTray = new OSXSysTray();
 
             if (Platform.isLinux())
-                desktopSysTray = new LinuxSysTrayAppIndicator();
+                desktopSysTray = new LinuxSysTrayGtk();
 
             if (desktopSysTray == null)
                 throw new RuntimeException("OS not supported");

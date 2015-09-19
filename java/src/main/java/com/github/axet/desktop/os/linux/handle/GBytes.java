@@ -1,6 +1,6 @@
 package com.github.axet.desktop.os.linux.handle;
 
-import com.github.axet.desktop.os.linux.libs.LibAppIndicator;
+import com.github.axet.desktop.os.linux.libs.LibGtk;
 import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
 
@@ -19,6 +19,6 @@ public class GBytes extends PointerType {
     }
 
     public void unref() {
-        LibAppIndicator.INSTANCE.g_bytes_unref(this);
+        LibGtk.INSTANCE.g_bytes_unref(this);
     }
 }
