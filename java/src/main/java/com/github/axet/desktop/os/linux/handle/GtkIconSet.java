@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import javax.swing.Icon;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 import com.github.axet.desktop.Utils;
 
@@ -19,6 +20,7 @@ public class GtkIconSet {
     public GtkIconSet() {
         try {
             tmp = Files.createTempDirectory("systrayicon").toFile();
+            tmp.deleteOnExit();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -38,9 +40,16 @@ public class GtkIconSet {
         }
 
         try {
-            File temp = File.createTempFile("temp", Long.toString(System.nanoTime()), tmp);
-            ImageIO.write(Utils.createBitmap(image), "png", temp);
+            String format = "png";
+            String suffix = "." + format;
+
+            File temp = File.createTempFile("temp", suffix, tmp);
+            temp.deleteOnExit();
+
+            ImageIO.write(Utils.createBitmap(image), format, temp);
             String name = temp.getName();
+
+            name = StringUtils.removeEnd(name, suffix);
 
             map.put(image, name);
 

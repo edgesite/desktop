@@ -46,7 +46,8 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
             return;
         }
 
-        iconset = new GtkIconSet();
+        if (iconset == null)
+            iconset = new GtkIconSet();
         String p = iconset.addIcon(icon);
         LibAppIndicator.INSTANCE.app_indicator_set_icon_theme_path(appindicator, iconset.getPath());
         LibAppIndicator.INSTANCE.app_indicator_set_icon_full(appindicator, p, getClass().getSimpleName());
