@@ -7,6 +7,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -42,24 +43,25 @@ public class SysTrayTest extends JFrame {
         }
     };
 
+    ImageIcon loadIcon(String s) {
+        try {
+            InputStream is = getClass().getResourceAsStream(s);
+            List<BufferedImage> bmp = ICODecoder.read(is);
+            return new ImageIcon(bmp.get(0));
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public SysTrayTest() {
         super("MainFrame");
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        try {
-            InputStream is = getClass().getResourceAsStream("bug.ico");
-            List<BufferedImage> bmp = ICODecoder.read(is);
-            warn = new ImageIcon(bmp.get(0));
-
-            is = getClass().getResourceAsStream("dov.ico");
-            bmp = ICODecoder.read(is);
-            stop = new ImageIcon(bmp.get(0));
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        warn = loadIcon("bug.ico");
+        stop = loadIcon("dov.ico");
 
         menu = new JPopupMenu();
         JMenuItem menuItem1 = new JMenuItem("test1", warn);
