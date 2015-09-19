@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.awt.peer.LightweightPeer;
 import java.util.Collections;
 
 import javax.swing.Icon;
@@ -81,6 +82,10 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
             LibGtk.INSTANCE.gtk_check_menu_item_set_active(menu, ((JCheckBoxMenuItem) item).getState());
         } else {
             menu = LibGtk.INSTANCE.gtk_menu_item_new();
+        }
+
+        if (!item.isEnabled()) {
+            LibGtk.INSTANCE.gtk_widget_set_sensitive(menu, false);
         }
 
         LibGtk.INSTANCE.gtk_box_pack_start(box, label, false, false, spacing);

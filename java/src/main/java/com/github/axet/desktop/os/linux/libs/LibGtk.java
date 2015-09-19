@@ -106,6 +106,8 @@ public interface LibGtk extends Library {
     GtkWidget gtk_check_menu_item_new();
 
     void gtk_check_menu_item_set_active(GtkWidget menu, boolean b);
+    
+    void gtk_widget_set_sensitive(GtkWidget item, boolean b);
 
     // status icon
 
