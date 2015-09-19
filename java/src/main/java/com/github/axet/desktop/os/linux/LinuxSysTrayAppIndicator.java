@@ -7,6 +7,7 @@ import com.github.axet.desktop.os.linux.handle.Fallback;
 import com.github.axet.desktop.os.linux.handle.GtkMessageLoop;
 import com.github.axet.desktop.os.linux.handle.GtkStatusIcon;
 import com.github.axet.desktop.os.linux.libs.LibAppIndicator;
+import com.github.axet.desktop.os.linux.libs.LibGtk;
 import com.github.axet.desktop.os.linux.libs.LibAppIndicator.AppIndicatorCategory;
 import com.github.axet.desktop.os.linux.libs.LibAppIndicator.AppIndicatorStatus;
 import com.sun.jna.Pointer;
@@ -29,6 +30,7 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
                 @Override
                 public GtkStatusIcon fallback(Pointer app) {
                     gtkstatusicon = createGStatusIcon();
+                    LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, true);
                     return gtkstatusicon;
                 }
             };

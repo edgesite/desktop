@@ -7,10 +7,12 @@ import com.sun.jna.NativeLibrary;
 
 public class LibGtkName {
 
-    static String NAME = null;
+    // set those variables to control what linux systray algorithm will be used
 
-    static boolean APPINDICATOR = false;
-    static boolean GTK = true;
+    public static boolean APPINDICATOR = false;
+    public static boolean GTK = true;
+
+    static String NAME = null;
 
     public static DesktopSysTray createSysTray() {
 
@@ -23,13 +25,12 @@ public class LibGtkName {
                     NAME = s;
                     return new LinuxSysTrayAppIndicator();
                 } catch (java.lang.UnsatisfiedLinkError e) {
-                    ;
                 }
             }
         }
 
         if (GTK) {
-            String ss[] = new String[] { "gtk-3" };
+            String ss[] = new String[] { "gtk-3", "gdk-x11-2.0" };
 
             for (String s : ss) {
                 try {
@@ -37,7 +38,6 @@ public class LibGtkName {
                     NAME = s;
                     return new LinuxSysTrayGtk();
                 } catch (java.lang.UnsatisfiedLinkError e) {
-                    ;
                 }
             }
         }

@@ -7,7 +7,6 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 
-import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
@@ -59,26 +58,27 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
         return gg;
     }
 
-    GtkWidget createMenuItem(String n, final AbstractButton b, Boolean check, Icon img) {
+    GtkWidget createMenuItem(final JMenuItem item) {
+        Icon img = item.getIcon();
+
+        if (img == null) {
+            img = SpaceIcon;
+        }
+
         int spacing = 6;
 
         GtkWidget box = LibGtk.INSTANCE.gtk_hbox_new(false, spacing);
 
-        GtkWidget wicon = null;
-        if (img != null) {
-            wicon = LibGtk.INSTANCE.gtk_image_new_from_gicon(convertMenuImage(img), GtkIconSize.GTK_ICON_SIZE_MENU);
-        } else {
-            wicon = LibGtk.INSTANCE.gtk_image_new_from_gicon(convertMenuImage(SpaceIcon),
-                    GtkIconSize.GTK_ICON_SIZE_MENU);
-        }
+        GtkWidget wicon = LibGtk.INSTANCE.gtk_image_new_from_gicon(convertMenuImage(img),
+                GtkIconSize.GTK_ICON_SIZE_MENU);
         LibGtk.INSTANCE.gtk_box_pack_start(box, wicon, false, false, spacing);
 
-        GtkWidget label = LibGtk.INSTANCE.gtk_label_new(n);
+        GtkWidget label = LibGtk.INSTANCE.gtk_label_new(item.getText());
         GtkWidget menu = null;
 
-        if (check != null) {
+        if (item instanceof JCheckBoxMenuItem) {
             menu = LibGtk.INSTANCE.gtk_check_menu_item_new();
-            LibGtk.INSTANCE.gtk_check_menu_item_set_active(menu, check.booleanValue());
+            LibGtk.INSTANCE.gtk_check_menu_item_set_active(menu, ((JCheckBoxMenuItem) item).getState());
         } else {
             menu = LibGtk.INSTANCE.gtk_menu_item_new();
         }
@@ -87,11 +87,11 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
         LibGtk.INSTANCE.gtk_container_add(menu, box);
         LibGtk.INSTANCE.gtk_widget_show_all(menu);
 
-        if (b != null) {
+        if (!(item instanceof JMenu)) {
             LibGtk.INSTANCE.g_signal_connect_data(menu.getPointer(), "activate", new SignalCallback() {
                 @Override
                 public void signal(Pointer data) {
-                    b.doClick();
+                    item.doClick();
                 }
             }, null, null, 0);
         }
@@ -109,18 +109,18 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
                 JMenu sub = (JMenu) e;
 
                 GtkWidget ss = createSubmenu(sub);
-                GtkWidget item = createMenuItem(sub.getText(), null, null, sub.getIcon());
+                GtkWidget item = createMenuItem(sub);
                 LibGtk.INSTANCE.gtk_menu_item_set_submenu(item, ss);
                 LibGtk.INSTANCE.gtk_menu_shell_append(gmenu, item);
             } else if (e instanceof JCheckBoxMenuItem) {
                 final JCheckBoxMenuItem ch = (JCheckBoxMenuItem) e;
 
-                GtkWidget item = createMenuItem(ch.getText(), ch, ch.getState(), ch.getIcon());
+                GtkWidget item = createMenuItem(ch);
                 LibGtk.INSTANCE.gtk_menu_shell_append(gmenu, item);
             } else if (e instanceof JMenuItem) {
                 final JMenuItem mi = (JMenuItem) e;
 
-                GtkWidget item = createMenuItem(mi.getText(), mi, null, mi.getIcon());
+                GtkWidget item = createMenuItem(mi);
                 LibGtk.INSTANCE.gtk_menu_shell_append(gmenu, item);
             }
 
@@ -135,6 +135,10 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
     }
 
     void updateMenus() {
+        if (gtkmenu != null) {
+            gtkmenu.destory();
+        }
+
         gtkmenu = LibGtk.INSTANCE.gtk_menu_new();
 
         for (int i = 0; i < menu.getComponentCount(); i++) {
@@ -144,18 +148,18 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
                 JMenu sub = (JMenu) e;
 
                 GtkWidget ss = createSubmenu(sub);
-                GtkWidget item1 = createMenuItem(sub.getText(), null, null, sub.getIcon());
+                GtkWidget item1 = createMenuItem(sub);
                 LibGtk.INSTANCE.gtk_menu_item_set_submenu(item1, ss);
                 LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
             } else if (e instanceof JCheckBoxMenuItem) {
                 final JCheckBoxMenuItem ch = (JCheckBoxMenuItem) e;
 
-                GtkWidget item1 = createMenuItem(ch.getText(), ch, ch.getState(), ch.getIcon());
+                GtkWidget item1 = createMenuItem(ch);
                 LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
             } else if (e instanceof JMenuItem) {
                 final JMenuItem mi = (JMenuItem) e;
 
-                GtkWidget item1 = createMenuItem(mi.getText(), mi, null, mi.getIcon());
+                GtkWidget item1 = createMenuItem(mi);
                 LibGtk.INSTANCE.gtk_menu_shell_append(gtkmenu, item1);
             }
 
@@ -168,8 +172,6 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
 
     GtkStatusIcon createGStatusIcon() {
         GtkStatusIcon gicon = LibGtk.INSTANCE.gtk_status_icon_new_from_gicon(convertMenuImage(icon));
-        gicon.ref();
-        LibGtk.INSTANCE.gtk_status_icon_set_visible(gicon, true);
 
         LibGtk.INSTANCE.g_signal_connect_data(gicon.getPointer(), "activate", new SignalCallback() {
             @Override
@@ -220,7 +222,10 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
             public void run() {
                 updateMenus();
 
-                gtkstatusicon = createGStatusIcon();
+                if (gtkstatusicon == null)
+                    gtkstatusicon = createGStatusIcon();
+
+                LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, true);
             }
         });
     }
@@ -232,14 +237,22 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
             public void run() {
                 updateMenus();
 
-                LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
-                LibGtk.INSTANCE.gtk_status_icon_set_tooltip_text(gtkstatusicon, title);
+                if (gtkstatusicon != null) {
+                    LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
+                    LibGtk.INSTANCE.gtk_status_icon_set_tooltip_text(gtkstatusicon, title);
+                }
             }
         });
     }
 
     @Override
     public void hide() {
+        GtkMessageLoop.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, false);
+            }
+        });
     }
 
     @Override
@@ -250,6 +263,9 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
     @Override
     public void close() {
         hide();
+
+        gtkstatusicon.unref();
+        gtkstatusicon = null;
     }
 
 }
