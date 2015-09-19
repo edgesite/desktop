@@ -3,7 +3,10 @@ package com.github.axet.desktop;
 import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.Icon;
 
 public class Utils {
@@ -15,5 +18,16 @@ public class Utils {
         icon.paintIcon(null, g, 0, 0);
         g.dispose();
         return bi;
+    }
+
+    public static byte[] BufferedImage2Bytes(BufferedImage b) {
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(b, "png", os);
+            os.flush();
+            return os.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

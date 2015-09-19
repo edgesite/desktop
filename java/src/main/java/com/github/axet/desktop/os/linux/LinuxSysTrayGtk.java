@@ -1,25 +1,17 @@
 package com.github.axet.desktop.os.linux;
 
-import java.awt.AWTException;
 import java.awt.CheckboxMenuItem;
 import java.awt.Component;
-import java.awt.Image;
 import java.awt.Menu;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -27,6 +19,15 @@ import javax.swing.JPopupMenu;
 
 import com.github.axet.desktop.DesktopSysTray;
 import com.github.axet.desktop.Utils;
+import com.github.axet.desktop.os.linux.handle.GBytes;
+import com.github.axet.desktop.os.linux.handle.GIcon;
+import com.github.axet.desktop.os.linux.handle.GtkStatusIcon;
+import com.github.axet.desktop.os.linux.handle.GtkWidget;
+import com.github.axet.desktop.os.linux.handle.SignalCallback;
+import com.github.axet.desktop.os.linux.libs.LibAppIndicator;
+import com.github.axet.desktop.os.linux.libs.Gtk3;
+import com.sun.jna.Function;
+import com.sun.jna.Pointer;
 
 /**
  * System Tray Protocol Specification
@@ -39,22 +40,19 @@ import com.github.axet.desktop.Utils;
  * 
  */
 
-public class LinuxSysTray extends DesktopSysTray {
-
-    SystemTray tray = SystemTray.getSystemTray();
+public class LinuxSysTrayGtk extends DesktopSysTray {
     PopupMenu popup;
-    BufferedImage image;
-
-    TrayIcon trayIcon;
     JPopupMenu menu;
     String title;
-    Icon icon;
+
+    BufferedImage icon;
+
+    public LinuxSysTrayGtk() {
+    }
 
     @Override
     public void setIcon(Icon icon) {
-        this.icon = icon;
-
-        image = Utils.createBitmap(icon);
+        this.icon = Utils.createBitmap(icon);
     }
 
     @Override
@@ -64,35 +62,59 @@ public class LinuxSysTray extends DesktopSysTray {
 
     @Override
     public void show() {
-        if (trayIcon == null) {
-            trayIcon = new TrayIcon(image, title, null);
-            trayIcon.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    for (Listener l : listeners) {
-                        if (e.getClickCount() == 2)
-                            l.mouseLeftDoubleClick();
-                        else
-                            l.mouseLeftClick();
-                    }
-                }
-            });
-            try {
-                tray.add(trayIcon);
-            } catch (AWTException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        Gtk3.INSTANCE.gtk_init(0, null);
 
-        update();
+        final GtkWidget menu = Gtk3.INSTANCE.gtk_menu_new();
+        GtkWidget item = Gtk3.INSTANCE.gtk_menu_item_new_with_label("Item1");
+        Gtk3.INSTANCE.g_signal_connect_data(item.getPointer(), "activate", new SignalCallback() {
+            @Override
+            public void signal(Pointer data) {
+                System.out.println("item");
+            }
+        }, null, null, 0);
+        Gtk3.INSTANCE.gtk_menu_shell_append(menu, item);
+        Gtk3.INSTANCE.gtk_widget_show(item);
+
+        byte[] buf = Utils.BufferedImage2Bytes(icon);
+
+        GBytes bg = Gtk3.INSTANCE.g_bytes_new(buf, buf.length);
+
+        GIcon g = Gtk3.INSTANCE.g_bytes_icon_new(bg);
+        GtkStatusIcon icon = Gtk3.INSTANCE.gtk_status_icon_new_from_gicon(g);
+
+        Gtk3.INSTANCE.gtk_status_icon_set_visible(icon, true);
+
+        Gtk3.INSTANCE.g_signal_connect_data(icon.getPointer(), "activate", new SignalCallback() {
+            @Override
+            public void signal(Pointer data) {
+                System.out.println("lclick");
+            }
+        }, null, null, 0);
+
+        Gtk3.INSTANCE.g_signal_connect_data(icon.getPointer(), "popup-menu", new SignalCallback() {
+            @Override
+            public void signal(Pointer data) {
+                System.out.println("rclick");
+                Function gtk_status_icon_position_menu = Function.getFunction("appindicator",
+                        "gtk_status_icon_position_menu");
+                int time = Gtk3.INSTANCE.gtk_get_current_event_time();
+                Gtk3.INSTANCE.gtk_menu_popup(menu, null, null, gtk_status_icon_position_menu, data, 1, time);
+            }
+        }, null, null, 0);
+
+        new Thread(new Runnable() {
+            
+            @Override
+            public void run() {
+                Pointer mainloop = Gtk3.INSTANCE.g_main_loop_new(null, false);
+                Gtk3.INSTANCE.g_main_loop_run(mainloop);
+            }
+        }).start();
     }
 
     @Override
     public void update() {
         updateMenus();
-
-        trayIcon.setImage(image);
-        trayIcon.setPopupMenu(popup);
     }
 
     void updateMenus() {
@@ -182,10 +204,6 @@ public class LinuxSysTray extends DesktopSysTray {
 
     @Override
     public void hide() {
-        if (trayIcon != null) {
-            tray.remove(trayIcon);
-            trayIcon = null;
-        }
     }
 
     @Override
@@ -196,7 +214,6 @@ public class LinuxSysTray extends DesktopSysTray {
     @Override
     public void close() {
         hide();
-        tray = null;
     }
 
 }

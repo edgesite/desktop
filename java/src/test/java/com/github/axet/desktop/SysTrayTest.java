@@ -162,6 +162,26 @@ public class SysTrayTest extends JFrame {
         });
         menu.add(menuItem5);
 
+        JCheckBoxMenuItem menuItem6 = new JCheckBoxMenuItem("test6");
+        menuItem6.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                System.out.println("test6");
+                sys.update();
+            }
+        });
+        menu.add(menuItem6);
+
+        JMenuItem menuItem7 = new JMenuItem("test7");
+        menuItem7.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                System.out.println("test7");
+            }
+        });
+        menu.add(menuItem7);
+        
+       
         sys.addListener(ml);
         sys.setIcon(warn);
         sys.setTitle("Java tool2");

@@ -8,7 +8,8 @@ import org.apache.commons.lang.SystemUtils;
 
 import com.github.axet.desktop.os.linux.LinuxFolders;
 import com.github.axet.desktop.os.linux.LinuxPower;
-import com.github.axet.desktop.os.linux.LinuxSysTray;
+import com.github.axet.desktop.os.linux.LinuxSysTrayAppIndicator;
+import com.github.axet.desktop.os.linux.LinuxSysTrayGtk;
 import com.github.axet.desktop.os.mac.OSXFolders;
 import com.github.axet.desktop.os.mac.OSXPower;
 import com.github.axet.desktop.os.mac.OSXSysTray;
@@ -101,7 +102,7 @@ public abstract class Desktop {
                 desktopSysTray = new OSXSysTray();
 
             if (Platform.isLinux())
-                desktopSysTray = new LinuxSysTray();
+                desktopSysTray = new LinuxSysTrayAppIndicator();
 
             if (desktopSysTray == null)
                 throw new RuntimeException("OS not supported");
