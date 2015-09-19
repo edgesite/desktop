@@ -72,7 +72,7 @@ public class SysTrayTest extends JFrame {
         menu.add(menuItem1);
         menu.addSeparator();
 
-        JMenu menu2 = new JMenu("submenu");
+        JMenu menu2 = new JMenu("test sub1");
         menu2.setIcon(stop);
         JMenuItem menuItem21 = new JMenuItem("test21", warn);
         menuItem21.addActionListener(new ActionListener() {
@@ -91,7 +91,7 @@ public class SysTrayTest extends JFrame {
         });
         menu2.add(menuItem22);
 
-        JMenu menu3 = new JMenu("submenu");
+        JMenu menu3 = new JMenu("test sub2");
         menu3.setIcon(stop);
         JMenuItem menuItem31 = new JMenuItem("test31", warn);
         menuItem31.addActionListener(new ActionListener() {
@@ -162,21 +162,21 @@ public class SysTrayTest extends JFrame {
         });
         menu.add(menuItem5);
 
-        JCheckBoxMenuItem menuItem6 = new JCheckBoxMenuItem("test6");
+        JCheckBoxMenuItem menuItem6 = new JCheckBoxMenuItem("test6 check noicon");
         menuItem6.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                System.out.println("test6");
+                System.out.println("test6 check noicon");
                 sys.update();
             }
         });
         menu.add(menuItem6);
 
-        JMenuItem menuItem7 = new JMenuItem("test7");
+        JMenuItem menuItem7 = new JMenuItem("test7 noicon");
         menuItem7.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                System.out.println("test7");
+                System.out.println("test7 noicon");
             }
         });
         menu.add(menuItem7);
