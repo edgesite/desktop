@@ -2,8 +2,10 @@ package com.github.axet.desktop.os.linux.libs;
 
 import com.github.axet.desktop.os.linux.handle.GBytes;
 import com.github.axet.desktop.os.linux.handle.GIcon;
+import com.github.axet.desktop.os.linux.handle.GMainContext;
 import com.github.axet.desktop.os.linux.handle.GMainLoop;
 import com.github.axet.desktop.os.linux.handle.GObject;
+import com.github.axet.desktop.os.linux.handle.GSourceFunc;
 import com.github.axet.desktop.os.linux.handle.GtkStatusIcon;
 import com.github.axet.desktop.os.linux.handle.GtkWidget;
 import com.sun.jna.Callback;
@@ -55,9 +57,9 @@ public interface LibGtk extends Library {
 
     void gtk_init(Pointer pargc, Pointer pargv);
 
-    void g_object_ref(GObject p);
+    void g_object_ref(Pointer p);
 
-    void g_object_unref(GObject p);
+    void g_object_unref(Pointer p);
 
     int gtk_get_current_event_time();
 
@@ -131,4 +133,16 @@ public interface LibGtk extends Library {
     void g_main_loop_run(GMainLoop loop);
 
     void g_main_loop_quit(GMainLoop loop);
+
+    GMainContext g_main_loop_get_context(GMainLoop loop);
+
+    // threads
+
+    void gdk_threads_init();
+
+    void gdk_threads_enter();
+
+    void gdk_threads_leave();
+
+    void g_main_context_invoke(GMainContext c, GSourceFunc func, Pointer data);
 }

@@ -10,17 +10,21 @@ public class GObject extends PointerType {
 
     public GObject(Pointer p) {
         super(p);
+        
+        ref();
     }
 
     protected void finalize() throws Throwable {
         super.finalize();
+        
+        unref();
     }
 
     public void ref() {
-        LibGtk.INSTANCE.g_object_ref(this);
+        LibGtk.INSTANCE.g_object_ref(getPointer());
     }
 
     public void unref() {
-        LibGtk.INSTANCE.g_object_unref(this);
+        LibGtk.INSTANCE.g_object_unref(getPointer());
     }
 }
