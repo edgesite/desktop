@@ -5,7 +5,7 @@ import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.awt.peer.LightweightPeer;
+import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.Icon;
@@ -19,6 +19,7 @@ import com.github.axet.desktop.DesktopSysTray;
 import com.github.axet.desktop.Utils;
 import com.github.axet.desktop.os.linux.handle.GBytes;
 import com.github.axet.desktop.os.linux.handle.GIcon;
+import com.github.axet.desktop.os.linux.handle.GtkMenuItem;
 import com.github.axet.desktop.os.linux.handle.GtkMessageLoop;
 import com.github.axet.desktop.os.linux.handle.GtkStatusIcon;
 import com.github.axet.desktop.os.linux.handle.GtkWidget;
@@ -36,6 +37,12 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
     Icon icon;
 
     GtkStatusIcon gtkstatusicon;
+    
+    ArrayList<GtkMenuItem> menukepper = new ArrayList<GtkMenuItem>();
+
+    static final String activate = "activate";
+
+    static final String popup_menu = "popup-menu";
 
     public static final Icon SpaceIcon = new ImageIcon(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB));
 
@@ -92,14 +99,19 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
         LibGtk.INSTANCE.gtk_container_add(menu, box);
         LibGtk.INSTANCE.gtk_widget_show_all(menu);
 
+        GtkMenuItem gtkmenu = new GtkMenuItem(menu.getPointer());
+        gtkmenu.activate = new SignalCallback() {
+            @Override
+            public void signal(Pointer data) {
+                item.doClick();
+            }
+        };
+        
         if (!(item instanceof JMenu)) {
-            LibGtk.INSTANCE.g_signal_connect_data(menu.getPointer(), "activate", new SignalCallback() {
-                @Override
-                public void signal(Pointer data) {
-                    item.doClick();
-                }
-            }, null, null, 0);
+            LibGtk.INSTANCE.g_signal_connect_data(menu.getPointer(), activate, gtkmenu.activate, null, null, 0);
         }
+        
+        menukepper.add(gtkmenu);
 
         return menu;
     }
@@ -143,6 +155,8 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
         if (gtkmenu != null) {
             gtkmenu.destory();
         }
+        
+        menukepper.clear();
 
         gtkmenu = LibGtk.INSTANCE.gtk_menu_new();
 
@@ -178,27 +192,35 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
     GtkStatusIcon createGStatusIcon() {
         GtkStatusIcon gicon = LibGtk.INSTANCE.gtk_status_icon_new_from_gicon(convertMenuImage(icon));
 
-        LibGtk.INSTANCE.g_signal_connect_data(gicon.getPointer(), "activate", new SignalCallback() {
+        gicon.activate = new SignalCallback() {
             @Override
             public void signal(Pointer data) {
                 for (Listener l : Collections.synchronizedCollection(listeners)) {
                     l.mouseLeftClick();
                 }
             }
-        }, null, null, 0);
+        };
 
-        LibGtk.INSTANCE.g_signal_connect_data(gicon.getPointer(), "popup-menu", new SignalCallback() {
+        gicon.popup_menu = new SignalCallback() {
             @Override
             public void signal(Pointer data) {
                 LibGtk.INSTANCE.gtk_menu_popup(gtkmenu, null, null, LibGtk.gtk_status_icon_position_menu, data, 1,
                         LibGtk.INSTANCE.gtk_get_current_event_time());
             }
-        }, null, null, 0);
+        };
+
+        LibGtk.INSTANCE.g_signal_connect_data(gicon.getPointer(), activate, gicon.activate, null, null, 0);
+
+        LibGtk.INSTANCE.g_signal_connect_data(gicon.getPointer(), popup_menu, gicon.popup_menu, null, null, 0);
 
         LibGtk.INSTANCE.gtk_status_icon_set_tooltip_text(gicon, title);
 
         return gicon;
     }
+
+    //
+    // public
+    //
 
     public LinuxSysTrayGtk() {
         GtkMessageLoop.inc();
@@ -208,6 +230,8 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
         super.finalize();
 
         GtkMessageLoop.dec();
+
+        close();
     }
 
     @Override
@@ -231,6 +255,8 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
                     gtkstatusicon = createGStatusIcon();
 
                 LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, true);
+
+                System.gc();
             }
         });
     }
@@ -269,10 +295,15 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
 
     @Override
     public void close() {
-        hide();
+        if (gtkstatusicon != null) {
+            gtkstatusicon.unref();
+            gtkstatusicon = null;
+        }
 
-        gtkstatusicon.unref();
-        gtkstatusicon = null;
+        if (gtkmenu != null) {
+            gtkmenu.destory();
+            gtkmenu = null;
+        }
     }
 
 }

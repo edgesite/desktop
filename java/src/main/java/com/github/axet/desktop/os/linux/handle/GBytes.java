@@ -13,6 +13,8 @@ public class GBytes extends PointerType {
     }
 
     protected void finalize() throws Throwable {
+        System.out.println(getClass().getSimpleName());
+        
         unref();
 
         super.finalize();

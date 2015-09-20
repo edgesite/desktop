@@ -27,8 +27,8 @@ public class SysTrayTest extends JFrame {
     private static final long serialVersionUID = -7388906080696230194L;
 
     DesktopSysTray sys = Desktop.getDesktopSysTray();
-    ImageIcon warn;
-    ImageIcon stop;
+    ImageIcon bug;
+    ImageIcon dov;
     JPopupMenu menu;
 
     DesktopSysTray.Listener ml = new DesktopSysTray.Listener() {
@@ -60,11 +60,11 @@ public class SysTrayTest extends JFrame {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        warn = loadIcon("bug.ico");
-        stop = loadIcon("dov.ico");
+        bug = loadIcon("bug.ico");
+        dov = loadIcon("dov.ico");
 
         menu = new JPopupMenu();
-        JMenuItem menuItem1 = new JMenuItem("test1", warn);
+        JMenuItem menuItem1 = new JMenuItem("test1", bug);
         menuItem1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -75,8 +75,8 @@ public class SysTrayTest extends JFrame {
         menu.addSeparator();
 
         JMenu menu2 = new JMenu("test sub1");
-        menu2.setIcon(stop);
-        JMenuItem menuItem21 = new JMenuItem("test21", warn);
+        menu2.setIcon(dov);
+        JMenuItem menuItem21 = new JMenuItem("test21", bug);
         menuItem21.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -84,7 +84,7 @@ public class SysTrayTest extends JFrame {
             }
         });
         menu2.add(menuItem21);
-        JMenuItem menuItem22 = new JMenuItem("test22", warn);
+        JMenuItem menuItem22 = new JMenuItem("test22", bug);
         menuItem22.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -94,8 +94,8 @@ public class SysTrayTest extends JFrame {
         menu2.add(menuItem22);
 
         JMenu menu3 = new JMenu("test sub2");
-        menu3.setIcon(stop);
-        JMenuItem menuItem31 = new JMenuItem("test31", warn);
+        menu3.setIcon(dov);
+        JMenuItem menuItem31 = new JMenuItem("test31", bug);
         menuItem31.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -103,7 +103,7 @@ public class SysTrayTest extends JFrame {
             }
         });
         menu3.add(menuItem31);
-        JMenuItem menuItem32 = new JMenuItem("test32", warn);
+        JMenuItem menuItem32 = new JMenuItem("test32", bug);
         menuItem32.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -114,7 +114,7 @@ public class SysTrayTest extends JFrame {
         menu2.add(menu3);
 
         menu2.addSeparator();
-        JMenuItem menuItem23 = new JMenuItem("test23", warn);
+        JMenuItem menuItem23 = new JMenuItem("test23", bug);
         menuItem23.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -125,7 +125,7 @@ public class SysTrayTest extends JFrame {
 
         menu.add(menu2);
         menu.addSeparator();
-        JMenuItem menuItem2 = new JMenuItem("test2", stop);
+        JMenuItem menuItem2 = new JMenuItem("test2", dov);
         menuItem2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -133,7 +133,7 @@ public class SysTrayTest extends JFrame {
             }
         });
         menu.add(menuItem2);
-        JCheckBoxMenuItem menuItem3 = new JCheckBoxMenuItem("test3", warn);
+        JCheckBoxMenuItem menuItem3 = new JCheckBoxMenuItem("test3", bug);
         menuItem3.setState(true);
         menuItem3.addActionListener(new ActionListener() {
             @Override
@@ -144,7 +144,7 @@ public class SysTrayTest extends JFrame {
         });
         menu.add(menuItem3);
 
-        JMenuItem menuItem4 = new JMenuItem("test4", warn);
+        JMenuItem menuItem4 = new JMenuItem("test4", bug);
         menuItem4.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -154,7 +154,7 @@ public class SysTrayTest extends JFrame {
         menuItem4.setEnabled(false);
         menu.add(menuItem4);
 
-        JCheckBoxMenuItem menuItem5 = new JCheckBoxMenuItem("test5", warn);
+        JCheckBoxMenuItem menuItem5 = new JCheckBoxMenuItem("test5", bug);
         menuItem5.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -185,7 +185,7 @@ public class SysTrayTest extends JFrame {
         
        
         sys.addListener(ml);
-        sys.setIcon(warn);
+        sys.setIcon(bug);
         sys.setTitle("Java tool2");
         sys.setMenu(menu);
         sys.show();
@@ -201,7 +201,7 @@ public class SysTrayTest extends JFrame {
         getContentPane().setLayout(gridBagLayout);
 
         JLabel lblNewLabel = new JLabel("Warn Label");
-        lblNewLabel.setIcon(warn);
+        lblNewLabel.setIcon(bug);
         GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
         gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
         gbc_lblNewLabel.gridx = 0;
@@ -209,7 +209,7 @@ public class SysTrayTest extends JFrame {
         getContentPane().add(lblNewLabel, gbc_lblNewLabel);
 
         JLabel lblNewLabel_1 = new JLabel("Stop Label");
-        lblNewLabel_1.setIcon(stop);
+        lblNewLabel_1.setIcon(dov);
         GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
         gbc_lblNewLabel_1.insets = new Insets(0, 0, 5, 5);
         gbc_lblNewLabel_1.gridx = 1;
@@ -219,7 +219,7 @@ public class SysTrayTest extends JFrame {
         JButton btnNewButton = new JButton("Icon Bug");
         btnNewButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                sys.setIcon(warn);
+                sys.setIcon(bug);
                 sys.update();
             }
         });
@@ -232,7 +232,7 @@ public class SysTrayTest extends JFrame {
         JButton btnNewButton_1 = new JButton("Icon Bird");
         btnNewButton_1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                sys.setIcon(stop);
+                sys.setIcon(dov);
                 sys.update();
             }
         });
@@ -254,7 +254,7 @@ public class SysTrayTest extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 sys = Desktop.getDesktopSysTray();
                 sys.addListener(ml);
-                sys.setIcon(warn);
+                sys.setIcon(bug);
                 sys.setTitle("Java tool2");
                 sys.show();
             }
@@ -321,14 +321,14 @@ public class SysTrayTest extends JFrame {
                         e.printStackTrace();
                     }
 
-                    sys.setIcon(warn);
+                    sys.setIcon(bug);
                     sys.update();
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    sys.setIcon(stop);
+                    sys.setIcon(dov);
                     sys.update();
 
                 }

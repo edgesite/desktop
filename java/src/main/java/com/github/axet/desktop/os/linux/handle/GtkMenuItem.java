@@ -3,11 +3,13 @@ package com.github.axet.desktop.os.linux.handle;
 import com.github.axet.desktop.os.linux.libs.LibGtk;
 import com.sun.jna.Pointer;
 
-public class GtkWidget extends GObject {
-    public GtkWidget() {
+public class GtkMenuItem extends GObject {
+    public SignalCallback activate;
+    
+    public GtkMenuItem() {
     }
 
-    public GtkWidget(Pointer p) {
+    public GtkMenuItem(Pointer p) {
         super(p);
     }
 

@@ -112,4 +112,12 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
         });
     }
 
+    @Override
+    public void close() {
+        if (appindicator != null) {
+            appindicator.unref();
+            appindicator = null;
+        }
+    }
+
 }

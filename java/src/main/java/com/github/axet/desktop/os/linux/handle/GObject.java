@@ -14,6 +14,8 @@ public class GObject extends PointerType {
 
     protected void finalize() throws Throwable {
         super.finalize();
+        
+        System.out.println(getClass().getSimpleName());
     }
 
     public void ref() {
