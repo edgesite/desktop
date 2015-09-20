@@ -26,9 +26,12 @@ const (
 	NIM_ADD    DWORD = 0
 	NIM_MODIFY DWORD = 1
 	NIM_DELETE DWORD = 2
+
+	SW_SHOWNORMAL = 1
 )
 
 var Shell32Dll = syscall.MustLoadDLL("Shell32.dll")
 var SHGetKnownFolderPath = Shell32Dll.MustFindProc("SHGetKnownFolderPath")
 var SHGetFolderPath = Shell32Dll.MustFindProc("SHGetFolderPathW")
 var Shell_NotifyIcon = Shell32Dll.MustFindProc("Shell_NotifyIconW")
+var ShellExecute = Shell32Dll.MustFindProc("ShellExecuteW")

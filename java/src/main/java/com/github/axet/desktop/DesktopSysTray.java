@@ -8,13 +8,11 @@ import javax.swing.JPopupMenu;
 
 public abstract class DesktopSysTray {
 
-    /**
-     * OSX does not have clicks on icon. Just ignore this functionality at
-     * whole.
-     * 
-     */
     public interface Listener {
+        // Left Click not available in Ubuntu Linux, Mac OS X
         public void mouseLeftClick();
+        
+        // Double Click not handled in Ubuntu Linux, Mac OS X
 
         public void mouseLeftDoubleClick();
 

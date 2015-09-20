@@ -71,6 +71,14 @@ func Main() {
 }
 
 //
+// Browser Functions
+//
+
+func BrowserOpenURI(s string) {
+	browserOpenURI(s)
+}
+
+//
 // SysTrayIcon or NSStatusBar or Notification Area
 //
 

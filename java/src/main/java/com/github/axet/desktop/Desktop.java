@@ -1,10 +1,14 @@
 package com.github.axet.desktop;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.commons.lang.SystemUtils;
 
 import com.github.axet.desktop.os.linux.LinuxFolders;
 import com.github.axet.desktop.os.linux.LinuxPower;
-import com.github.axet.desktop.os.linux.LinuxSysTray;
+import com.github.axet.desktop.os.linux.libs.LibGtkName;
 import com.github.axet.desktop.os.mac.OSXFolders;
 import com.github.axet.desktop.os.mac.OSXPower;
 import com.github.axet.desktop.os.mac.OSXSysTray;
@@ -19,6 +23,30 @@ public abstract class Desktop {
     static DesktopFolders desktopFolders = null;
     static DesktopSysTray desktopSysTray = null;
     static DesktopPower desktopPower = null;
+
+    //
+    // Desktop Folders
+    //
+
+    public static File getHomeFolder() {
+        return getDesktopFolders().getHome();
+    }
+
+    public static File getDocumentsFolder() {
+        return getDesktopFolders().getDocuments();
+    }
+
+    public static File getAppDataFolder() {
+        return getDesktopFolders().getAppData();
+    }
+
+    public static File getDesktopFolder() {
+        return getDesktopFolders().getDesktop();
+    }
+
+    public static File getDownloadsFolder() {
+        return getDesktopFolders().getDownloads();
+    }
 
     public static DesktopFolders getDesktopFolders() {
         if (desktopFolders == null) {
@@ -38,6 +66,31 @@ public abstract class Desktop {
         return desktopFolders;
     }
 
+    //
+    // Browser
+    //
+
+    public static void browserOpenURI(String s) {
+        try {
+            URI uri;
+            uri = new URI(s);
+            java.awt.Desktop desktop = java.awt.Desktop.isDesktopSupported() ? java.awt.Desktop.getDesktop() : null;
+            if (desktop != null && desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
+                try {
+                    desktop.browse(uri);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    //
+    // SysTray
+    //
+
     public static DesktopSysTray getDesktopSysTray() {
         if (desktopSysTray == null) {
             if (com.sun.jna.Platform.isWindows()) {
@@ -48,7 +101,7 @@ public abstract class Desktop {
                 desktopSysTray = new OSXSysTray();
 
             if (Platform.isLinux())
-                desktopSysTray = new LinuxSysTray();
+                desktopSysTray = LibGtkName.createSysTray();
 
             if (desktopSysTray == null)
                 throw new RuntimeException("OS not supported");
@@ -56,6 +109,10 @@ public abstract class Desktop {
 
         return desktopSysTray;
     }
+
+    //
+    // Power
+    //
 
     public static DesktopPower getDesktopPower() {
         if (desktopPower == null) {

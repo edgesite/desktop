@@ -10,9 +10,10 @@ Script nature of Java or Go now not limited by system programming working with s
 
   - [X] Cross platform user specific folders: Download folder, Home folder, Documents folder, etc ...
   - [X] Cross platform SysTray Icon
+  - [X] Cross platform Open Browser URL
   - [ ] Cross platform Browser Pop Window
-  - [ ] Cross platform Power Events (reboot, logout)
-  - [ ] Register URL handlers (open a application from a browser)
+  - [ ] Cross platform Power Events (control reboot, logout, suspend)
+  - [ ] Register URL handlers (open an application from a browser)
   - [ ] Sound and Volume control
 
 ## Example Desktop Folders
@@ -26,13 +27,11 @@ package com.github.axet.desktop;
 
 public class DesktopTest {
     public static void main(String[] args) {
-        DesktopFolders d = Desktop.getDesktopFolders();
-
-        System.out.println("Home: " + d.getHome());
-        System.out.println("Documents: " + d.getDocuments());
-        System.out.println("AppFolder: " + d.getAppData());
-        System.out.println("Desktop: " + d.getDesktop());
-        System.out.println("Downloads: " + d.getDownloads());
+        System.out.println("Home: " + Desktop.getHomeFolder());
+        System.out.println("Documents: " + Desktop.getDocumentsFolder());
+        System.out.println("AppFolder: " + Desktop.getAppDataFolder());
+        System.out.println("Desktop: " + Desktop.getDesktopFolder());
+        System.out.println("Downloads: " + Desktop.getDownloadsFolder());
     }
 }
 ```
