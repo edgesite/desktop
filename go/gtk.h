@@ -47,7 +47,7 @@ void* g_bytes_icon_new(void* bytes);
 void g_bytes_unref(void* b);
 
 // loop
-void* g_main_loop_new(void* context, bool is_running);
+void* g_main_loop_new(void* context, void* is_running);
 void g_main_loop_run(void* loop);
 void g_main_loop_quit(void* loop);
 void* g_main_loop_get_context(void* loop);

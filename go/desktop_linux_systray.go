@@ -37,20 +37,19 @@ func desktopSysTrayNew() *DesktopSysTray {
 
 	if APPINDICATOR {
 		for _, s := range []string{"libappindicator3.so", "libappindicator.so"} {
-			_, err := dlopen(s, RTLD_LAZY | RTLD_GLOBAL)
+			_, err := dlopen(s, RTLD_LAZY|RTLD_GLOBAL)
 			if err == nil {
-				m.os = &DesktopSysTrayAppIndicator{DesktopSysTrayGtk{m}}
+				m.os = DesktopSysTrayAppIndicatorNew(m)
 				return m
 			}
 		}
 	}
 
-
 	if GTK {
 		for _, s := range []string{"libgtk-3.so", "libgdk-x11-2.0.so"} {
-			_, err := dlopen(s, RTLD_LAZY | RTLD_GLOBAL)
+			_, err := dlopen(s, RTLD_LAZY|RTLD_GLOBAL)
 			if err == nil {
-				m.os = &DesktopSysTrayGtk{m}
+				m.os = DesktopSysTrayGtkNew(m)
 				return m
 			}
 		}
@@ -118,4 +117,3 @@ func (m *DesktopSysTray) setIcon(i image.Image) {
 	}
 	panic("broken systray interface")
 }
-

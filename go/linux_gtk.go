@@ -4,8 +4,11 @@ package desktop
 
 /*
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "gtk.h"
+
+extern void* gsourcefunc(void*);
 
 #cgo LDFLAGS: -Wl,--unresolved-symbols=ignore-all
 */
@@ -16,28 +19,40 @@ import (
 )
 
 const (
-        GTK_ORIENTATION_HORIZONTAL = 0;
-        GTK_ORIENTATION_VERTICAL = 1;
-        GTK_ICON_SIZE_INVALID = 0;
-        GTK_ICON_SIZE_MENU = 1;
-        GTK_ICON_SIZE_SMALL_TOOLBAR = 2;
-        GTK_ICON_SIZE_LARGE_TOOLBAR = 3;
-        GTK_ICON_SIZE_BUTTON = 4;
-        GTK_ICON_SIZE_DND = 5;
-        GTK_ICON_SIZE_DIALOG = 6;
+	GTK_ORIENTATION_HORIZONTAL  = 0
+	GTK_ORIENTATION_VERTICAL    = 1
+	GTK_ICON_SIZE_INVALID       = 0
+	GTK_ICON_SIZE_MENU          = 1
+	GTK_ICON_SIZE_SMALL_TOOLBAR = 2
+	GTK_ICON_SIZE_LARGE_TOOLBAR = 3
+	GTK_ICON_SIZE_BUTTON        = 4
+	GTK_ICON_SIZE_DND           = 5
+	GTK_ICON_SIZE_DIALOG        = 6
 )
 
 type GObject unsafe.Pointer
 type GtkWidget unsafe.Pointer
+type GMainLoop unsafe.Pointer
+type GMainContext unsafe.Pointer
+type GSourceFunc func()
+type GPointer unsafe.Pointer
 
 func gtk_init() {
 	C.gtk_init(0, 0)
 }
 
-func g_signal_connect(item unsafe.Pointer, action string, callback unsafe.Pointer, data unsafe.Pointer) {
+//export gsourcefunc
+func gsourcefunc(p unsafe.Pointer) unsafe.Pointer {
+	var pp = &p
+	f := *(*GSourceFunc)(unsafe.Pointer(&pp))
+	f()
+	return Arg(false)
+}
+
+func g_signal_connect(item unsafe.Pointer, action string, callback GSourceFunc) {
 	n := C.CString(action)
 	defer C.free(unsafe.Pointer(n))
-	C.g_signal_connect_data(item, n, callback, data, NULL, C.int(0))
+	C.g_signal_connect_data(item, n, Arg(C.gsourcefunc), Arg(callback), NULL, C.int(0))
 }
 
 func g_object_ref(p GObject) {
@@ -106,15 +121,30 @@ void* g_bytes_new(void* buf, int size);
 void* g_bytes_icon_new(void* bytes);
 void g_bytes_unref(void* b);
 
-// loop
-void* g_main_loop_new(void* context, bool is_running);
-void g_main_loop_run(void* loop);
-void g_main_loop_quit(void* loop);
-void* g_main_loop_get_context(void* loop);
 
 // threads
 void gdk_threads_init();
 void gdk_threads_enter();
 void gdk_threads_leave();
-void g_main_context_invoke(void* c, void* func, void* data);
 */
+
+func g_main_loop_new(context GMainContext, is_running bool) GMainLoop {
+	return GMainLoop(C.g_main_loop_new(Arg(context), Arg(Bool2Int[is_running])))
+}
+
+func g_main_loop_run(loop GMainLoop) {
+	C.g_main_loop_run(Arg(loop))
+}
+
+func g_main_loop_quit(loop GMainLoop) {
+	C.g_main_loop_quit(Arg(loop))
+}
+
+func g_main_loop_get_context(loop GMainLoop) GMainContext {
+	return GMainContext(C.g_main_loop_get_context(Arg(loop)))
+}
+
+func g_main_context_invoke(c GMainContext, fn GSourceFunc) {
+	C.g_main_context_invoke(Arg(c), Arg(C.gsourcefunc), Arg(fn))
+}
+

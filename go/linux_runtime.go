@@ -10,21 +10,21 @@ package desktop
 import "C"
 
 import (
-	"unsafe"
 	"errors"
 	"reflect"
+	"unsafe"
 )
 
-const(
- RTLD_LAZY     = 0x0001;
- RTLD_NOW=       0x0002;
- RTLD_GLOBAL   =0x0100;
- RTLD_LOCAL    =0x0000;
- RTLD_NOSHARE  =0x1000;
- RTLD_EXE      =0x2000;
- RTLD_SCRIPT   =0x4000;
+const (
+	RTLD_LAZY    = 0x0001
+	RTLD_NOW     = 0x0002
+	RTLD_GLOBAL  = 0x0100
+	RTLD_LOCAL   = 0x0000
+	RTLD_NOSHARE = 0x1000
+	RTLD_EXE     = 0x2000
+	RTLD_SCRIPT  = 0x4000
 
-	RTLD_DEFAULT = 0;
+	RTLD_DEFAULT = 0
 )
 
 var NULL = unsafe.Pointer(uintptr(0))
@@ -51,9 +51,8 @@ func Arg(d interface{}) unsafe.Pointer {
 	}
 }
 
-
 func dlopen(lib string, flags uint) (uintptr, error) {
-	n := C.CString(lib) 
+	n := C.CString(lib)
 	defer C.free(unsafe.Pointer(n))
 	u := C.dlopen(n, (C.int)(flags))
 	if u == nil {
@@ -64,7 +63,7 @@ func dlopen(lib string, flags uint) (uintptr, error) {
 }
 
 func dlmust(lib string) uintptr {
-	u, err := dlopen(lib, RTLD_LAZY | RTLD_GLOBAL)
+	u, err := dlopen(lib, RTLD_LAZY|RTLD_GLOBAL)
 	if err != nil {
 		panic(err)
 	}
