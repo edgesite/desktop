@@ -19,6 +19,7 @@ import com.github.axet.desktop.DesktopSysTray;
 import com.github.axet.desktop.Utils;
 import com.github.axet.desktop.os.linux.handle.GBytes;
 import com.github.axet.desktop.os.linux.handle.GIcon;
+import com.github.axet.desktop.os.linux.handle.GSourceFunc;
 import com.github.axet.desktop.os.linux.handle.GtkMenuItem;
 import com.github.axet.desktop.os.linux.handle.GtkMessageLoop;
 import com.github.axet.desktop.os.linux.handle.GtkStatusIcon;
@@ -37,7 +38,7 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
     Icon icon;
 
     GtkStatusIcon gtkstatusicon;
-    
+
     ArrayList<GtkMenuItem> menukepper = new ArrayList<GtkMenuItem>();
 
     static final String activate = "activate";
@@ -106,11 +107,11 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
                 item.doClick();
             }
         };
-        
+
         if (!(item instanceof JMenu)) {
             LibGtk.INSTANCE.g_signal_connect_data(menu.getPointer(), activate, gtkmenu.activate, null, null, 0);
         }
-        
+
         menukepper.add(gtkmenu);
 
         return menu;
@@ -155,7 +156,7 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
         if (gtkmenu != null) {
             gtkmenu.destory();
         }
-        
+
         menukepper.clear();
 
         gtkmenu = LibGtk.INSTANCE.gtk_menu_new();
@@ -244,48 +245,56 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
         this.title = title;
     }
 
+    GSourceFunc show = new GSourceFunc() {
+        @Override
+        public boolean invoke(Pointer data) {
+            updateMenus();
+
+            if (gtkstatusicon == null)
+                gtkstatusicon = createGStatusIcon();
+
+            LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, true);
+            return false;
+        }
+    };
+
     @Override
     public void show() {
-        GtkMessageLoop.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                updateMenus();
-
-                if (gtkstatusicon == null)
-                    gtkstatusicon = createGStatusIcon();
-
-                LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, true);
-
-                System.gc();
-            }
-        });
+        GtkMessageLoop.invokeLater(show, null);
     }
+
+    GSourceFunc update = new GSourceFunc() {
+        @Override
+        public boolean invoke(Pointer data) {
+            updateMenus();
+
+            if (gtkstatusicon != null) {
+                LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
+                LibGtk.INSTANCE.gtk_status_icon_set_tooltip_text(gtkstatusicon, title);
+            }
+
+            return false;
+        }
+    };
 
     @Override
     public void update() {
-        GtkMessageLoop.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                updateMenus();
-
-                if (gtkstatusicon != null) {
-                    LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
-                    LibGtk.INSTANCE.gtk_status_icon_set_tooltip_text(gtkstatusicon, title);
-                }
-            }
-        });
+        GtkMessageLoop.invokeLater(update, null);
     }
+
+    GSourceFunc hide = new GSourceFunc() {
+        @Override
+        public boolean invoke(Pointer data) {
+            if (gtkstatusicon != null) {
+                LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, false);
+            }
+            return false;
+        }
+    };
 
     @Override
     public void hide() {
-        GtkMessageLoop.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (gtkstatusicon != null) {
-                    LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, false);
-                }
-            }
-        });
+        GtkMessageLoop.invokeLater(hide, null);
     }
 
     @Override

@@ -61,14 +61,8 @@ public class GtkMessageLoop {
         LibGtk.INSTANCE.g_main_loop_run(mainloop);
     }
 
-    public static void invokeLater(final Runnable r) {
-        LibGtk.INSTANCE.g_main_context_invoke(context, new GSourceFunc() {
-            @Override
-            public boolean invoke(Pointer data) {
-                r.run();
-                return false;
-            }
-        }, null);
+    public static void invokeLater(final GSourceFunc r, Pointer data) {
+        LibGtk.INSTANCE.g_main_context_invoke(context, r, data);
     }
 
 }
