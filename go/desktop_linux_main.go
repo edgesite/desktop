@@ -3,4 +3,5 @@
 package desktop
 
 func desktopMain() {
+	desktopGtkMain()
 }

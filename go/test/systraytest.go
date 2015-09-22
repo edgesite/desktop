@@ -52,12 +52,69 @@ KI03BCTwWQzfg5Uiabq7vhU2SGANIlJRcacoQbl7vhaHsRGiewVzhywUrOzb5/8FIsAmTyQZSDKQ
 ZCDJQJKBJAN3DQP/A41LWpuxeT5gAAAAAElFTkSuQmCC
 `
 
+const icon2_png =
+`
+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
+`
+
+var icon = desktop.DecodeImageString(icon_png)
+var icon2 = desktop.DecodeImageString(icon2_png)
+
 type SysTest struct {
 	s *desktop.DesktopSysTray
 }
 
+func (m *SysTest) Icon1(mn *desktop.Menu) {
+	m.s.SetIcon(icon)
+	fmt.Println("icon1")
+}
+
+func (m *SysTest) Icon2(mn *desktop.Menu) {
+	m.s.SetIcon(icon2)
+	fmt.Println("icon2")
+}
+
 func (m *SysTest) Click(mn *desktop.Menu) {
 	fmt.Println("m", mn.Name)
+}
+
+func (m *SysTest) Quit(mn *desktop.Menu) {
+	fmt.Println("quit", mn.Name)
+	m.s.Close()
 }
 
 func (m *SysTest) ClickBox(mn *desktop.Menu) {
@@ -76,20 +133,22 @@ func (m *SysTest) MouseLeftDoubleClick() {
 
 func main() {
 	m := &SysTest{desktop.DesktopSysTrayNew()}
-
-	icon := desktop.DecodeImageString(icon_png)
+	defer m.s.Close()
 
 	menu := []desktop.Menu{
+		desktop.Menu{Icon: icon, Type: desktop.MenuItem, Enabled: true, Name: "Set Icon 1", Action: m.Icon1},
+		desktop.Menu{Icon: icon2, Type: desktop.MenuItem, Enabled: true, Name: "Set Icon 2", Action: m.Icon2},
 		desktop.Menu{Icon: icon, Type: desktop.MenuItem, Enabled: true, Name: "test1", Action: m.Click},
 		desktop.Menu{Type: desktop.MenuSeparator},
 		desktop.Menu{Icon: icon, Type: desktop.MenuItem, Enabled: true, Name: "test2", Menu: []desktop.Menu{
-			desktop.Menu{Type: desktop.MenuItem, Enabled: true, Name: "test21", Action: m.Click},
+			desktop.Menu{Icon: icon, Type: desktop.MenuItem, Enabled: true, Name: "test21", Action: m.Click},
 			desktop.Menu{Type: desktop.MenuItem, Enabled: true, Name: "test22", Action: m.Click},
 		}},
 		desktop.Menu{Type: desktop.MenuItem, Enabled: false, Name: "test3", Action: m.Click},
 		desktop.Menu{Type: desktop.MenuCheckBox, Enabled: true, Name: "test4", State: true, Action: m.ClickBox},
 		desktop.Menu{Type: desktop.MenuSeparator},
 		desktop.Menu{Icon: icon, Type: desktop.MenuItem, Enabled: true, Name: "test5", Action: m.Click},
+		desktop.Menu{Icon: icon, Type: desktop.MenuItem, Enabled: true, Name: "Quit", Action: m.Quit},
 	}
 
 	m.s.AddListener(m)

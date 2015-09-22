@@ -4,6 +4,7 @@ import com.github.axet.desktop.os.linux.handle.AppIndicator;
 import com.github.axet.desktop.os.linux.handle.AppIndicatorClassStruct;
 import com.github.axet.desktop.os.linux.handle.AppIndicatorInstanceStruct;
 import com.github.axet.desktop.os.linux.handle.Fallback;
+import com.github.axet.desktop.os.linux.handle.GSourceFunc;
 import com.github.axet.desktop.os.linux.handle.GtkIconSet;
 import com.github.axet.desktop.os.linux.handle.GtkMessageLoop;
 import com.github.axet.desktop.os.linux.handle.GtkStatusIcon;
@@ -26,8 +27,8 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
             // hacking took from https://github.com/dorkbox/SystemTray
             // we should not do this. but we can't avoid it. so lets do
             // it :)
-            AppIndicatorClassStruct aiclass = new AppIndicatorClassStruct(new AppIndicatorInstanceStruct(
-                    appindicator.getPointer()).parent.g_type_instance.g_class);
+            AppIndicatorInstanceStruct inst = new AppIndicatorInstanceStruct(appindicator.getPointer());
+            AppIndicatorClassStruct aiclass = new AppIndicatorClassStruct(inst.parent.g_type_instance.g_class);
             aiclass.fallback = new Fallback() {
                 @Override
                 public GtkStatusIcon fallback(Pointer app) {
@@ -37,7 +38,6 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
                 }
             };
             aiclass.write();
-            LibAppIndicator.INSTANCE.app_indicator_set_menu(appindicator, gtkmenu);
         }
     }
 
@@ -48,6 +48,7 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
 
         if (iconset == null)
             iconset = new GtkIconSet();
+
         String p = iconset.addIcon(icon);
         LibAppIndicator.INSTANCE.app_indicator_set_icon_theme_path(appindicator, iconset.getPath());
         LibAppIndicator.INSTANCE.app_indicator_set_icon_full(appindicator, p, getClass().getSimpleName());
@@ -60,56 +61,65 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
     public LinuxSysTrayAppIndicator() {
     }
 
+    GSourceFunc show = new GSourceFunc() {
+        @Override
+        public boolean invoke(Pointer data) {
+            updateMenus();
+
+            createAppIndicator();
+
+            updateIcon();
+
+            LibAppIndicator.INSTANCE.app_indicator_set_menu(appindicator, gtkmenu);
+            LibAppIndicator.INSTANCE.app_indicator_set_status(appindicator,
+                    AppIndicatorStatus.APP_INDICATOR_STATUS_ACTIVE);
+            return false;
+        }
+    };
+
     @Override
     public void show() {
-        GtkMessageLoop.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                updateMenus();
-
-                createAppIndicator();
-
-                LibAppIndicator.INSTANCE.app_indicator_set_status(appindicator,
-                        AppIndicatorStatus.APP_INDICATOR_STATUS_ACTIVE);
-                LibAppIndicator.INSTANCE.app_indicator_set_menu(appindicator, gtkmenu);
-
-                updateIcon();
-            }
-        });
+        GtkMessageLoop.invokeLater(show, null);
     }
+
+    GSourceFunc update = new GSourceFunc() {
+        @Override
+        public boolean invoke(Pointer data) {
+            updateMenus();
+
+            LibAppIndicator.INSTANCE.app_indicator_set_menu(appindicator, gtkmenu);
+
+            if (gtkstatusicon != null) {
+                LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
+                LibGtk.INSTANCE.gtk_status_icon_set_tooltip_text(gtkstatusicon, title);
+            }
+
+            updateIcon();
+            return false;
+        }
+    };
 
     @Override
     public void update() {
-        GtkMessageLoop.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                updateMenus();
-
-                LibAppIndicator.INSTANCE.app_indicator_set_menu(appindicator, gtkmenu);
-
-                if (gtkstatusicon != null) {
-                    LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
-                    LibGtk.INSTANCE.gtk_status_icon_set_tooltip_text(gtkstatusicon, title);
-                }
-
-                updateIcon();
-            }
-        });
+        GtkMessageLoop.invokeLater(update, null);
     }
+
+    GSourceFunc hide = new GSourceFunc() {
+        @Override
+        public boolean invoke(Pointer data) {
+            if (gtkstatusicon != null) {
+                LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, false);
+            }
+
+            LibAppIndicator.INSTANCE.app_indicator_set_status(appindicator,
+                    AppIndicatorStatus.APP_INDICATOR_STATUS_PASSIVE);
+            return false;
+        }
+    };
 
     @Override
     public void hide() {
-        GtkMessageLoop.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (gtkstatusicon != null) {
-                    LibGtk.INSTANCE.gtk_status_icon_set_visible(gtkstatusicon, false);
-                }
-
-                LibAppIndicator.INSTANCE.app_indicator_set_status(appindicator,
-                        AppIndicatorStatus.APP_INDICATOR_STATUS_PASSIVE);
-            }
-        });
+        GtkMessageLoop.invokeLater(hide, null);
     }
 
     @Override
