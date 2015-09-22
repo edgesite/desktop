@@ -20,9 +20,9 @@ type DesktopSysTrayGtk struct {
 	IconActivate GSourceFunc
 	IconPopup    GSourceFunc
 
-	ShowInvokeVar   GSourceFunc
-	HideInvokeVar   GSourceFunc
-	UpdateInvokeVar GSourceFunc
+	ShowInvokeVar    GSourceFunc
+	HideInvokeVar    GSourceFunc
+	UpdateInvokeVar  GSourceFunc
 	SetIconInvokeVar GSourceFunc
 
 	GSourceFuncs []*GSourceFunc
@@ -219,4 +219,3 @@ func (os *DesktopSysTrayGtk) setIcon(i image.Image) {
 
 	GtkMessageLoopInvoke(&os.SetIconInvokeVar)
 }
-

@@ -60,7 +60,7 @@ func signal_activate(p, p1 unsafe.Pointer) {
 }
 
 //export signal_popup_menu
-func signal_popup_menu(p, p1, p2 ,p3 unsafe.Pointer) {
+func signal_popup_menu(p, p1, p2, p3 unsafe.Pointer) {
 	f := *(*GSourceFunc)(unsafe.Pointer(p3))
 	f()
 }

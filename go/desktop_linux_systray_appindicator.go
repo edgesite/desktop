@@ -3,8 +3,8 @@
 package desktop
 
 import (
-	"image"
 	"fmt"
+	"image"
 )
 
 type DesktopSysTrayAppIndicator struct {
@@ -14,9 +14,9 @@ type DesktopSysTrayAppIndicator struct {
 
 	IconSet *GtkIconSet
 
-	ShowInvokeVar   GSourceFunc
-	HideInvokeVar   GSourceFunc
-	UpdateInvokeVar GSourceFunc
+	ShowInvokeVar    GSourceFunc
+	HideInvokeVar    GSourceFunc
+	UpdateInvokeVar  GSourceFunc
 	SetIconInvokeVar GSourceFunc
 
 	FallbackVar AppIndicatorFallback
@@ -86,6 +86,8 @@ func (os *DesktopSysTrayAppIndicator) close() {
 }
 
 func (os *DesktopSysTrayAppIndicator) UpdateIcon() {
+	m := os.M
+
 	if os.Icon == nil {
 		return
 	}
@@ -110,4 +112,3 @@ func (os *DesktopSysTrayAppIndicator) setIcon(i image.Image) {
 
 	GtkMessageLoopInvoke(&os.SetIconInvokeVar)
 }
-

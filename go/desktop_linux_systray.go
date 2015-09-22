@@ -117,4 +117,3 @@ func (m *DesktopSysTray) setIcon(i image.Image) {
 	}
 	panic("broken systray interface")
 }
-

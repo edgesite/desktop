@@ -78,7 +78,7 @@ func (m *GtkIconSet) Add(icon image.Image) string {
 	}
 
 	format := "png"
-	suffix := "."+format
+	suffix := "." + format
 	f, err := TempFile(m.Path, "systray", suffix)
 	if err != nil {
 		panic(err)
