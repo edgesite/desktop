@@ -224,20 +224,31 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
     //
 
     public LinuxSysTrayGtk() {
-        GtkMessageLoop.inc();
+        GtkMessageLoop.inc(System.identityHashCode(this));
     }
 
     protected void finalize() throws Throwable {
         super.finalize();
 
-        GtkMessageLoop.dec();
-
         close();
     }
+
+    GSourceFunc setIcon = new GSourceFunc() {
+        @Override
+        public boolean invoke(Pointer data) {
+            if (gtkstatusicon != null) {
+                LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
+            }
+
+            return false;
+        }
+    };
 
     @Override
     public void setIcon(Icon icon) {
         this.icon = icon;
+
+        GtkMessageLoop.invokeLater(setIcon, null);
     }
 
     @Override
@@ -313,6 +324,8 @@ public class LinuxSysTrayGtk extends DesktopSysTray {
             gtkmenu.destory();
             gtkmenu = null;
         }
+
+        GtkMessageLoop.dec(System.identityHashCode(this));
     }
 
 }

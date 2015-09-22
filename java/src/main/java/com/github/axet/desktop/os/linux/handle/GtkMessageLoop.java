@@ -1,5 +1,8 @@
 package com.github.axet.desktop.os.linux.handle;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import com.github.axet.desktop.os.linux.libs.LibGtk;
 import com.sun.jna.Pointer;
 
@@ -24,6 +27,7 @@ public class GtkMessageLoop {
 
     public GtkMessageLoop() {
         synchronized (lock) {
+            MessageLoop.setDaemon(false);
             MessageLoop.start();
             try {
                 lock.wait();
@@ -34,19 +38,20 @@ public class GtkMessageLoop {
     }
 
     public static GtkMessageLoop loop = null;
-    public static int count = 0;
+    public static Set<Integer> count = new TreeSet<Integer>();
 
-    synchronized public static void inc() {
-        if (count == 0) {
+    synchronized public static void inc(int id) {
+        if (count.size() == 0) {
             loop = new GtkMessageLoop();
         }
-        count++;
+        count.add(id);
     }
 
-    synchronized public static void dec() {
-        count--;
+    synchronized public static void dec(int id) {
+        count.remove(id);
 
-        if (count == 0) {
+        if (count.size() == 0) {
+            close();
             loop = null;
         }
     }

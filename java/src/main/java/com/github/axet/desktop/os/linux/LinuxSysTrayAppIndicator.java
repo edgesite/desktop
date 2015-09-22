@@ -1,5 +1,7 @@
 package com.github.axet.desktop.os.linux;
 
+import javax.swing.Icon;
+
 import com.github.axet.desktop.os.linux.handle.AppIndicator;
 import com.github.axet.desktop.os.linux.handle.AppIndicatorClassStruct;
 import com.github.axet.desktop.os.linux.handle.AppIndicatorInstanceStruct;
@@ -52,6 +54,11 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
         String p = iconset.addIcon(icon);
         LibAppIndicator.INSTANCE.app_indicator_set_icon_theme_path(appindicator, iconset.getPath());
         LibAppIndicator.INSTANCE.app_indicator_set_icon_full(appindicator, p, getClass().getSimpleName());
+
+        if (gtkstatusicon != null) {
+            LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
+            LibGtk.INSTANCE.gtk_status_icon_set_tooltip_text(gtkstatusicon, title);
+        }
     }
 
     //
@@ -89,11 +96,6 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
 
             LibAppIndicator.INSTANCE.app_indicator_set_menu(appindicator, gtkmenu);
 
-            if (gtkstatusicon != null) {
-                LibGtk.INSTANCE.gtk_status_icon_set_from_gicon(gtkstatusicon, convertMenuImage(icon));
-                LibGtk.INSTANCE.gtk_status_icon_set_tooltip_text(gtkstatusicon, title);
-            }
-
             updateIcon();
             return false;
         }
@@ -128,6 +130,23 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
             appindicator.unref();
             appindicator = null;
         }
+        
+        super.close();
     }
 
+    GSourceFunc setIcon = new GSourceFunc() {
+        @Override
+        public boolean invoke(Pointer data) {
+            updateIcon();
+
+            return false;
+        }
+    };
+
+    @Override
+    public void setIcon(Icon icon) {
+        this.icon = icon;
+
+        GtkMessageLoop.invokeLater(setIcon, null);
+    }
 }
