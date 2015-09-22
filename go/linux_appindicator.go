@@ -5,7 +5,7 @@ package desktop
 /*
 #include <stdlib.h>
 
-#include "appindicator.h"
+#include "linux_appindicator.h"
 
 extern void* appindicator_fallback(void*);
 

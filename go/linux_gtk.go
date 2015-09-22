@@ -6,7 +6,7 @@ package desktop
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "gtk.h"
+#include "linux_gtk.h"
 
 extern void* gsourcefunc(void*);
 extern void signal_activate(void*, void*);
