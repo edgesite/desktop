@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -77,15 +78,18 @@ func (m *GtkIconSet) Add(icon image.Image) string {
 	}
 
 	format := "png"
-	f, err := TempFile(m.Path, "systray", "."+format)
+	suffix := "."+format
+	f, err := TempFile(m.Path, "systray", suffix)
 	if err != nil {
 		panic(err)
 	}
 	w := bufio.NewWriter(f)
 	path := f.Name()
 	png.Encode(w, icon)
-	m.icons[icon] = path
-	return path
+	name := filepath.Base(path)
+	name = strings.TrimRight(name, suffix)
+	m.icons[icon] = name
+	return name
 }
 
 func (m *GtkIconSet) Close() {

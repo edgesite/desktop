@@ -36,7 +36,7 @@ func desktopSysTrayNew() *DesktopSysTray {
 	m := &DesktopSysTray{}
 
 	if APPINDICATOR {
-		for _, s := range []string{"libappindicator3.so", "libappindicator.so"} {
+		for _, s := range []string{"libappindicator3.so.1", "libappindicator3.so", "libappindicator.so"} {
 			_, err := dlopen(s, RTLD_LAZY|RTLD_GLOBAL)
 			if err == nil {
 				m.os = DesktopSysTrayAppIndicatorNew(m)
@@ -46,7 +46,7 @@ func desktopSysTrayNew() *DesktopSysTray {
 	}
 
 	if GTK {
-		for _, s := range []string{"libgtk-3.so", "libgdk-x11-2.0.so"} {
+		for _, s := range []string{"libgtk-3.so", "libgtk-x11-2.0.so"} {
 			_, err := dlopen(s, RTLD_LAZY|RTLD_GLOBAL)
 			if err == nil {
 				m.os = DesktopSysTrayGtkNew(m)
