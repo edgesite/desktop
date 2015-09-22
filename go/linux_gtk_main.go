@@ -24,14 +24,16 @@ func GtkMessageLoopInc() {
 }
 
 func GtkMessageLoopDec() {
-	messageloop.Count--
-	if messageloop.Count == 0 {
-		messageloop.Close()
-		messageloop = nil
+	if messageloop != nil {
+		messageloop.Count--
+		if messageloop.Count == 0 {
+			messageloop.Close()
+			messageloop = nil
+		}
 	}
 }
 
-func GtkMessageLoopInvoke(fn GSourceFunc) {
+func GtkMessageLoopInvoke(fn *GSourceFunc) {
 	g_main_context_invoke(messageloop.Context, fn)
 }
 
@@ -89,4 +91,3 @@ func (m *GtkMessageLoop) Close() {
 func desktopGtkMain() {
 	messageloop.Main()
 }
-

@@ -2,11 +2,12 @@ typedef int bool;
 
 void gtk_init(int a, int v);
 
-void g_signal_connect_data(void* item, const char* action, void* callback, void* data, void* pzero1, int pzero2);
+int g_signal_connect_data(void* item, const char* action, void* callback, void* data, void* destroy_data, int connect_flags);
 void g_object_ref(void* p);
 void g_object_unref(void* p);
 void gtk_widget_destroy(void* p);
 int gtk_get_current_event_time();
+void g_signal_emit_by_name(void*, const char*p);
 
 // menus
 void* gtk_menu_new();
@@ -41,6 +42,8 @@ void gtk_status_icon_set_title(void* icon, const char* title);
 const char* gtk_status_icon_get_title(void* icon);
 void gtk_status_icon_set_tooltip_text(void* icon, const char* title);
 const char* gtk_status_icon_get_tooltip_text(void* icon);
+void gtk_status_icon_position_menu(void*, void *x, void *y, void *push, void* data);
+
 // GBytes
 void* g_bytes_new(void* buf, int size);
 void* g_bytes_icon_new(void* bytes);

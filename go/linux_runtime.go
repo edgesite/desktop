@@ -73,4 +73,3 @@ func dlmust(lib string) uintptr {
 func dlclose(p uintptr) {
 	C.dlclose(unsafe.Pointer(p))
 }
-

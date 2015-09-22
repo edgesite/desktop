@@ -27,8 +27,8 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
             // hacking took from https://github.com/dorkbox/SystemTray
             // we should not do this. but we can't avoid it. so lets do
             // it :)
-            AppIndicatorClassStruct aiclass = new AppIndicatorClassStruct(new AppIndicatorInstanceStruct(
-                    appindicator.getPointer()).parent.g_type_instance.g_class);
+            AppIndicatorInstanceStruct inst = new AppIndicatorInstanceStruct(appindicator.getPointer());
+            AppIndicatorClassStruct aiclass = new AppIndicatorClassStruct(inst.parent.g_type_instance.g_class);
             aiclass.fallback = new Fallback() {
                 @Override
                 public GtkStatusIcon fallback(Pointer app) {
@@ -38,7 +38,6 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
                 }
             };
             aiclass.write();
-            LibAppIndicator.INSTANCE.app_indicator_set_menu(appindicator, gtkmenu);
         }
     }
 
@@ -49,6 +48,7 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
 
         if (iconset == null)
             iconset = new GtkIconSet();
+
         String p = iconset.addIcon(icon);
         LibAppIndicator.INSTANCE.app_indicator_set_icon_theme_path(appindicator, iconset.getPath());
         LibAppIndicator.INSTANCE.app_indicator_set_icon_full(appindicator, p, getClass().getSimpleName());
@@ -68,11 +68,11 @@ public class LinuxSysTrayAppIndicator extends LinuxSysTrayGtk {
 
             createAppIndicator();
 
+            updateIcon();
+
+            LibAppIndicator.INSTANCE.app_indicator_set_menu(appindicator, gtkmenu);
             LibAppIndicator.INSTANCE.app_indicator_set_status(appindicator,
                     AppIndicatorStatus.APP_INDICATOR_STATUS_ACTIVE);
-            LibAppIndicator.INSTANCE.app_indicator_set_menu(appindicator, gtkmenu);
-
-            updateIcon();
             return false;
         }
     };

@@ -9,6 +9,8 @@ package desktop
 #include "gtk.h"
 
 extern void* gsourcefunc(void*);
+extern void signal_activate(void*, void*);
+extern void signal_popup_menu(void*, void*, void*,void*);
 
 #cgo LDFLAGS: -Wl,--unresolved-symbols=ignore-all
 */
@@ -36,6 +38,9 @@ type GMainLoop unsafe.Pointer
 type GMainContext unsafe.Pointer
 type GSourceFunc func()
 type GPointer unsafe.Pointer
+type GtkStatusIcon unsafe.Pointer
+type GIcon unsafe.Pointer
+type GBytes unsafe.Pointer
 
 func gtk_init() {
 	C.gtk_init(0, 0)
@@ -43,16 +48,45 @@ func gtk_init() {
 
 //export gsourcefunc
 func gsourcefunc(p unsafe.Pointer) unsafe.Pointer {
-	var pp = &p
-	f := *(*GSourceFunc)(unsafe.Pointer(&pp))
+	f := *(*GSourceFunc)(unsafe.Pointer(p))
 	f()
 	return Arg(false)
 }
 
-func g_signal_connect(item unsafe.Pointer, action string, callback GSourceFunc) {
+//export signal_activate
+func signal_activate(p, p1 unsafe.Pointer) {
+	f := *(*GSourceFunc)(unsafe.Pointer(p1))
+	f()
+}
+
+//export signal_popup_menu
+func signal_popup_menu(p, p1, p2 ,p3 unsafe.Pointer) {
+	f := *(*GSourceFunc)(unsafe.Pointer(p3))
+	f()
+}
+
+func g_signal_connect_activate(item GtkWidget, fn *GSourceFunc) {
+	n := C.CString("activate")
+	defer C.free(unsafe.Pointer(n))
+	i := C.g_signal_connect_data(Arg(item), n, Arg(C.signal_activate), Arg(fn), NULL, C.int(0))
+	if i <= 0 {
+		panic("unable to connect")
+	}
+}
+
+func g_signal_connect_popup(item GtkWidget, fn *GSourceFunc) {
+	n := C.CString("popup-menu")
+	defer C.free(unsafe.Pointer(n))
+	i := C.g_signal_connect_data(Arg(item), n, Arg(C.signal_popup_menu), Arg(fn), NULL, C.int(0))
+	if i <= 0 {
+		panic("unable to connect")
+	}
+}
+
+func g_signal_emit_by_name(item GtkWidget, action string) {
 	n := C.CString(action)
 	defer C.free(unsafe.Pointer(n))
-	C.g_signal_connect_data(item, n, Arg(C.gsourcefunc), Arg(callback), NULL, C.int(0))
+	C.g_signal_emit_by_name(Arg(item), n)
 }
 
 func g_object_ref(p GObject) {
@@ -87,46 +121,135 @@ func gtk_menu_item_new() GtkWidget {
 	return GtkWidget(C.gtk_menu_item_new())
 }
 
-/*
-void* gtk_menu_item_new_with_label(const char* s);
-void* gtk_check_menu_item_new_with_label(const char* s);
-const char* gtk_menu_item_get_label(void* item);
-void gtk_menu_item_set_submenu(void* menu, void* item);
-void gtk_menu_popup(void* m, void* parent, void* parentitem, void* func, void* data, int button, int time);
-void gtk_widget_show(void* item);
-void* gtk_hbox_new(bool homogeneous, int spacing);
-void gtk_box_pack_start(void* box, void* item, bool expand, bool fill, int padding);
-void gtk_box_pack_end(void* box, void* item, bool expand, bool fill, int padding);
-void* gtk_label_new(const char* s);
-void gtk_label_set_text(void* label, const char* s);
-const char* gtk_label_get_text(void* label);
-void gtk_container_add(void* container, void* widget);
-void gtk_widget_show_all(void* container);
-void* gtk_check_menu_item_new();
-void gtk_check_menu_item_set_active(void* menu, bool b);
-void gtk_widget_set_sensitive(void* item, bool b);
+func gtk_menu_item_new_with_label(s string) GtkWidget {
+	n := C.CString(s)
+	defer C.free(unsafe.Pointer(n))
+	return GtkWidget(C.gtk_menu_item_new_with_label(n))
+}
 
-// status icon
-void* gtk_status_icon_new_from_gicon(void* icon);
-void gtk_status_icon_set_from_gicon(void* s, void* i);
-void gtk_status_icon_set_visible(void* icon, bool b);
-void* gtk_image_new();
-void* gtk_image_new_from_gicon(void* g, int size);
-void gtk_status_icon_set_title(void* icon, const char* title);
-const char* gtk_status_icon_get_title(void* icon);
-void gtk_status_icon_set_tooltip_text(void* icon, const char* title);
-const char* gtk_status_icon_get_tooltip_text(void* icon);
-// GBytes
-void* g_bytes_new(void* buf, int size);
-void* g_bytes_icon_new(void* bytes);
-void g_bytes_unref(void* b);
+func gtk_check_menu_item_new_with_label(s string) GtkWidget {
+	n := C.CString(s)
+	defer C.free(unsafe.Pointer(n))
+	return GtkWidget(C.gtk_check_menu_item_new_with_label(n))
+}
 
+func gtk_menu_item_get_label(item GtkWidget) string {
+	return C.GoString(C.gtk_menu_item_get_label(Arg(item)))
+}
 
-// threads
-void gdk_threads_init();
-void gdk_threads_enter();
-void gdk_threads_leave();
-*/
+func gtk_menu_item_set_submenu(menu GtkWidget, item GtkWidget) {
+	C.gtk_menu_item_set_submenu(Arg(menu), Arg(item))
+}
+
+func gtk_menu_popup(m GtkWidget, parent GtkWidget, parentitem GtkWidget, fn GPointer, data GPointer, button int, time int) {
+	C.gtk_menu_popup(Arg(m), Arg(parent), Arg(parentitem), Arg(fn), Arg(data), C.int(button), C.int(time))
+}
+
+var gtk_status_icon_position_menu = GPointer(C.gtk_status_icon_position_menu)
+
+func gtk_widget_show(item GtkWidget) {
+	C.gtk_widget_show(Arg(item))
+}
+
+func gtk_hbox_new(homogeneous bool, spacing int) GtkWidget {
+	return GtkWidget(C.gtk_hbox_new(C.bool(Bool2Int[homogeneous]), C.int(spacing)))
+}
+
+func gtk_box_pack_start(box GtkWidget, item GtkWidget, expand bool, fill bool, padding int) {
+	C.gtk_box_pack_start(Arg(box), Arg(item), C.bool(Bool2Int[expand]), C.bool(Bool2Int[fill]), C.int(padding))
+}
+
+func gtk_box_pack_end(box GtkWidget, item GtkWidget, expand bool, fill bool, padding int) {
+	C.gtk_box_pack_end(Arg(box), Arg(item), C.bool(Bool2Int[expand]), C.bool(Bool2Int[fill]), C.int(padding))
+}
+
+func gtk_label_new(s string) GtkWidget {
+	n := C.CString(s)
+	defer C.free(unsafe.Pointer(n))
+	return GtkWidget(C.gtk_label_new(n))
+}
+
+func gtk_label_set_text(label GtkWidget, s string) {
+	n := C.CString(s)
+	defer C.free(unsafe.Pointer(n))
+	C.gtk_label_set_text(Arg(label), n)
+}
+
+func gtk_label_get_text(label GtkWidget) string {
+	return C.GoString(C.gtk_label_get_text(Arg(label)))
+}
+
+func gtk_container_add(container GtkWidget, widget GtkWidget) {
+	C.gtk_container_add(Arg(container), Arg(widget))
+}
+
+func gtk_widget_show_all(container GtkWidget) {
+	C.gtk_widget_show_all(Arg(container))
+}
+
+func gtk_check_menu_item_new() GtkWidget {
+	return GtkWidget(GtkWidget(C.gtk_check_menu_item_new()))
+}
+
+func gtk_check_menu_item_set_active(menu GtkWidget, b bool) {
+	C.gtk_check_menu_item_set_active(Arg(menu), C.bool(Bool2Int[b]))
+}
+
+func gtk_widget_set_sensitive(item GtkWidget, b bool) {
+	C.gtk_widget_set_sensitive(Arg(item), C.bool(Bool2Int[b]))
+}
+
+func gtk_status_icon_new_from_gicon(icon GIcon) GtkWidget {
+	return GtkWidget(C.gtk_status_icon_new_from_gicon(Arg(icon)))
+}
+
+func gtk_status_icon_set_from_gicon(s GtkWidget, i GIcon) {
+	C.gtk_status_icon_set_from_gicon(Arg(s), Arg(i))
+}
+
+func gtk_status_icon_set_visible(icon GtkWidget, b bool) {
+	C.gtk_status_icon_set_visible(Arg(icon), C.bool(Bool2Int[b]))
+}
+
+func gtk_image_new() GtkWidget {
+	return GtkWidget(C.gtk_image_new())
+}
+
+func gtk_image_new_from_gicon(g GIcon, size int) GtkWidget {
+	return GtkWidget(C.gtk_image_new_from_gicon(Arg(g), C.int(size)))
+}
+
+func gtk_status_icon_set_title(icon GtkWidget, title string) {
+	n := C.CString(title)
+	defer C.free(unsafe.Pointer(n))
+	C.gtk_status_icon_set_title(Arg(icon), n)
+}
+
+func gtk_status_icon_get_title(icon GtkWidget) string {
+	return C.GoString(C.gtk_status_icon_get_title(Arg(icon)))
+}
+
+func gtk_status_icon_set_tooltip_text(icon GtkWidget, title string) {
+	n := C.CString(title)
+	defer C.free(unsafe.Pointer(n))
+	C.gtk_status_icon_set_tooltip_text(Arg(icon), n)
+}
+
+func gtk_status_icon_get_tooltip_text(icon GtkWidget) string {
+	return C.GoString(C.gtk_status_icon_get_tooltip_text(Arg(icon)))
+}
+
+func g_bytes_new(buf []byte, size int) GBytes {
+	return GBytes(C.g_bytes_new(Arg(buf), C.int(size)))
+}
+
+func g_bytes_icon_new(bytes GBytes) GIcon {
+	return GIcon(C.g_bytes_icon_new(Arg(bytes)))
+}
+
+func g_bytes_unref(b GBytes) {
+	C.g_bytes_unref(Arg(b))
+}
 
 func g_main_loop_new(context GMainContext, is_running bool) GMainLoop {
 	return GMainLoop(C.g_main_loop_new(Arg(context), Arg(Bool2Int[is_running])))
@@ -144,7 +267,6 @@ func g_main_loop_get_context(loop GMainLoop) GMainContext {
 	return GMainContext(C.g_main_loop_get_context(Arg(loop)))
 }
 
-func g_main_context_invoke(c GMainContext, fn GSourceFunc) {
+func g_main_context_invoke(c GMainContext, fn *GSourceFunc) {
 	C.g_main_context_invoke(Arg(c), Arg(C.gsourcefunc), Arg(fn))
 }
-

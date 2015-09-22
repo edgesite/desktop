@@ -60,6 +60,11 @@ func (m *SysTest) Click(mn *desktop.Menu) {
 	fmt.Println("m", mn.Name)
 }
 
+func (m *SysTest) Quit(mn *desktop.Menu) {
+	fmt.Println("quit", mn.Name)
+	m.s.Close()
+}
+
 func (m *SysTest) ClickBox(mn *desktop.Menu) {
 	fmt.Println(mn.Name)
 	mn.State = !mn.State
@@ -76,6 +81,7 @@ func (m *SysTest) MouseLeftDoubleClick() {
 
 func main() {
 	m := &SysTest{desktop.DesktopSysTrayNew()}
+	defer m.s.Close()
 
 	icon := desktop.DecodeImageString(icon_png)
 
@@ -83,13 +89,14 @@ func main() {
 		desktop.Menu{Icon: icon, Type: desktop.MenuItem, Enabled: true, Name: "test1", Action: m.Click},
 		desktop.Menu{Type: desktop.MenuSeparator},
 		desktop.Menu{Icon: icon, Type: desktop.MenuItem, Enabled: true, Name: "test2", Menu: []desktop.Menu{
-			desktop.Menu{Type: desktop.MenuItem, Enabled: true, Name: "test21", Action: m.Click},
+			desktop.Menu{Icon: icon, Type: desktop.MenuItem, Enabled: true, Name: "test21", Action: m.Click},
 			desktop.Menu{Type: desktop.MenuItem, Enabled: true, Name: "test22", Action: m.Click},
 		}},
 		desktop.Menu{Type: desktop.MenuItem, Enabled: false, Name: "test3", Action: m.Click},
 		desktop.Menu{Type: desktop.MenuCheckBox, Enabled: true, Name: "test4", State: true, Action: m.ClickBox},
 		desktop.Menu{Type: desktop.MenuSeparator},
 		desktop.Menu{Icon: icon, Type: desktop.MenuItem, Enabled: true, Name: "test5", Action: m.Click},
+		desktop.Menu{Icon: icon, Type: desktop.MenuItem, Enabled: true, Name: "Quit", Action: m.Quit},
 	}
 
 	m.s.AddListener(m)
