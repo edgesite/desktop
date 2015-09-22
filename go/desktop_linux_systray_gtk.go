@@ -23,6 +23,7 @@ type DesktopSysTrayGtk struct {
 	ShowInvokeVar   GSourceFunc
 	HideInvokeVar   GSourceFunc
 	UpdateInvokeVar GSourceFunc
+	SetIconInvokeVar GSourceFunc
 
 	GSourceFuncs []*GSourceFunc
 }
@@ -49,6 +50,13 @@ func DesktopSysTrayGtkNew(m *DesktopSysTray) *DesktopSysTrayGtk {
 	os.UpdateInvokeVar = func() {
 		os.UpdateMenus()
 
+		if os.GtkStatusIcon != nil {
+			gtk_status_icon_set_from_gicon(os.GtkStatusIcon, ConvertMenuImage(os.Icon))
+			gtk_status_icon_set_tooltip_text(os.GtkStatusIcon, m.Title)
+		}
+	}
+
+	os.SetIconInvokeVar = func() {
 		if os.GtkStatusIcon != nil {
 			gtk_status_icon_set_from_gicon(os.GtkStatusIcon, ConvertMenuImage(os.Icon))
 			gtk_status_icon_set_tooltip_text(os.GtkStatusIcon, m.Title)
@@ -208,5 +216,7 @@ func (os *DesktopSysTrayGtk) close() {
 
 func (os *DesktopSysTrayGtk) setIcon(i image.Image) {
 	os.Icon = i
+
+	GtkMessageLoopInvoke(&os.SetIconInvokeVar)
 }
 

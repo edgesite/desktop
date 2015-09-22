@@ -100,10 +100,12 @@ type SysTest struct {
 
 func (m *SysTest) Icon1(mn *desktop.Menu) {
 	m.s.SetIcon(icon)
+	fmt.Println("icon1")
 }
 
 func (m *SysTest) Icon2(mn *desktop.Menu) {
 	m.s.SetIcon(icon2)
+	fmt.Println("icon2")
 }
 
 func (m *SysTest) Click(mn *desktop.Menu) {

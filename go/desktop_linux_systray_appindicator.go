@@ -3,6 +3,7 @@
 package desktop
 
 import (
+	"image"
 	"fmt"
 )
 
@@ -16,6 +17,7 @@ type DesktopSysTrayAppIndicator struct {
 	ShowInvokeVar   GSourceFunc
 	HideInvokeVar   GSourceFunc
 	UpdateInvokeVar GSourceFunc
+	SetIconInvokeVar GSourceFunc
 
 	FallbackVar AppIndicatorFallback
 }
@@ -37,17 +39,18 @@ func DesktopSysTrayAppIndicatorNew(m *DesktopSysTray) *DesktopSysTrayAppIndicato
 
 		app_indicator_set_status(os.App, APP_INDICATOR_STATUS_ACTIVE)
 	}
+
 	os.UpdateInvokeVar = func() {
 		os.UpdateIcon()
 
 		os.UpdateMenus()
 		app_indicator_set_menu(os.App, os.GtkMenu)
-
-		if os.GtkStatusIcon != nil {
-			gtk_status_icon_set_from_gicon(os.GtkStatusIcon, ConvertMenuImage(os.Icon))
-			gtk_status_icon_set_tooltip_text(os.GtkStatusIcon, m.Title)
-		}
 	}
+
+	os.SetIconInvokeVar = func() {
+		os.UpdateIcon()
+	}
+
 	os.HideInvokeVar = func() {
 		if os.GtkStatusIcon != nil {
 			gtk_status_icon_set_visible(os.GtkStatusIcon, false)
@@ -95,5 +98,16 @@ func (os *DesktopSysTrayAppIndicator) UpdateIcon() {
 	fmt.Println(os.IconSet.Path, p)
 	app_indicator_set_icon_theme_path(os.App, os.IconSet.Path)
 	app_indicator_set_icon_full(os.App, p, "SysTrayIcon")
+
+	if os.GtkStatusIcon != nil {
+		gtk_status_icon_set_from_gicon(os.GtkStatusIcon, ConvertMenuImage(os.Icon))
+		gtk_status_icon_set_tooltip_text(os.GtkStatusIcon, m.Title)
+	}
+}
+
+func (os *DesktopSysTrayAppIndicator) setIcon(i image.Image) {
+	os.Icon = i
+
+	GtkMessageLoopInvoke(&os.SetIconInvokeVar)
 }
 
