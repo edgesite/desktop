@@ -84,6 +84,7 @@ func (m *GtkIconSet) Add(icon image.Image) string {
 		panic(err)
 	}
 	w := bufio.NewWriter(f)
+	defer w.Flush()
 	path := f.Name()
 	png.Encode(w, icon)
 	name := filepath.Base(path)
