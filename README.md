@@ -6,6 +6,8 @@ Using this library you can use Java or Go language to write a desktop applicatio
 
 Script nature of Java or Go now not limited by system programming working with sockets and system files. But extened to desktop features like working with user desktop objects. Now you can write a http server which have status systray icon and can download a file into Download folder without hacking.
 
+Go check [Java Docs](java/) or [Go Docs](go/)
+
 ## Features
 
   - [X] Cross platform user specific folders: Download folder, Home folder, Documents folder, etc ...
