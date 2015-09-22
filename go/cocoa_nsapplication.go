@@ -14,6 +14,8 @@ var NSApplicationRun unsafe.Pointer = Runtime_sel_getUid("run")
 var NSApplicationNextEventMatchingMaskUntilDateInModeDequeue unsafe.Pointer = Runtime_sel_getUid("nextEventMatchingMask:untilDate:inMode:dequeue:")
 var NSApplicationUpdateWindows unsafe.Pointer = Runtime_sel_getUid("updateWindows")
 var NSApplicationSendEvent unsafe.Pointer = Runtime_sel_getUid("sendEvent:")
+var NSApplicationTerminate unsafe.Pointer = Runtime_sel_getUid("terminate:")
+var NSApplicationForceTerminate unsafe.Pointer = Runtime_sel_getUid("forceTerminate")
 
 type NSApplication struct {
 	NSObject
@@ -43,4 +45,12 @@ func (m NSApplication) UpdateWindows() {
 
 func (m NSApplication) SendEvent(e NSEvent) {
 	Runtime_objc_msgSend(m.Pointer, NSApplicationSendEvent, e.Pointer)
+}
+
+func (m NSApplication) Terminate() {
+	Runtime_objc_msgSend(m.Pointer, NSApplicationTerminate, m.Pointer)
+}
+
+func (m NSApplication) ForceTerminate() {
+	Runtime_objc_msgSend(m.Pointer, NSApplicationForceTerminate)
 }

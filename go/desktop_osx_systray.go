@@ -170,4 +170,6 @@ func (m *DesktopSysTray) close() {
 		d.image.Release()
 		d.image.Pointer = nil
 	}
+
+  desktopMainClose()
 }
