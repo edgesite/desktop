@@ -92,7 +92,7 @@ QjhkKjPC82Dwe3HKZDzXCvlaI3QbBn/7aoQmkRBVJTYHA58fVWKTAyMx6gRvAeZXneA0ImasFPUJ
 `
 
 var icon = desktop.DecodeImageString(icon_png)
-var icon2 = desktop.DecodeImageString(icon_png)
+var icon2 = desktop.DecodeImageString(icon2_png)
 
 type SysTest struct {
 	s *desktop.DesktopSysTray

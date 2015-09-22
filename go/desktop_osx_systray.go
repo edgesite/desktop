@@ -138,6 +138,10 @@ func (m *DesktopSysTray) setIcon(icon image.Image) {
 	}
 
 	d.image = convertTrayIcon(icon)
+  
+  if d.statusitem.Pointer != nil {
+  	d.statusitem.SetImage(d.image)
+  }
 }
 
 func (m *DesktopSysTray) show() {
