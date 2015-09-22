@@ -35,6 +35,7 @@ func (m *Window) DefWindowProc(hWnd HWND, msg UINT, wParam WPARAM, lParam LPARAM
 }
 
 func (m *Window) Close() {
+	PostMessage.Call(Arg(m.Wnd), Arg(WM_QUIT), NULL, NULL)
 	m.Wnd.Close()
 	m.WndClassEx.Close()
 }

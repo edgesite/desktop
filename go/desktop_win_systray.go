@@ -233,6 +233,14 @@ func (m *DesktopSysTray) setIcon(i image.Image) {
 		d.Icon.Close()
 	}
 	d.Icon = HICONNew(bm.hbm)
+	
+	n := NOTIFYICONDATANew()
+	n.hWnd = d.MainWnd.Wnd
+	n.SetCallback(WM_SHELLNOTIFY)
+	n.SetIcon(d.Icon)
+	if !BOOLPtr(Shell_NotifyIcon.Call(Arg(NIM_MODIFY), Arg(n))).Bool() {
+		// no icon
+	}
 }
 
 func (m *DesktopSysTray) show() {
@@ -287,6 +295,11 @@ func (m *DesktopSysTray) close() {
 	if d.TaskbarCreated != 0 {
 		d.TaskbarCreated.Close()
 		d.TaskbarCreated = 0
+	}
+	
+	if d.MainWnd != nil {
+		d.MainWnd.Close()
+		d.MainWnd = nil
 	}
 }
 
