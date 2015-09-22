@@ -44,11 +44,16 @@ public class OSXSysTray extends DesktopSysTray {
     public OSXSysTray() {
         // init menubar font, to get proper font sizes
         statusbar = NSStatusBar.systemStatusBar();
+
+        OSXMain.inc();
     }
 
     @Override
     public void setIcon(Icon icon) {
         this.icon = convertTrayIcon(icon);
+
+        if (statusItem != null)
+            statusItem.setImage(this.icon);
     }
 
     static NSImage convertTrayIcon(Icon i) {
@@ -91,6 +96,10 @@ public class OSXSysTray extends DesktopSysTray {
     @Override
     public void show() {
         updateMenus();
+
+        statusItem.setToolTip(title);
+        statusItem.setImage(icon);
+        statusItem.setHighlightMode(true);
     }
 
     void updateMenus() {
@@ -98,12 +107,7 @@ public class OSXSysTray extends DesktopSysTray {
             statusItem = statusbar.statusItemWithLength(NSStatusBar.NSVariableStatusItemLength);
         }
 
-        statusItem.setToolTip(title);
-
         actionKeeper.clear();
-
-        statusItem.setImage(icon);
-        statusItem.setHighlightMode(true);
 
         if (menu != null) {
             NSMenu m = new NSMenu();
@@ -257,5 +261,7 @@ public class OSXSysTray extends DesktopSysTray {
     @Override
     public void close() {
         hide();
+
+        OSXMain.dec();
     }
 }

@@ -464,6 +464,13 @@ public class WindowsSysTray extends DesktopSysTray {
         this.hbitmapTrayIcon = new HBITMAPWrap(Utils.createBitmap(icon));
         this.hicoTrayIcon = new HICONWrap(hbitmapTrayIcon);
 
+        NOTIFYICONDATA nid = new NOTIFYICONDATA();
+        nid.hWnd = mp.hWnd;
+        nid.setIcon(hicoTrayIcon);
+        nid.setCallback(WM_SHELLNOTIFY);
+
+        if (!Shell32Ex.INSTANCE.Shell_NotifyIcon(Shell32Ex.NIM_MODIFY, nid))
+            ;//throw new GetLastErrorException();
     }
 
     public void setTitle(String t) {

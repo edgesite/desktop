@@ -3,7 +3,6 @@
 package desktop
 
 import (
-	"fmt"
 	"image"
 )
 
@@ -97,7 +96,6 @@ func (os *DesktopSysTrayAppIndicator) UpdateIcon() {
 	}
 
 	p := os.IconSet.Add(os.Icon)
-	fmt.Println(os.IconSet.Path, p)
 	app_indicator_set_icon_theme_path(os.App, os.IconSet.Path)
 	app_indicator_set_icon_full(os.App, p, "SysTrayIcon")
 

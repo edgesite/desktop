@@ -2,8 +2,14 @@
 
 package desktop
 
+var App NSApplication
+
 func desktopMain() {
-	app := NSApplicationMainSharedApplication()
-	defer app.Release()
-	app.Run()
+	App = NSApplicationMainSharedApplication()
+	defer App.Release()
+	App.Run()
+}
+
+func desktopMainClose() {
+  App.Terminate()
 }
