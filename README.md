@@ -13,7 +13,7 @@ Go check [Java Docs](java/) or [Go Docs](go/)
   - [X] Cross platform user specific folders: Download folder, Home folder, Documents folder, etc ...
   - [X] Cross platform SysTray Icon
   - [X] Cross platform Open Browser URL
-  - [ ] Cross platform Browser Pop Systray Window
+  - [ ] Cross platform Browser Pop SysTray Window
   - [ ] Cross platform Power Events (control reboot, logout, suspend)
   - [ ] Register URL handlers (open an application from a browser)
   - [ ] Sound and Volume control
