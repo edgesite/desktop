@@ -233,7 +233,7 @@ func (m *DesktopSysTray) setIcon(i image.Image) {
 		d.Icon.Close()
 	}
 	d.Icon = HICONNew(bm.hbm)
-	
+
 	n := NOTIFYICONDATANew()
 	n.hWnd = d.MainWnd.Wnd
 	n.SetCallback(WM_SHELLNOTIFY)
@@ -296,7 +296,7 @@ func (m *DesktopSysTray) close() {
 		d.TaskbarCreated.Close()
 		d.TaskbarCreated = 0
 	}
-	
+
 	if d.MainWnd != nil {
 		d.MainWnd.Close()
 		d.MainWnd = nil

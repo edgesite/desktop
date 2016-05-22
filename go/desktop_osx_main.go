@@ -2,6 +2,10 @@
 
 package desktop
 
+import (
+	"runtime"
+)
+
 var App NSApplication
 
 func desktopMain() {
@@ -11,5 +15,8 @@ func desktopMain() {
 }
 
 func desktopMainClose() {
-  App.Terminate()
+	// get locked when window created in desktop
+	runtime.UnlockOSThread()
+
+	App.Terminate()
 }

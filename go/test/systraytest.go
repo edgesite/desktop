@@ -3,9 +3,8 @@
 package main
 
 import (
-	"fmt"
-	
 	".."
+	"fmt"
 )
 
 const icon_png = `
@@ -52,8 +51,7 @@ KI03BCTwWQzfg5Uiabq7vhU2SGANIlJRcacoQbl7vhaHsRGiewVzhywUrOzb5/8FIsAmTyQZSDKQ
 ZCDJQJKBJAN3DQP/A41LWpuxeT5gAAAAAElFTkSuQmCC
 `
 
-const icon2_png =
-`
+const icon2_png = `
 iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAACXBI
 WXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wkWDhgHQT9OmAAAB1VJREFUeNrtm39sVFkVxz/nTRG6
 dSq7LP0htNBfmZZtN8i2dTF2BTUEzG7dX+5a2RVYEsOqf/grxh9ZWY1/aAK6f7lhDRoVAigiCAmG
