@@ -149,7 +149,7 @@ public class SimpleTrayTest extends JFrame {
 	<dependency>
 	  <groupId>com.github.axet</groupId>
 	  <artifactId>desktop</artifactId>
-	  <version>2.3.0</version>
+	  <version>2.3.2</version>
 	</dependency>
 </dependencies>
 ```
