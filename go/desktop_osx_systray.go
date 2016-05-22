@@ -5,6 +5,7 @@ package desktop
 import (
 	"github.com/nfnt/resize"
 	"image"
+	"runtime"
 )
 
 func convertTrayIcon(i image.Image) NSImage {
@@ -108,6 +109,12 @@ type DesktopSysTrayOSX struct {
 }
 
 func desktopSysTrayNew() *DesktopSysTray {
+	// locket for thread message pump, will be unlocked after
+	// desktopMainClose
+	//
+	// [NSUndoManager(NSInternal) _endTopLevelGroupings] is only safe to invoke on the main thread.
+	runtime.LockOSThread()
+
 	return &DesktopSysTray{os: &DesktopSysTrayOSX{statusbar: NSStatusBarSystemStatusBar()}}
 }
 
@@ -171,5 +178,5 @@ func (m *DesktopSysTray) close() {
 		d.image.Pointer = nil
 	}
 
-  desktopMainClose()
+	desktopMainClose()
 }
